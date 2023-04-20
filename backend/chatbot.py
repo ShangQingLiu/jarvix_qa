@@ -29,7 +29,7 @@ class ChatBot():
         template=pre_promt + """to provide answers.
                     Do not provide any answers that deviate from your toolkit documents. If you don't know the answer, just say "Hmm, Im not sure."
                     Don't try to make up an answer up. You only 
-                    allow to answer less than 100 words, please answer in traditional chinese:
+                    allow to answer less than 300 words, and you need to complete the sentence in the end, please answer in simplified Chinese:
                    --------
                    Question: {query}
                   """,
