@@ -7,6 +7,9 @@ from flask_cors import CORS
 import openai
 from os import walk
 import mimetypes
+from flask_restful import Resource, Api
+from flask_cors import CORS
+
 
 
 import os
@@ -14,15 +17,21 @@ import os
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
+api = Api(app)
+CORS(app)
 app.config['OPEN_API_KEY'] = os.environ.get('OPEN_API_KEY')
 app.config['INDEX_SAVE_PATH'] = os.environ.get('INDEX_SAVE_PATH')
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd() ,os.environ.get('UPLOAD_FOLDER'))
 global_chatbots = {}
 
 
-@app.route("/")
-def hello_world():
-    return "<p>This is the QA system based on llama index!</p>"
+class HelloWorld(Resource):
+    def get(self):
+        return "<p>This is the QA system based on llama index!</p>"
+api.add_resource(HelloWorld, '/')
+#@app.route("/")
+#def hello_world():
+#    return "<p>This is the QA system based on llama index!</p>"
 
 
 
