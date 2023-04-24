@@ -54,7 +54,10 @@ def upload_file():
         return jsonify({'error': 'No file selected'}), 400
 
     upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], project_name)
-    upload_folder = os.path.join(upload_folder, file_extension[1:].lower())
+    if file_extension[1:].lower() == 'm4a':
+        upload_folder = os.path.join(upload_folder, 'audio')
+    else:
+        upload_folder = os.path.join(upload_folder, file_extension[1:].lower())
     # Check if the upload directory exists, create it if not
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
