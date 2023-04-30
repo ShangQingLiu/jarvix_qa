@@ -1,14 +1,21 @@
 from flask import Flask,request,jsonify
+from openapi_schema_pydantic import SecurityRequirement
 from config import Config
 from utils import IndexUtils, DataType
 from chatbot import ChatBot 
 from dotenv import load_dotenv
-from flask_cors import CORS
 import openai
 from os import walk
 import mimetypes
-from flask_restful import Resource, Api
 from flask_cors import CORS
+
+from flask_restx import Api, Resource, fields, Namespace
+from models import db, User
+
+import jwt
+from datetime import datetime, timedelta
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token
+
 
 
 
@@ -17,23 +24,141 @@ import os
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
-api = Api(app)
-CORS(app)
+JWTManager(app)
+
+api = Api(app,version='1.0',title='Jarvix QA',authorizations={
+    'jwt': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
+    }
+},security=[
+        {'jwt':[]}
+    ]
+)
+# Create a namespace for the users endpoint
+user_management_ns = Namespace('user management', description='user management')
+
+user_model = api.model('User', {
+    'username': fields.String(required=True, description='The username of the user'),
+    'email': fields.String(required=True, description='The email of the user'),
+    'password': fields.String(required=True, description='The password of the user'),
+})
+
 app.config['OPEN_API_KEY'] = os.environ.get('OPEN_API_KEY')
 app.config['INDEX_SAVE_PATH'] = os.environ.get('INDEX_SAVE_PATH')
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd() ,os.environ.get('UPLOAD_FOLDER'))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'secret_key'
+
+db.init_app(app)
 global_chatbots = {}
 
 
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+auth_ns = Namespace('auth', description='Authentication operations')
+
+user_login = auth_ns.model('UserLogin', {
+    'username': fields.String(required=True, description='The username'),
+    'password': fields.String(required=True, description='The password')
+})
+
+@auth_ns.route('/login')
+class Login(Resource):
+    @auth_ns.expect(user_login, validate=True)
+    def post(self):
+        data = auth_ns.payload
+        username = data.get('username')
+        password = data.get('password')
+
+        # Lookup user by username
+        user = User.query.filter_by(username=username).first()
+
+        # Verify password
+        if user and user.verify_password(password):
+            # Password is valid, create token
+            token = create_access_token(identity=user.id)
+            return {'access_token': token}, 200
+
+        # Invalid credentials
+        return {'message': 'Invalid username or password'}, 401
+    
+@user_management_ns.route('/user_list')
+class UserList(Resource):
+    @user_management_ns.doc('list_users')
+    @user_management_ns.marshal_list_with(user_model)
+    def get(self):
+        '''Fetch all users'''
+        return User.query.all()
+
+    @user_management_ns.doc('create_user')
+    @user_management_ns.expect(user_model)
+    @user_management_ns.marshal_with(user_model, code=201)
+    def post(self):
+        '''Create a new user'''
+        data = request.get_json()
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+        user = User(username=username, email=email,password=password)
+        db.session.add(user)
+        db.session.commit()
+        return user, 201
+
+@user_management_ns.route('/<int:user_id>')
+@user_management_ns.response(404, 'User not found')
+@user_management_ns.param('user_id', 'The user identifier')
+class UserResource(Resource):
+    @user_management_ns.doc('get_user')
+    @user_management_ns.marshal_with(user_model)
+    def get(self, user_id):
+        '''Fetch a user given its identifier'''
+        user = User.query.get(user_id)
+        if not user:
+            api.abort(404)
+        return user
+
+    @user_management_ns.doc('update_user')
+    @user_management_ns.expect(user_model)
+    @user_management_ns.marshal_with(user_model)
+    def put(self, user_id):
+        '''Update a user given its identifier'''
+        data = request.get_json()
+        user = User.query.get(user_id)
+        if not user:
+            api.abort(404)
+        user.username = data.get('username', user.username)
+        user.email = data.get('email', user.email)
+        db.session.commit()
+        return user
+
+    @user_management_ns.doc('delete_user')
+    @user_management_ns.response(204, 'User deleted')
+    def delete(self, user_id):
+        '''Delete a user given its identifier'''
+        user = User.query.get(user_id)
+        if not user:
+            api.abort(404)
+        db.session.delete(user)
+        db.session.commit()
+        return '', 204
+
+@api.route('/')
 class HelloWorld(Resource):
     def get(self):
         return "<p>This is the QA system based on llama index!</p>"
-api.add_resource(HelloWorld, '/')
-#@app.route("/")
-#def hello_world():
-#    return "<p>This is the QA system based on llama index!</p>"
 
-
+@api.route('/protected')
+class Protected(Resource):
+    @api.doc(security='jwt')
+    @jwt_required
+    def get(self):
+        current_user = get_jwt_identity()
+        return {'message': f'Hello, {current_user}!'}
 
 # Upload File
 @app.route("/upload", methods=['POST'])
@@ -212,3 +337,10 @@ def list_files():
     project_name = request.form["project_name"]
     file_list = get_files_for_project(project_name)
     return jsonify({"files": file_list})
+
+
+api.add_namespace(user_management_ns,path='/api/user-management')
+api.add_namespace(auth_ns,path='/api/auth')
+
+if __name__ == '__main__':
+    app.run(debug=True)
