@@ -4,12 +4,12 @@ from enum import Enum
 import pandas as pd
 import shutil
 
-from gpt_index import download_loader, GPTSimpleVectorIndex, ServiceContext
+from llama_index import download_loader, GPTSimpleVectorIndex, ServiceContext
 from pathlib import Path
-from gpt_index import GPTListIndex, LLMPredictor
+from llama_index import GPTListIndex, LLMPredictor
 
 from langchain.chat_models import ChatOpenAI
-from gpt_index.indices.composability import ComposableGraph
+from llama_index.indices.composability import ComposableGraph
 
 class DataType(Enum):
     AUDIO = 1
@@ -109,9 +109,10 @@ class IndexUtils():
 
     def loadIndexer(self, pathes:list):
         index_set = {}
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo"))
 
         for path in pathes:
-            cur_index = GPTSimpleVectorIndex.load_from_disk(Path(path))
+            cur_index = GPTSimpleVectorIndex.load_from_disk(Path(path),llm_predictor=llm_predictor)
             file_name = os.path.basename(path)
             index_set[file_name] = cur_index
 
@@ -123,7 +124,7 @@ class IndexUtils():
         graph_path = os.path.join(graph_path,file_name) 
 
         # set number of output tokens
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo"))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo"))
         service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor)
 
         if os.path.exists(graph_path):

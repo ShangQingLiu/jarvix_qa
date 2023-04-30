@@ -18,25 +18,32 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
-CORS(app)
 app.config['OPEN_API_KEY'] = os.environ.get('OPEN_API_KEY')
 app.config['INDEX_SAVE_PATH'] = os.environ.get('INDEX_SAVE_PATH')
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd() ,os.environ.get('UPLOAD_FOLDER'))
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 global_chatbots = {}
 
+#ns = api.namespace('/api/', description='test')
 
+
+#ns.route('/')
 class HelloWorld(Resource):
     def get(self):
         return "<p>This is the QA system based on llama index!</p>"
-api.add_resource(HelloWorld, '/')
+api.add_resource(HelloWorld, '/api/')
 #@app.route("/")
 #def hello_world():
+#    return "<p>This is the QA system based on llama index!</p>"
+#
+#@app.route("/api/")
+#def hello_world_t():
 #    return "<p>This is the QA system based on llama index!</p>"
 
 
 
 # Upload File
-@app.route("/upload", methods=['POST'])
+@app.route("/api/upload", methods=['POST'])
 def upload_file():
     if 'file' not in request.files or 'project_name' not in request.form:
         return jsonify({'error': 'No file part or project name in the request'}), 400
@@ -68,7 +75,7 @@ def upload_file():
     return jsonify({'message': 'File uploaded successfully'}), 200
 
 
-@app.route("/prepareIndex", methods=['POST'])
+@app.route("/api/prepareIndex", methods=['POST'])
 def prepare_index():
     def check_dir_exists(dir_path):
         if not os.path.exists(dir_path):
@@ -138,7 +145,7 @@ def prepare_index():
     return jsonify({'message': 'Index created successfully'}), 200
 
 
-@app.route("/query", methods=['POST'])
+@app.route("/api/query", methods=['POST'])
 def query():
     data = request.get_json()
 
@@ -150,8 +157,9 @@ def query():
         return jsonify({'error': 'No project name in the request'}), 400
 
     project_dir = os.path.join(app.config['UPLOAD_FOLDER'], project_name)
-
+    print(f"gloabl_chatbots keys:{global_chatbots.keys()}")
     if session_id not in global_chatbots.keys():
+        print("Loading index")
         # Make sure the project directory exists
         if not os.path.exists(project_dir):
             os.makedirs(project_dir)
@@ -190,7 +198,7 @@ def query():
                 audio_pathes = [os.path.join(project_dir, "audio", audio_path) for audio_path in audio_pathes]
                 index_set.update(indexUtils.dataLoader(audio_pathes, data_type))
         print("Index set: ", index_set)
-        chatbot = ChatBot(index_set,None,project_name=project_name)
+        chatbot = ChatBot(index_set,True,project_name=project_name,chunk_size_limit=512)
         global_chatbots[session_id] = chatbot
     chatbot = global_chatbots[session_id]
     response = chatbot.run(query)
@@ -207,8 +215,11 @@ def get_files_for_project(project_name):
 
     return f
 
-@app.route("/list_files", methods=["POST"])
+@app.route("/api/list_files", methods=["POST"])
 def list_files():
     project_name = request.form["project_name"]
     file_list = get_files_for_project(project_name)
     return jsonify({"files": file_list})
+
+if __name__ == '__main__':
+    app.run(debug=False,threaded=True)
