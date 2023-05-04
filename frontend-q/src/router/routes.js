@@ -10,19 +10,27 @@ const routes = [
           {
             path: "",
             component: () => import("pages/IndexPage/Index.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
           {
             path: "/:id",
             component: () => import("pages/IndexPage/Detail.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
           {
             path: "/edit/:id",
             component: () =>
               import("components/IndexPage/Index/EditProject.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
           {
             path: "/invite/:id",
             component: () => import("pages/IndexPage/Invite.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
         ],
       },
@@ -34,16 +42,24 @@ const routes = [
             path: "",
             component: () =>
               import("pages/UserAuthenticationAndManagement/IndexPage.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
+            name: "UsersManagementPage",
           },
           {
             path: "login",
             component: () =>
               import("pages/UserAuthenticationAndManagement/LoginPage.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: false },
+            name: "login",
           },
           {
             path: "register",
             component: () =>
               import("pages/UserAuthenticationAndManagement/RegisterPage.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: false },
           },
           {
             path: "forgot-password",
@@ -51,11 +67,15 @@ const routes = [
               import(
                 "pages/UserAuthenticationAndManagement/ForgotPasswordPage.vue"
               ),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
           {
             path: "otp-code",
             component: () =>
               import("pages/UserAuthenticationAndManagement/OtpPage.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
           {
             path: "new-password",
@@ -63,31 +83,45 @@ const routes = [
               import(
                 "pages/UserAuthenticationAndManagement/NewPasswordPage.vue"
               ),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
           {
             path: "done",
             component: () =>
               import("pages/UserAuthenticationAndManagement/DonePage.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
           {
             path: "edit/:id",
             component: () =>
               import("pages/UserAuthenticationAndManagement/EditUserPage.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
           {
             path: "view/:id",
             component: () =>
               import("pages/UserAuthenticationAndManagement/ViewUserPage.vue"),
+            // only authenticated users can create posts
+            meta: { requiresAuth: true },
           },
         ],
       },
       {
         path: "/file-management",
         component: () => import("pages/FileManagement.vue"),
+        // only authenticated users can create posts
+        meta: { requiresAuth: true },
+        name: "fileManagement",
       },
       {
         path: "/index-preparation",
         component: () => import("pages/IndexPreparation.vue"),
+        // only authenticated users can create posts
+        meta: { requiresAuth: true },
+        name: "services",
       },
     ],
   },

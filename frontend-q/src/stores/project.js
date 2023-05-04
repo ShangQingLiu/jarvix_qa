@@ -6,6 +6,7 @@ export const useProjectStore = defineStore("projectStore", {
     projectsList: [],
     userProjects: [],
     projectFiles: [],
+    selectedProject: null,
   }),
   actions: {
     createProject(form) {
@@ -28,7 +29,7 @@ export const useProjectStore = defineStore("projectStore", {
         try {
           const { data } = await api.get("project-management/projects");
           this.projectsList = data.projects;
-          resolve(data);
+          resolve(data.projects);
         } catch (error) {
           reject(error);
         }
@@ -142,10 +143,10 @@ export const useProjectStore = defineStore("projectStore", {
         try {
           console.log(payload);
           const { data } = await api.delete(`file/delete`, {
-            data:{
-            filename: payload.filename,
-            project_name: payload.project_name,
-            }
+            data: {
+              filename: payload.filename,
+              project_name: payload.project_name,
+            },
           });
           this.projectFiles = this.projectFiles.filter(
             (file) => file !== payload.filename

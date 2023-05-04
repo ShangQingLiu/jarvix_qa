@@ -8,7 +8,7 @@
           <div class="row q-col-gutter-md">
             <div v-for="n in 8" :key="n" class="col-12 col-sm-4 col-md-3">
               <div class="img-container">
-                <img src="~/assets/file-img.png" class="full-width" alt="" />
+                <!-- <img src="~/assets/file-img.png" class="full-width" alt="" /> -->
                 <q-btn
                   color="transparent"
                   class="menu-icon"

@@ -11,7 +11,7 @@
             {{ currentProject && currentProject.description }}
           </p>
           <q-separator class="q-my-lg" />
-          <div class="q-my-md" style="height: 80px">
+          <!-- <div class="q-my-md" style="height: 80px">
             <q-avatar
               v-for="n in 5"
               :key="n"
@@ -31,7 +31,7 @@
             >
               <span>+3</span>
             </q-avatar>
-          </div>
+          </div> -->
           <div class="row q-gutter-md">
             <q-btn
               color="primary"
@@ -89,9 +89,9 @@
               class="col-12 col-sm-6 col-md-4"
             >
               <div class="wrapper bg-accent">
-                <div class="img-container">
+                <!-- <div class="img-container">
                   <img src="~/assets/file-img.png" class="full-width" alt="" />
-                </div>
+                </div> -->
                 <div
                   class="flex full-width justify-between items-center q-px-md q-py-sm"
                 >

@@ -1,9 +1,24 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
 
+function parseJwt(token) {
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const jsonPayload = decodeURIComponent(
+    window
+      .atob(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+
+  return JSON.parse(jsonPayload);
+}
 export const useAuthStore = defineStore("authStore", {
   state: () => ({
-    user: null,
+    user: {},
     usersList: [],
   }),
   actions: {
@@ -31,8 +46,12 @@ export const useAuthStore = defineStore("authStore", {
             password: form.password,
           });
           console.log(data);
-          this.user = data;
-          localStorage.setItem("jarvixUser", JSON.stringify(data));
+
+          const parsedData = parseJwt(data.access_token);
+          localStorage.setItem(
+            "jarvixUser",
+            JSON.stringify({ ...data, ...parsedData })
+          );
           resolve(data);
         } catch (error) {
           reject(error);
@@ -73,6 +92,31 @@ export const useAuthStore = defineStore("authStore", {
             }
             return user;
           });
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    getCode(payload) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const { data } = await api.post(`user-management/forgot_password`, {
+            email: payload.email,
+          });
+          console.log(data);
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    getLoggedInUserData() {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const { data } = await api.get(`user-management/info`);
+          console.log(data);
+          this.user = data;
           resolve(data);
         } catch (error) {
           reject(error);

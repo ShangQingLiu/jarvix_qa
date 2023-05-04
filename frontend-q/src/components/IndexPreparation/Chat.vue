@@ -24,7 +24,7 @@
           :input-style="{ color: '#878787' }"
         >
           <template v-slot:append>
-            <q-icon name="img:src/assets/send.svg" />
+            <q-icon name="/send.svg" />
           </template>
         </q-input>
       </q-form>

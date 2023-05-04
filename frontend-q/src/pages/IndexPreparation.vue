@@ -7,7 +7,7 @@
           :text-color="panel === 'chat' ? 'white' : 'dark-page'"
           unelevated
           style="height: 55px"
-          icon="img:src/assets/chat.svg"
+          icon="img:/static/chat.svg"
           label="Chat Room"
           @click="panel = 'chat'"
         />
@@ -16,7 +16,7 @@
           :text-color="panel === 'questions' ? 'white' : 'dark-page'"
           unelevated
           style="height: 55px"
-          icon="img:src/assets/questions.svg"
+          icon="img:/static/questions.svg"
           label="Question Form"
           @click="panel = 'questions'"
           class="q-ml-md"

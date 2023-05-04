@@ -55,7 +55,7 @@
           text-color="white"
           square
           style="width: 200px"
-          to="/user-authentication-and-management/otp-code"
+          type="submit"
           >Send code</q-btn
         >
       </div>
@@ -75,11 +75,9 @@ const getCode = async () => {
   try {
     error.value = null;
     loading.value = true;
-    // const res = await store.getCode({
-
-    //   email: email.value,
-
-    // });
+    const res = await store.getCode({
+      email: email.value,
+    });
     console.log(res);
   } catch (err) {
     console.log(err);

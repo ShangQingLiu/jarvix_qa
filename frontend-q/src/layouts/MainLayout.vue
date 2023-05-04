@@ -21,9 +21,23 @@
               text-color="white"
               rounded
               to="/user-authentication-and-management/login"
+              v-if="Object.keys(store.user).length === 0"
               >Login</q-btn
             >
-            <div class="gt-md flex flex-center">
+            <q-btn
+              color="primary"
+              unelevated
+              class="text-capitalize"
+              text-color="white"
+              rounded
+              @click="logout"
+              v-if="Object.keys(store.user).length !== 0"
+              >Logout</q-btn
+            >
+            <div
+              v-if="Object.keys(store.user).length !== 0"
+              class="gt-md flex flex-center"
+            >
               <q-item class="user-profile q-py-none">
                 <q-item-section top avatar>
                   <q-avatar size="60px">
@@ -32,8 +46,10 @@
                 </q-item-section>
 
                 <q-item-section>
-                  <q-item-label class="text-dark">Randy Riley</q-item-label>
-                  <q-item-label caption>randy.riley@gmail.com</q-item-label>
+                  <q-item-label class="text-dark">
+                    {{ store.user.username }}
+                  </q-item-label>
+                  <q-item-label caption>{{ store.user.email }}</q-item-label>
                 </q-item-section>
               </q-item>
             </div>
@@ -48,7 +64,7 @@
         :width="350"
       >
         <div class="logo-container q-my-xl text-center">
-          <img style="max-width: 200px" src="../assets/logo.svg" />
+          <img style="max-width: 200px" src="/static/logo.svg" />
         </div>
         <q-list class="">
           <EssentialLink
@@ -69,30 +85,30 @@
 <script>
 import { defineComponent, ref } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
-
+import { useRouter } from "vue-router";
+import { useAuthStore } from "src/stores/auth";
 const linksList = [
   {
     title: "User Authentication and User Management",
-    icon: "img:src/assets/user-management.svg",
+    icon: "img:/static/user-management.svg",
     link: "/user-authentication-and-management",
   },
   {
     title: "Project Management",
-    icon: "img:src/assets/project-management.svg",
+    icon: "img:/static/project-management.svg",
     link: "/",
   },
   {
     title: "File Management",
-    icon: "img:src/assets/file-management.svg",
+    icon: "img:/static/file-management.svg",
     link: "/file-management",
   },
   {
     title: "Services",
-    icon: "img:src/assets/index-preparation.svg",
+    icon: "img:/static/index-preparation.svg",
     link: "/index-preparation",
   },
 ];
-
 export default defineComponent({
   name: "MainLayout",
 
@@ -103,6 +119,14 @@ export default defineComponent({
   setup() {
     const leftDrawerOpen = ref(false);
     const search = ref("");
+    const router = useRouter();
+    const store = useAuthStore();
+
+    function logout() {
+      localStorage.removeItem("jarvixUser");
+      store.user = {};
+      router.push("user-authentication-and-management/login");
+    }
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
@@ -110,6 +134,8 @@ export default defineComponent({
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
       search,
+      logout,
+      store,
     };
   },
 });

@@ -3,7 +3,7 @@
     <div class="row q-col-gutter-md">
       <UsersList />
       <div class="col-12">
-        <q-card flat class="bg-white q-mb-lg">
+        <!-- <q-card flat class="bg-white q-mb-lg">
           <q-card-section>
             <div class="text-h6 text-weight-bold text-dark">Invite People</div>
             <q-separator class="q-my-lg" />
@@ -34,8 +34,9 @@
               </div>
             </q-form>
           </q-card-section>
-        </q-card>
-        <q-card flat class="bg-white q-mb-lg">
+        </q-card> -->
+
+        <!-- <q-card flat class="bg-white q-mb-lg">
           <q-card-section>
             <div class="text-h6 text-weight-bold text-dark">
               Create New Account
@@ -89,7 +90,7 @@
               </div>
             </q-form>
           </q-card-section>
-        </q-card>
+        </q-card> -->
       </div>
     </div>
   </div>

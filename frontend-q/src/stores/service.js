@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
+import { useProjectStore } from "src/stores/project";
 
 function guidGenerator() {
   var S4 = function () {
@@ -28,14 +29,19 @@ export const useServiceStore = defineStore("ServiceStore", {
     submitQuery(form) {
       return new Promise(async (resolve, reject) => {
         try {
-          const { data } = await api.post("service/query", {
-            query: form.query,
-            // Static Data for now
-            project_name: "project",
-            session_id: guidGenerator(),
-          });
-          this.chatHistory.push({ type: "bot-message", text: data });
-          resolve(data);
+          const store = useProjectStore();
+          if (store.selectedProject) {
+            const { data } = await api.post("service/query", {
+              query: form.query,
+              // Static Data for now
+              project_name: store.selectedProject,
+              session_id: guidGenerator(),
+            });
+            this.chatHistory.push({ type: "bot-message", text: data });
+            resolve(data);
+          } else {
+            reject(new Error("Something Wrong"));
+          }
         } catch (error) {
           reject(error);
         }

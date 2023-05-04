@@ -4,26 +4,53 @@
       <div class="col-12 col-md-9">
         <q-card flat class="bg-white q-mb-lg" style="border-radius: 16px">
           <q-card-section class="q-pa-lg">
-            <div class="text-h6 text-weight-bold text-dark">Uploaded Files</div>
+            <p class="text-h6 text-weight-bold">Select Project</p>
+            <q-select
+              v-model="projectName"
+              placeholder="Choose Project"
+              class="q-mb-md"
+              bg-color="accent"
+              borderless
+              :options="projectList"
+              option-value="name"
+              option-label="name"
+              emit-value
+            />
+          </q-card-section>
+          <q-card-section class="q-pa-lg">
+            <div v-if="projectName" class="flex justify-between">
+              <div class="text-h6 text-weight-bold text-dark">
+                Uploaded Files
+              </div>
+              <div class="text-h6 text-weight-bold text-dark">
+                {{ projectName }}
+              </div>
+            </div>
+            <div v-else class="flex justify-between">
+              <div class="text-h6 text-weight-bold text-negative">
+                Select Project
+              </div>
+            </div>
             <q-separator class="q-my-lg" />
-            <div class="row q-col-gutter-md">
-              <div v-for="n in 6" :key="n" class="col-12 col-sm-6 col-md-4">
+            <div v-if="projectName" class="row q-col-gutter-md">
+              <div
+                v-for="(file, i) in projectFiles"
+                :key="i"
+                class="col-12 col-sm-6 col-md-4"
+              >
                 <div class="wrapper bg-accent">
-                  <div class="img-container">
-                    <img
-                      src="~/assets/file-img.png"
-                      class="full-width"
-                      alt=""
-                    />
-                  </div>
                   <div
                     class="flex full-width justify-between items-center q-px-md q-py-sm"
                   >
                     <div>
+                      <!-- Name -->
                       <div class="text-dark text-h6 text-weight-bold">
-                        Name of the fle
+                        {{ file.split(".")[0] }}
                       </div>
-                      <div class="text-dark-page text-body">File type: mp4</div>
+                      <!-- Extension -->
+                      <div class="text-dark-page text-body">
+                        {{ file.split(".")[1] }}
+                      </div>
                     </div>
                     <q-btn
                       round
@@ -32,23 +59,26 @@
                       class="q-mx-xs"
                       icon="delete"
                       size="sm"
+                      @click="deleteProjectFile(file)"
                     />
                   </div>
                 </div>
               </div>
             </div>
             <q-btn
+              v-if="projectName"
               unelevated
               color="primary"
               class="q-mt-md"
               text-color="white"
+              @click="indexProject"
             >
               Re-Index
             </q-btn>
           </q-card-section>
         </q-card>
       </div>
-      <div class="col-12 col-md-3">
+      <div v-if="projectName" class="col-12 col-md-3">
         <q-card flat class="bg-white q-mb-lg" style="border-radius: 10px">
           <q-card-section class="q-pa-md">
             <div class="text-h6 text-weight-bold text-dark">
@@ -102,70 +132,149 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, watch, computed, onMounted } from "vue";
 import { api } from "src/boot/axios";
-export default {
-  data() {
-    return {
-      filesRef: null,
-      uploadingFiles: false,
-      uploadedFiles: [],
-      loading: false,
-      error: null,
-      success: null,
-    };
-  },
-  methods: {
-    loadLocalFiles() {
-      this.$refs.filesRef.click();
-    },
-    async uploadFiles(e) {
-      try {
-        this.loading = true;
-        this.uploadedFiles = [];
-        const formData = new FormData();
-        let res;
-        for (var i = 0; i < this.$refs.filesRef.files.length; i++) {
-          let file = this.$refs.filesRef.files[i];
-          formData.append("files", file);
-          res = await api.post(`file/upload?project_name=project`, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-        }
-        // let files = this.$refs.filesRef.files;
-        // console.log(files);
-        // formData.append("files", files);
-        // console.log("Here");
-        // const { data } = await api.post(
-        //   `file/upload?project_name=project`,
-        //   formData,
-        //   {
-        //     headers: {
-        //       "Content-Type": "multipart/form-data",
-        //     },
-        //   }
-        // );
-        console.log(res);
-        // this.success = data.message;
-      } catch (err) {
-        this.error = err;
-      } finally {
-        this.loading = false;
-      }
-    },
-    // async removeImage(img) {
-    //   try {
-    //     const res = await axios.delete(`/medicalreportsimages/${img.id}/`);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    //   this.uploadedFiles = this.uploadedFiles.filter(
-    //     (image) => image.id !== img.id
-    //   );
-    // },
-  },
+import { useProjectStore } from "src/stores/project";
+import { useAuthStore } from "src/stores/auth";
+
+import { useQuasar } from "quasar";
+const $q = useQuasar();
+const authStore = useAuthStore();
+
+const filesRef = ref(null);
+const store = useProjectStore();
+const loading = ref(false);
+const error = ref(null);
+const success = ref(null);
+const projectName = ref("");
+const projectFiles = computed(() => store.projectFiles);
+const projectList = ref([]);
+const userProjects = ref([]);
+
+const loadLocalFiles = () => {
+  filesRef.value.click();
 };
+const fetchUserProjects = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    const res = await store.fetchUserProjects(authStore.user.id);
+    userProjects.value = res;
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+const uploadFiles = async (e) => {
+  try {
+    loading.value = true;
+    // uploadedFiles.value = [];
+    const formData = new FormData();
+    let res;
+    console.log(e.target.files);
+    for (var i = 0; i < e.target.files.length; i++) {
+      let file = e.target.files[i];
+      formData.append("files", file);
+      res = await api.post(
+        `file/upload?project_name=${projectName.value}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+    }
+    await listProjectFiles();
+  } catch (err) {
+    error.value = err;
+  } finally {
+    loading.value = false;
+  }
+};
+const deleteProjectFile = async (file) => {
+  try {
+    error.value = null;
+    loading.value = true;
+    console.log("Delete Project");
+    const res = await store.deleteProjectFile({
+      project_name: projectName.value,
+      filename: file,
+    });
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+const listProjectFiles = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    const res = await store.listProjectFiles({
+      project_name: projectName.value,
+    });
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+watch(projectName, (projectValue) => {
+  if (projectValue) {
+    store.selectedProject = projectValue;
+    listProjectFiles();
+  }
+});
+const fetchProjects = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    const res = await store.fetchProjects();
+    console.log(res);
+    var projects = res.filter(function (o1) {
+      return userProjects.value.some(function (o2) {
+        return o1.name === o2.name; // return the ones with equal id
+      });
+    });
+    projectList.value = projects;
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+const indexProject = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    const res = await store.indexProject({
+      project_name: projectName.value,
+    });
+    if (res) {
+      $q.notify({
+        message: res.message,
+        position: "top-right",
+        color: "primary",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+onMounted(async () => {
+  await fetchUserProjects();
+  await fetchProjects();
+});
 </script>
 <style lang="scss" scoped></style>
