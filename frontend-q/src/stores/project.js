@@ -51,11 +51,11 @@ export const useProjectStore = defineStore("projectStore", {
     deleteProject(projectId) {
       return new Promise(async (resolve, reject) => {
         try {
-          const { data } = await api.delete(`project-management/${projectId}/`);
+          const { data } = await api.delete(`project-management/${projectId}`);
           console.log(data);
-          // this.projectsList = this.projectsList.filter(
-          //   (project) => project.id != projectId
-          // );
+          this.projectsList = this.projectsList.filter(
+            (project) => project.id != projectId
+          );
           resolve(data);
         } catch (error) {
           reject(error);
