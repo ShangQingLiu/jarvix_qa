@@ -55,21 +55,35 @@
               Upload New File
             </div>
             <q-separator class="q-my-lg" />
+            <div v-if="loading" class="q-py-lg flex justify-center">
+              <q-spinner color="dark" size="3em" />
+            </div>
+            <div v-if="error" class="q-py-sm flex justify-center">
+              <div class="text-h6 text-negative">
+                {{ error }}
+              </div>
+            </div>
+            <div v-if="success" class="q-py-sm flex justify-center">
+              <div class="text-h6 text-primary">
+                {{ success }}
+              </div>
+            </div>
             <q-btn
               unelevated
               color="bg-accent"
               class="full-width bg-accent"
               style="height: 200px"
-              @click="uploadImage"
+              @click="loadLocalFiles"
+              v-if="!loading"
             >
               <q-icon name="add" color="dark"></q-icon>
             </q-btn>
             <input
               accept=".docx,.pdf,.html,.mp3,.m4a"
-              @change="handleImage"
+              @change="uploadFiles"
               multiple
               type="file"
-              ref="imageFile"
+              ref="filesRef"
               style="display: none"
             />
             <q-btn
@@ -78,6 +92,7 @@
               class="text-capitalize q-mt-lg"
               text-color="white"
               style="width: 120px"
+              v-if="!loading"
               >Upload</q-btn
             >
           </q-card-section>
@@ -88,46 +103,68 @@
 </template>
 
 <script>
+import { api } from "src/boot/axios";
 export default {
   data() {
-    return {};
+    return {
+      filesRef: null,
+      uploadingFiles: false,
+      uploadedFiles: [],
+      loading: false,
+      error: null,
+      success: null,
+    };
   },
   methods: {
-    uploadImage() {
-      this.$refs.imageFile.click();
+    loadLocalFiles() {
+      this.$refs.filesRef.click();
     },
-    async handleImage(e) {
+    async uploadFiles(e) {
       try {
-        this.uploadingImages = true;
-        this.uploadedImages = [];
+        this.loading = true;
+        this.uploadedFiles = [];
         const formData = new FormData();
-        for (var i = 0; i < this.$refs.imageFile.files.length; i++) {
-          let file = this.$refs.imageFile.files[i];
-          formData.append("image", file);
-          const res = await axios.post(`medicalreportsimages/`, formData, {
+        let res;
+        for (var i = 0; i < this.$refs.filesRef.files.length; i++) {
+          let file = this.$refs.filesRef.files[i];
+          formData.append("files", file);
+          res = await api.post(`file/upload?project_name=project`, formData, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
           });
-          this.uploadedImages.push(res.data);
         }
-        console.log();
+        // let files = this.$refs.filesRef.files;
+        // console.log(files);
+        // formData.append("files", files);
+        // console.log("Here");
+        // const { data } = await api.post(
+        //   `file/upload?project_name=project`,
+        //   formData,
+        //   {
+        //     headers: {
+        //       "Content-Type": "multipart/form-data",
+        //     },
+        //   }
+        // );
+        console.log(res);
+        // this.success = data.message;
       } catch (err) {
         this.error = err;
       } finally {
-        this.uploadingImages = false;
+        this.loading = false;
       }
     },
-    async removeImage(img) {
-      try {
-        const res = await axios.delete(`/medicalreportsimages/${img.id}/`);
-      } catch (error) {
-        console.log(error);
-      }
-      this.uploadedImages = this.uploadedImages.filter(
-        (image) => image.id !== img.id
-      );
-    },
+    // async removeImage(img) {
+    //   try {
+    //     const res = await axios.delete(`/medicalreportsimages/${img.id}/`);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    //   this.uploadedFiles = this.uploadedFiles.filter(
+    //     (image) => image.id !== img.id
+    //   );
+    // },
   },
 };
 </script>

@@ -3,61 +3,64 @@
     <div class="chat-wrapper">
       <q-scroll-area class="chat-area">
         <q-chat-message
-          v-for="n in 3"
-          :key="n"
-          bg-color="white"
+          v-for="(message, i) in chatHistory"
+          :key="i"
+          :bg-color="message.type === 'user-message' ? 'info' : 'white'"
           text-color="dark-page"
           size="6"
-          :text="[
-            `Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euu
-            ismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim
-            veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea `,
-          ]"
+          :text="[message.text]"
+          :sent="message.type === 'user-message' ? true : false"
           class="q-mb-md"
-        />
-        <q-chat-message
-          v-for="n in 3"
-          :key="n"
-          text-color="dark-page"
-          bg-color="info"
-          sent
-          class="q-mb-md"
-          size="6"
-          :text="[
-            `Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euu
-            ismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim
-            veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea `,
-          ]"
         />
       </q-scroll-area>
-      <q-input
-        rounded
-        bg-color="white"
-        standout="bg-white text-dark"
-        class="elevation-0 q-mr-md full-width"
-        v-model="search"
-        placeholder="Search"
-        :input-style="{ color: '#878787' }"
-      >
-        <template v-slot:append>
-          <q-icon name="img:src/assets/send.svg" />
-        </template>
-      </q-input>
+      <q-form @submit.prevent="submitQuery">
+        <q-input
+          rounded
+          bg-color="white"
+          standout="bg-white text-dark"
+          class="elevation-0 q-mr-md full-width"
+          v-model="queryText"
+          placeholder="Search"
+          :input-style="{ color: '#878787' }"
+        >
+          <template v-slot:append>
+            <q-icon name="img:src/assets/send.svg" />
+          </template>
+        </q-input>
+      </q-form>
     </div>
   </div>
 </template>
 
-<script>
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  setup() {
-    return {};
-  },
-});
+<script setup>
+import { computed, onMounted, ref } from "vue";
+import { useServiceStore } from "src/stores/service";
+import { useRoute } from "vue-router";
+const store = useServiceStore();
+const chatHistory = computed(() => store.chatHistory);
+const loading = ref(false);
+const error = ref(null);
+const queryText = ref("");
+const submitQuery = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    store.addUserMessage(queryText.value);
+    const res = await store.submitQuery({
+      query: queryText.value,
+    });
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+    queryText.value = "";
+  }
+};
 </script>
 
-<style lang="scss" >
+<style lang="scss">
 .q-field--standout .q-field__control {
   box-shadow: none !important;
   &::before,
