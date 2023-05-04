@@ -5,6 +5,9 @@ from utils import IndexUtils, DataType
 from globals import global_chatbots
 from chatbot import ChatBot
 import os
+import requests
+
+
 
 
 service_ns = Namespace('service',description="File management")
@@ -75,4 +78,16 @@ class Query(Resource):
         chatbot = global_chatbots[session_id]
         response = chatbot.run(query)
         print("Response: ", response)
-        return response
+        url = "https://api-free.deepl.com/v2/translate"
+        headers = {
+            "Authorization": "DeepL-Auth-Key e2eac097-95e2-3107-90ce-13d51845862a:fx"
+        }
+        data = {
+            "text": f"{response}",
+            "target_lang": "ZH"
+        }
+
+        response = requests.post(url, headers=headers, data=data)
+        print(response.json())
+
+        return response.json()["translations"][0]["text"]
