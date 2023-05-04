@@ -18,3 +18,4 @@ class Config:
     INDEX_SAVE_PATH = os.environ.get('INDEX_SAVE_PATH')
     OPEN_API_KEY = os.environ.get('OPEN_API_KEY')
     ROOT_PATH = os.getcwd()
+    JWT_ACCESS_TOKEN_EXPIRES = 60 * 60

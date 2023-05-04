@@ -1,6 +1,6 @@
 from flask import request, current_app
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import db, User
 import uuid
 from flask_mail import Message
@@ -14,6 +14,13 @@ get_user_model = user_ns.model('Get_user', {
     'username': fields.String(required=True, description='The username of the user'),
     'email': fields.String(required=True, description='The email of the user'),
     'password': fields.String(required=True, description='The password of the user'),
+    'role': fields.String(required=True, description='The role of the user'),
+})
+
+user_info = user_ns.model('User info', {
+    'id': fields.String(required=True, description='The username of the user'),
+    'username': fields.String(required=True, description='The username of the user'),
+    'email': fields.String(required=True, description='The email of the user'),
     'role': fields.String(required=True, description='The role of the user'),
 })
 
@@ -120,3 +127,16 @@ class ForgotPassword(Resource):
 
         # User not found
         return {'message': 'User not found with this email'}, 404
+
+@user_ns.route('/info')
+class UserInfo(Resource):
+    @user_ns.marshal_with(user_info)
+    @jwt_required() 
+    def get(self):
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        if user is None:
+            return {'error': 'User not found'}, 404
+        user_info = {'id': user.id, 'username': user.username, 'email': user.email, 'role':user.role}
+        return user_info, 200
+

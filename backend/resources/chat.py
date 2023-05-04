@@ -78,16 +78,21 @@ class Query(Resource):
         chatbot = global_chatbots[session_id]
         response = chatbot.run(query)
         print("Response: ", response)
-        url = "https://api-free.deepl.com/v2/translate"
-        headers = {
-            "Authorization": "DeepL-Auth-Key e2eac097-95e2-3107-90ce-13d51845862a:fx"
-        }
-        data = {
-            "text": f"{response}",
-            "target_lang": "ZH"
-        }
+        return response
 
-        response = requests.post(url, headers=headers, data=data)
-        print(response.json())
+        if response != "":
+            url = "https://api-free.deepl.com/v2/translate"
+            headers = {
+                "Authorization": "DeepL-Auth-Key e2eac097-95e2-3107-90ce-13d51845862a:fx"
+            }
+            data = {
+                "text": f"{response}",
+                "target_lang": "ZH"
+            }
 
-        return response.json()["translations"][0]["text"]
+            response = requests.post(url, headers=headers, data=data)
+            print(response.json())
+
+            return response.json()["translations"][0]["text"]
+        else:
+            return response

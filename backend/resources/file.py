@@ -44,7 +44,7 @@ class UploadFile(Resource):
     @jwt_required() 
     def post(self): 
         files = request.files.getlist('files')
-
+        print(files)
         for file in files:
 
             # Get the file's MIME type
@@ -54,7 +54,7 @@ class UploadFile(Resource):
             file_extension = mimetypes.guess_extension(content_type)
             project_name = request.args.get("project_name")
             if file.filename == '':
-                return jsonify({'error': 'No file selected'}), 400
+                return {'error': 'No file selected'}, 400
             upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
 
             if file_extension[1:].lower() == 'm4a':
