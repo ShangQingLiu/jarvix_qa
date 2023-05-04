@@ -127,7 +127,7 @@ export default {
       formData.append("project_name", this.projectName);
 
       try {
-        const response = await axios.post("http://localhost:5000/upload", formData);
+        const response = await axios.post("/api/upload", formData);
         this.sessionID = response.data.session_id;
         this.selectedFile = null;
       } catch (error) {
@@ -143,7 +143,7 @@ export default {
     console.log("Preparing index...", this.projectName);
     const formData = new FormData();
     formData.append("project_name", this.projectName);
-    const response = await axios.post("http://localhost:5000/prepareIndex", formData);
+    const response = await axios.post("/api/prepareIndex", formData);
     console.log("Index prepared successfully:", response.data);
   } catch (error) {
     console.error("Failed to prepare index:", error);
@@ -160,11 +160,14 @@ export default {
     this.chatHistory.push({ type: 'user-message', text: this.query });
 
     const response = await axios.post(
-      `http://localhost:5000/query`,
+      `/api/query`,
       {
         project_name: this.projectName,
         session_id: this.sessionID,
-        query: this.query,
+        query: this.query
+      },
+      {
+        timeout: 300000 // Set the timeout to 5 minutes (300000 ms)
       }
     );
     this.answer = response.data;
@@ -183,7 +186,7 @@ async listFiles() {
 
       const formData = new FormData();
       formData.append("project_name", this.projectName);
-      const response = await axios.post("http://localhost:5000/list_files", formData);
+      const response = await axios.post("/api/list_files", formData);
       this.files = response.data.files;
     } catch (error) {
       console.error("Failed to list files:", error);
