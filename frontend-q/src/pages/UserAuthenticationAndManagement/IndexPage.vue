@@ -2,7 +2,7 @@
   <div>
     <div class="row q-col-gutter-md">
       <UsersList />
-      <div class="col-12 col-md-7">
+      <div class="col-12">
         <q-card flat class="bg-white q-mb-lg">
           <q-card-section>
             <div class="text-h6 text-weight-bold text-dark">Invite People</div>

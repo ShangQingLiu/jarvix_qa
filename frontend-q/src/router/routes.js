@@ -20,6 +20,10 @@ const routes = [
             component: () =>
               import("components/IndexPage/Index/EditProject.vue"),
           },
+          {
+            path: "/invite/:id",
+            component: () => import("pages/IndexPage/Invite.vue"),
+          },
         ],
       },
       {

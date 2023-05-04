@@ -30,6 +30,15 @@
                   color="primary"
                   unelevated
                   class="q-mx-xs"
+                  icon="visibility"
+                  @click="$router.push(`/${project.id}`)"
+                  size="sm"
+                />
+                <q-btn
+                  round
+                  color="primary"
+                  unelevated
+                  class="q-mx-xs"
                   icon="edit"
                   @click="$router.push(`/edit/${project.id}`)"
                   size="sm"

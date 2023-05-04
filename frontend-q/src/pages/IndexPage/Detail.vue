@@ -3,21 +3,12 @@
     <div class="col-12">
       <q-card flat class="">
         <q-card-section>
-          <div class="text-h6 text-weight-bold text-dark">Project Name</div>
+          <div class="text-h6 text-weight-bold text-dark">
+            {{ currentProject && currentProject.name }}
+          </div>
           <q-separator class="q-my-lg" />
           <p class="text-dark-page">
-            dolor in hendrerit in vulputate velit esse molestie consequat, vel
-            illum dolore eu feugiat nulla facilisis at vero eros et accumsan et
-            iusto odio dignissim dolor in hendrerit in vulputate velit esse
-            molestie consequat, vel illum dolore eu feugiat nulla facilisis at
-            vero eros et accumsan et iusto odio dignissim dolor in hendrerit in
-            vulputate velit esse molestie consequat, vel illum dolore eu feugiat
-            nulla facilisis at vero eros et accumsan et iusto odio dignissim
-            dolor in hendrerit in vulputate velit esse molestie consequat, vel
-            illum dolore eu feugiat nulla facilisis at vero eros et accumsan et
-            iusto odio dignissim dolor in hendrerit in vulputate velit esse
-            molestie consequat, vel illum dolore eu feugiat nulla facilisis at
-            vero eros et accumsan et iusto odio dignissim
+            {{ currentProject && currentProject.description }}
           </p>
           <q-separator class="q-my-lg" />
           <div class="q-my-md" style="height: 80px">
@@ -47,6 +38,7 @@
               unelevated
               class="text-capitalize"
               text-color="white"
+              @click="$router.push(`/invite/${$route.params.id}`)"
               >Invite people</q-btn
             >
             <q-btn
@@ -54,13 +46,15 @@
               unelevated
               class="text-capitalize"
               text-color="white"
-              >Create New Project</q-btn
+              @click="$router.push(`/edit/${$route.params.id}`)"
+              >Update Project</q-btn
             >
             <q-btn
               color="dark1"
               unelevated
               class="text-capitalize"
               text-color="white"
+              @click="deleteProject"
               >Delete Project</q-btn
             >
           </div>
@@ -70,7 +64,39 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { useProjectStore } from "src/stores/project";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+const route = useRoute();
+const router = useRouter();
+const store = useProjectStore();
+const loading = ref(false);
+const error = ref(null);
+const currentProject = computed(() => {
+  return store.projectsList.find((project) => project.id == route.params.id);
+});
+onMounted(() => {
+  if (!currentProject.value) {
+    router.push("/");
+  }
+});
+const deleteProject = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    console.log(route.params.id);
+    const res = await store.deleteProject(route.params.id);
+    console.log(res);
+    router.push("/");
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
 
 <style lang="scss">
 .q-field--outlined .q-field__control:before {

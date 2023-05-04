@@ -4,6 +4,7 @@ import { api } from "src/boot/axios";
 export const useProjectStore = defineStore("projectStore", {
   state: () => ({
     projectsList: [],
+    userProjects: [],
   }),
   actions: {
     createProject(form) {
@@ -16,22 +17,6 @@ export const useProjectStore = defineStore("projectStore", {
           console.log(res);
           await this.fetchProjects();
           resolve(res);
-        } catch (error) {
-          reject(error);
-        }
-      });
-    },
-    loginUser(form) {
-      return new Promise(async (resolve, reject) => {
-        try {
-          const { data } = await api.post("auth/login", {
-            username: form.username,
-            password: form.password,
-          });
-          console.log(data);
-          this.user = data;
-          localStorage.setItem("jarvixUser", JSON.stringify(data));
-          resolve(data);
         } catch (error) {
           reject(error);
         }
@@ -77,6 +62,34 @@ export const useProjectStore = defineStore("projectStore", {
             }
             return project;
           });
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    sendProjectInvitation(payload) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const { data } = await api.post(
+            `project-management/${payload.projectId}/invite`,
+            {
+              email: payload.email,
+            }
+          );
+          console.log(data);
+
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    fetchUserProjects(userId) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const { data } = await api.get(`project-management/user/${userId}`);
+          this.userProjects = data.projects;
           resolve(data);
         } catch (error) {
           reject(error);

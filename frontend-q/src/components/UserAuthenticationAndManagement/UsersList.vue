@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12 col-md-5">
+  <div class="col-12">
     <q-card flat class="bg-white q-mb-lg">
       <q-card-section>
         <div class="text-h6 text-weight-bold text-dark">All Users</div>
@@ -34,6 +34,19 @@
             </q-item-section>
             <q-item-section side>
               <div class="flex">
+                <q-btn
+                  round
+                  color="primary"
+                  unelevated
+                  class="q-mx-xs"
+                  icon="visibility"
+                  @click="
+                    $router.push(
+                      `/user-authentication-and-management/view/${user.id}`
+                    )
+                  "
+                  size="sm"
+                />
                 <q-btn
                   round
                   color="primary"

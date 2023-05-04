@@ -60,9 +60,18 @@
               color="bg-accent"
               class="full-width bg-accent"
               style="height: 200px"
+              @click="uploadImage"
             >
               <q-icon name="add" color="dark"></q-icon>
             </q-btn>
+            <input
+              accept=".docx,.pdf,.html,.mp3,.m4a"
+              @change="handleImage"
+              multiple
+              type="file"
+              ref="imageFile"
+              style="display: none"
+            />
             <q-btn
               color="primary"
               unelevated
@@ -78,4 +87,48 @@
   </div>
 </template>
 
+<script>
+export default {
+  data() {
+    return {};
+  },
+  methods: {
+    uploadImage() {
+      this.$refs.imageFile.click();
+    },
+    async handleImage(e) {
+      try {
+        this.uploadingImages = true;
+        this.uploadedImages = [];
+        const formData = new FormData();
+        for (var i = 0; i < this.$refs.imageFile.files.length; i++) {
+          let file = this.$refs.imageFile.files[i];
+          formData.append("image", file);
+          const res = await axios.post(`medicalreportsimages/`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+          this.uploadedImages.push(res.data);
+        }
+        console.log();
+      } catch (err) {
+        this.error = err;
+      } finally {
+        this.uploadingImages = false;
+      }
+    },
+    async removeImage(img) {
+      try {
+        const res = await axios.delete(`/medicalreportsimages/${img.id}/`);
+      } catch (error) {
+        console.log(error);
+      }
+      this.uploadedImages = this.uploadedImages.filter(
+        (image) => image.id !== img.id
+      );
+    },
+  },
+};
+</script>
 <style lang="scss" scoped></style>
