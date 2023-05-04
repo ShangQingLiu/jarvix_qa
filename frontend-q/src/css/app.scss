@@ -1,0 +1,32 @@
+// app global css in SCSS form
+@font-face {
+  font-family: customfont;
+  src: url(../assets/fonts/Proxima_Nova_Font.otf);
+}
+
+.text-dark-page {
+  color: $dark-page;
+}
+.bg-dark1 {
+  background: $dark1;
+}
+.no-underline {
+  text-decoration: none;
+}
+// declare a class which applies it
+body {
+  font-family: "customfont", sans-serif !important;
+}
+.q-header {
+  .q-field__control {
+    &::after,
+    &::before {
+      display: none;
+    }
+    box-shadow: none !important;
+    height: 60px;
+    .q-field__prepend {
+      height: 60px;
+    }
+  }
+}
