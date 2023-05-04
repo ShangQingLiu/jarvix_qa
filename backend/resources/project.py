@@ -1,6 +1,7 @@
 from flask import request, render_template, make_response, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
 from flask_restx import Namespace, Resource, fields
+from flask_cors import cross_origin
 from flask_mail import Message
 from functools import wraps
 from models import db, Project, User, Invitation
@@ -10,6 +11,12 @@ import os
 project_ns = Namespace('project management', description='project management')
 
 project_model = project_ns.model('Project', {
+    'name': fields.String(required=True, description='Project name'),
+    'description': fields.String(required=True, description='Project description'),
+})
+
+project_model_with_id = project_ns.model('Project All', {
+    'id': fields.String(required=True, description='Project ID'),
     'name': fields.String(required=True, description='Project name'),
     'description': fields.String(required=True, description='Project description'),
 })
@@ -170,3 +177,11 @@ class ProjectsByUser(Resource):
         
         projects = user.projects.all()
         return projects
+
+@project_ns.route('/projects')
+class ProjectList(Resource):
+    @project_ns.marshal_with(project_model_with_id, envelope='projects')
+    def get(self):
+        projects = Project.query.all()
+        return projects, 200
+
