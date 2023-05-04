@@ -3,6 +3,7 @@ import openai
 from enum import Enum
 import pandas as pd
 import shutil
+from flask import current_app
 
 from gpt_index import download_loader, GPTSimpleVectorIndex, ServiceContext
 from pathlib import Path
@@ -18,6 +19,21 @@ class DataType(Enum):
     HTML = 4
     XLSX = 5
     # IMAGE = 5
+
+def check_dir_exists(dir_path):
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+def get_files_for_project(project_name):
+    # Assuming your uploaded files are stored in a folder named after the project_name
+    print(current_app.config['UPLOAD_FOLDER'])
+    project_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
+
+    f = []
+    for data_fd in  os.listdir(project_folder):
+        f.extend(os.listdir(os.path.join(project_folder,data_fd)))
+
+    return f
 
     
 class IndexUtils():
