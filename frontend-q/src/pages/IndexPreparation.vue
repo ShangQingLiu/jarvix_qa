@@ -19,7 +19,7 @@
               unelevated
               style="height: 55px"
               icon="img:/static/questions.svg"
-              label="Question Form"
+              label="Validation Forum"
               @click="panel = 'questions'"
               class="q-ml-md"
             />
@@ -101,6 +101,12 @@ watch(session, (sessionValue) => {
     getChatHistory();
   }
 });
+// watch(panel, (panelValue) => {
+//   if (panelValue) {
+//     serviceStore.selectedSession = sessionValue;
+//     getChatHistory();
+//   }
+// });
 const fetchUserProjects = async () => {
   try {
     error.value = null;
@@ -126,6 +132,7 @@ const getSessions = async () => {
     }
   } catch (err) {
     console.log(err);
+    sessions.value = [];
     error.value = err.response.status + " - " + err.response.statusText;
   } finally {
     loading.value = false;

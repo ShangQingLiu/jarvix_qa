@@ -17,7 +17,10 @@ api.interceptors.request.use((config) => {
   // If token is found
   if (user) {
     config.headers = config.headers || {};
-    if (config.url !== "auth/login") {
+    if (
+      config.url !== "auth/login" ||
+      config.url !== "user-management/forgot_password"
+    ) {
       config.headers.Authorization = user ? `${user.access_token}` : "";
     }
   }

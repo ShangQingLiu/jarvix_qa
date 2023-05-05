@@ -65,8 +65,10 @@
 <script setup>
 import { useAuthStore } from "src/stores/auth";
 import { ref } from "vue";
+import { useQuasar } from "quasar";
 
 const email = ref("");
+const $q = useQuasar();
 
 const loading = ref(false);
 const error = ref(null);
@@ -79,6 +81,13 @@ const getCode = async () => {
       email: email.value,
     });
     console.log(res);
+    if (res) {
+      $q.notify({
+        message: res.message,
+        position: "top-right",
+        color: "primary",
+      });
+    }
   } catch (err) {
     console.log(err);
     error.value = err.response.status + " - " + err.response.statusText;

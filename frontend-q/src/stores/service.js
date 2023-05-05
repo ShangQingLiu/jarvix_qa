@@ -4,22 +4,9 @@ import { useProjectStore } from "src/stores/project";
 
 function guidGenerator() {
   var S4 = function () {
-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    return (((1 + Math.random()) * 0x1000) | 0).toString(16).substring(1);
   };
-  return (
-    S4() +
-    S4() +
-    "-" +
-    S4() +
-    "-" +
-    S4() +
-    "-" +
-    S4() +
-    "-" +
-    S4() +
-    S4() +
-    S4()
-  );
+  return S4() + S4() + "-" + S4() + S4();
 }
 export const useServiceStore = defineStore("ServiceStore", {
   state: () => ({
@@ -66,9 +53,11 @@ export const useServiceStore = defineStore("ServiceStore", {
             this.sessions = data.sessions;
             resolve(data);
           } else {
+            this.sessions = [];
             reject(new Error("Something Wrong"));
           }
         } catch (error) {
+          this.sessions = [];
           reject(error);
         }
       });

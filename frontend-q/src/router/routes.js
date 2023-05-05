@@ -68,7 +68,7 @@ const routes = [
                 "pages/UserAuthenticationAndManagement/ForgotPasswordPage.vue"
               ),
             // only authenticated users can create posts
-            meta: { requiresAuth: true },
+            meta: { requiresAuth: false },
           },
           {
             path: "otp-code",
