@@ -14,7 +14,7 @@
         </div>
         <q-list>
           <q-item
-            v-for="(user, i) in users"
+            v-for="(user, i) in users.slice(0, numberOfUsersToShow)"
             :key="i"
             class="q-py-none q-px-none list-item q-mb-lg"
           >
@@ -53,6 +53,7 @@
                   unelevated
                   class="q-mx-xs"
                   icon="edit"
+                  v-if="store.user.id === user.id"
                   @click="
                     $router.push(
                       `/user-authentication-and-management/edit/${user.id}`
@@ -67,6 +68,7 @@
                   class="q-mx-xs"
                   icon="delete"
                   @click="deleteUser(user.id)"
+                  v-if="store.user.id === user.id"
                   size="sm"
                 />
               </div>
@@ -77,8 +79,21 @@
           </q-item>
         </q-list>
         <q-separator class="q-my-lg" />
-        <q-item-label header class="text-primary">
+        <q-item-label
+          @click="numberOfUsersToShow = users.length"
+          v-if="users.length >= 10 && numberOfUsersToShow !== users.length"
+          header
+          class="text-primary cursor-pointer q-pl-none"
+        >
           View All Users
+        </q-item-label>
+        <q-item-label
+          @click="numberOfUsersToShow = 10"
+          v-if="numberOfUsersToShow == users.length"
+          header
+          class="text-primary cursor-pointer q-pl-none"
+        >
+          Show Less
         </q-item-label>
       </q-card-section>
     </q-card>
@@ -92,6 +107,8 @@ const store = useAuthStore();
 const users = computed(() => store.usersList);
 const loading = ref(false);
 const error = ref(null);
+const numberOfUsersToShow = ref(10);
+
 const fetchUsers = async () => {
   try {
     error.value = null;

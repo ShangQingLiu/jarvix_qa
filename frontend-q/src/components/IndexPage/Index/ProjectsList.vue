@@ -14,7 +14,7 @@
         </div>
         <q-list>
           <q-item
-            v-for="(project, i) in projects"
+            v-for="(project, i) in projects.slice(0, numberOfProjectsToShow)"
             :key="i"
             class="q-py-none q-px-none list-item q-mb-lg"
           >
@@ -56,12 +56,27 @@
             </q-item-section>
           </q-item>
           <q-item v-if="projects.length === 0">
-            <q-item-section> No Users Found </q-item-section>
+            <q-item-section> No Projects Found </q-item-section>
           </q-item>
         </q-list>
         <q-separator class="q-my-lg" />
-        <q-item-label header class="text-primary">
+        <q-item-label
+          @click="numberOfProjectsToShow = projects.length"
+          v-if="
+            projects.length >= 10 && numberOfProjectsToShow !== projects.length
+          "
+          header
+          class="text-primary cursor-pointer q-pl-none"
+        >
           View All Projects
+        </q-item-label>
+        <q-item-label
+          @click="numberOfProjectsToShow = 10"
+          v-if="numberOfProjectsToShow == projects.length"
+          header
+          class="text-primary cursor-pointer q-pl-none"
+        >
+          Show Less
         </q-item-label>
       </q-card-section>
     </q-card>
@@ -71,16 +86,20 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useProjectStore } from "src/stores/project";
+import { useAuthStore } from "src/stores/auth";
 const store = useProjectStore();
-const projects = computed(() => store.projectsList);
+const projects = ref([]);
 const loading = ref(false);
 const error = ref(null);
-const fetchProjects = async () => {
+const numberOfProjectsToShow = ref(10);
+const authStore = useAuthStore();
+
+const fetchUserProjects = async () => {
   try {
     error.value = null;
     loading.value = true;
-    const res = await store.fetchProjects();
-    console.log(res);
+    const res = await store.fetchUserProjects(authStore.user.id);
+    projects.value = res;
   } catch (err) {
     console.log(err);
     error.value = err.response.status + " - " + err.response.statusText;
@@ -104,7 +123,8 @@ const deleteProject = async (id) => {
 };
 
 onMounted(async () => {
-  await fetchProjects();
+  // await fetchProjects();
+  await fetchUserProjects();
 });
 </script>
 

@@ -4,7 +4,7 @@
       <div class="col-12 col-md-9">
         <q-card flat class="bg-white q-mb-lg" style="border-radius: 16px">
           <q-card-section class="q-pa-lg">
-            <p class="text-h6 text-weight-bold">Select Project</p>
+            <p class="text-h6 text-weight-bold">Please select a project</p>
             <q-select
               v-model="projectName"
               placeholder="Choose Project"
@@ -32,7 +32,7 @@
               </div>
             </div>
             <q-separator class="q-my-lg" />
-            <div v-if="projectName" class="row q-col-gutter-md">
+            <div v-if="projectName && !loading" class="row q-col-gutter-md">
               <div
                 v-for="(file, i) in projectFiles"
                 :key="i"
@@ -65,6 +65,12 @@
                 </div>
               </div>
             </div>
+            <div v-if="loading" class="q-py-lg flex justify-center">
+              <q-spinner color="dark" size="3em" />
+            </div>
+            <div class="text-center q-py-lg" v-if="projectFiles.length === 0">
+              No Project Files. Please Index and Upload Files Now
+            </div>
             <q-btn
               v-if="projectName"
               unelevated
@@ -85,12 +91,12 @@
               Upload New File
             </div>
             <q-separator class="q-my-lg" />
-            <div v-if="loading" class="q-py-lg flex justify-center">
+            <div v-if="uploadingFiles" class="q-py-lg flex justify-center">
               <q-spinner color="dark" size="3em" />
             </div>
-            <div v-if="error" class="q-py-sm flex justify-center">
+            <div v-if="uploadingError" class="q-py-sm flex justify-center">
               <div class="text-h6 text-negative">
-                {{ error }}
+                {{ uploadingError }}
               </div>
             </div>
             <div v-if="success" class="q-py-sm flex justify-center">
@@ -104,7 +110,7 @@
               class="full-width bg-accent"
               style="height: 200px"
               @click="loadLocalFiles"
-              v-if="!loading"
+              v-if="!uploadingFiles"
             >
               <q-icon name="add" color="dark"></q-icon>
             </q-btn>
@@ -122,7 +128,8 @@
               class="text-capitalize q-mt-lg"
               text-color="white"
               style="width: 120px"
-              v-if="!loading"
+              v-if="!uploadingFiles"
+              @click="loadLocalFiles"
               >Upload</q-btn
             >
           </q-card-section>
@@ -139,6 +146,9 @@ import { useProjectStore } from "src/stores/project";
 import { useAuthStore } from "src/stores/auth";
 
 import { useQuasar } from "quasar";
+import { useServiceStore } from "src/stores/service";
+
+const serviceStore = useServiceStore();
 const $q = useQuasar();
 const authStore = useAuthStore();
 
@@ -146,8 +156,10 @@ const filesRef = ref(null);
 const store = useProjectStore();
 const loading = ref(false);
 const error = ref(null);
+const uploadingFiles = ref(false);
+const uploadingError = ref(null);
 const success = ref(null);
-const projectName = ref("");
+const projectName = ref(store.selectedProject ? store.selectedProject : "");
 const projectFiles = computed(() => store.projectFiles);
 const projectList = ref([]);
 const userProjects = ref([]);
@@ -157,15 +169,16 @@ const loadLocalFiles = () => {
 };
 const fetchUserProjects = async () => {
   try {
-    error.value = null;
-    loading.value = true;
+    uploadingError.value = null;
+    uploadingFiles.value = true;
     const res = await store.fetchUserProjects(authStore.user.id);
     userProjects.value = res;
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    uploadingError.value =
+      err.response.status + " - " + err.response.statusText;
   } finally {
-    loading.value = false;
+    uploadingFiles.value = false;
   }
 };
 const uploadFiles = async (e) => {
@@ -229,7 +242,9 @@ const listProjectFiles = async () => {
 watch(projectName, (projectValue) => {
   if (projectValue) {
     store.selectedProject = projectValue;
+    store.projectFiles = [];
     listProjectFiles();
+    getSessions();
   }
 });
 const fetchProjects = async () => {
@@ -264,6 +279,22 @@ const indexProject = async () => {
         position: "top-right",
         color: "primary",
       });
+    }
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+const getSessions = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    if (store.selectedProject) {
+      const res = await serviceStore.getSessions();
+    } else {
+      return;
     }
   } catch (err) {
     console.log(err);

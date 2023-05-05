@@ -91,7 +91,8 @@ export const useProjectStore = defineStore("projectStore", {
       return new Promise(async (resolve, reject) => {
         try {
           const { data } = await api.get(`project-management/user/${userId}`);
-          this.userProjects = data.projects;
+          console.log(data);
+          this.userProjects = data;
           resolve(data);
         } catch (error) {
           reject(error);

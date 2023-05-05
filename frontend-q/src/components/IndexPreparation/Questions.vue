@@ -26,25 +26,33 @@
               :options="questionTypes"
             />
 
-            <q-btn
-              color="primary"
-              unelevated
-              class="text-dark text-capitalize"
-              text-color="white"
-              style="width: 204px"
-              type="submit"
-              >Add Question</q-btn
-            >
+            <div class="flex">
+              <q-btn
+                color="primary"
+                unelevated
+                class="text-dark text-capitalize"
+                text-color="white"
+                style="width: 204px"
+                type="submit"
+                >Add Question</q-btn
+              >
+              <q-spinner
+                v-if="loading"
+                class="q-ml-auto"
+                color="negative"
+                size="2em"
+              />
+            </div>
           </q-form>
           <q-separator class="q-my-lg" />
-          <q-scroll-area style="height: 300px">
+          <q-scroll-area ref="scrollAreaRef" style="height: 300px">
             <div v-for="(message, i) in chatHistory" :key="i" class="q-mb-md">
-              <div v-if="message.type === 'user-message'">
+              <div>
                 <div class="text-body text-dark text-weight-bold">
                   Question {{ i + 1 }} :
                 </div>
                 <div class="text-body text-dark q-ml-md text-weight-regular">
-                  {{ message.text }}
+                  {{ message.query }}
                 </div>
               </div>
             </div>
@@ -59,16 +67,18 @@
             All Possible Answers
           </div>
           <q-separator class="q-my-lg" />
-          <div v-for="(message, i) in chatHistory" :key="i" class="q-mb-md">
-            <div v-if="message.type === 'bot-message'">
-              <div class="text-body text-dark text-weight-bold">
-                Answer {{ i - 1 }} :
-              </div>
-              <div class="text-body text-dark q-ml-md text-weight-regular">
-                {{ message.text }}
+          <q-scroll-area ref="scrollAreaRef2" style="height: 300px">
+            <div v-for="(message, i) in chatHistory" :key="i" class="q-mb-md">
+              <div>
+                <div class="text-body text-dark text-weight-bold">
+                  Answer {{ i + 1 }} :
+                </div>
+                <div class="text-body text-dark q-ml-md text-weight-regular">
+                  {{ message.response }}
+                </div>
               </div>
             </div>
-          </div>
+          </q-scroll-area>
         </q-card-section>
       </q-card>
     </div>
@@ -76,7 +86,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { useServiceStore } from "src/stores/service";
 import { useRoute } from "vue-router";
 const store = useServiceStore();
@@ -86,15 +96,40 @@ const error = ref(null);
 const queryText = ref("");
 const questionType = ref("");
 const questionTypes = ref(["True/False"]);
+const scrollAreaRef = ref(null);
+const scrollAreaRef2 = ref(null);
+
+const position = ref(1);
 const submitQuery = async () => {
   try {
     error.value = null;
     loading.value = true;
     store.addUserMessage(queryText.value);
+    await nextTick();
+
+    // Scrolling at the bottom of Question List
+    const scrollArea = scrollAreaRef.value;
+    const scrollTarget = scrollArea.getScrollTarget();
+    const duration = 300;
+    scrollAreaRef.value.setScrollPosition(
+      "vertical",
+      scrollTarget.scrollHeight,
+      duration
+    );
     const res = await store.submitQuery({
       query: queryText.value,
     });
-    console.log(res);
+    await nextTick();
+
+    // Scrolling at the bottom of Answers List
+    const scrollArea2 = scrollAreaRef2.value;
+    const scrollTarget2 = scrollArea2.getScrollTarget();
+    const duration2 = 300;
+    scrollAreaRef2.value.setScrollPosition(
+      "vertical",
+      scrollTarget2.scrollHeight,
+      duration2
+    );
   } catch (err) {
     console.log(err);
     error.value = err.response.status + " - " + err.response.statusText;

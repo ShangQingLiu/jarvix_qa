@@ -1,17 +1,22 @@
 <template>
   <div class="q-py-lg">
     <div class="chat-wrapper">
-      <q-scroll-area class="chat-area">
-        <q-chat-message
-          v-for="(message, i) in chatHistory"
-          :key="i"
-          :bg-color="message.type === 'user-message' ? 'info' : 'white'"
-          text-color="dark-page"
-          size="6"
-          :text="[message.text]"
-          :sent="message.type === 'user-message' ? true : false"
-          class="q-mb-md"
-        />
+      <q-scroll-area ref="scrollAreaRef" class="chat-area">
+        <div v-for="(chat, i) in chatHistory" :key="i">
+          <q-chat-message
+            v-for="(message, j) in Object.values(chat)"
+            :key="j"
+            :bg-color="j === 0 ? 'info' : 'white'"
+            text-color="dark-page"
+            size="6"
+            :text="[message]"
+            :sent="j === 0 ? true : false"
+            class="q-mb-md"
+          />
+        </div>
+        <!-- <div v-if="!loading" class="flex flex-center q-py-lg">
+          <q-spinner color="dark" size="3em" />
+        </div> -->
       </q-scroll-area>
       <q-form @submit.prevent="submitQuery">
         <q-input
@@ -24,7 +29,8 @@
           :input-style="{ color: '#878787' }"
         >
           <template v-slot:append>
-            <q-icon name="/send.svg" />
+            <q-icon v-if="!loading" name="/send.svg" />
+            <q-spinner v-else color="negative" size="2em" />
           </template>
         </q-input>
       </q-form>
@@ -33,7 +39,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, nextTick } from "vue";
 import { useServiceStore } from "src/stores/service";
 import { useRoute } from "vue-router";
 const store = useServiceStore();
@@ -41,15 +47,32 @@ const chatHistory = computed(() => store.chatHistory);
 const loading = ref(false);
 const error = ref(null);
 const queryText = ref("");
+const scrollAreaRef = ref(null);
+const position = ref(1);
 const submitQuery = async () => {
   try {
     error.value = null;
     loading.value = true;
     store.addUserMessage(queryText.value);
+    await nextTick();
+    // Scrolling at the bottom of Question List
+    const scrollArea = scrollAreaRef.value;
+    const scrollTarget = scrollArea.getScrollTarget();
+    const duration = 300;
+    scrollAreaRef.value.setScrollPosition(
+      "vertical",
+      scrollTarget.scrollHeight,
+      duration
+    );
     const res = await store.submitQuery({
       query: queryText.value,
     });
-    console.log(res);
+    await nextTick();
+    scrollAreaRef.value.setScrollPosition(
+      "vertical",
+      scrollTarget.scrollHeight,
+      duration
+    );
   } catch (err) {
     console.log(err);
     error.value = err.response.status + " - " + err.response.statusText;
@@ -69,6 +92,6 @@ const submitQuery = async () => {
   }
 }
 .chat-area {
-  height: calc(100vh - 300px);
+  height: calc(100vh - 350px);
 }
 </style>
