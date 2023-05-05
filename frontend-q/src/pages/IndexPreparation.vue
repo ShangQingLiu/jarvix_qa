@@ -37,7 +37,10 @@
               borderless
             />
           </div>
-          <div class="q-mb-md col-12 col-md-4">
+          <div
+            class="q-mb-md col-12 col-md-4"
+            v-if="sessions.length && showExistingSessions"
+          >
             <q-select
               label="Choose Session"
               v-model="session"
@@ -46,8 +49,17 @@
               bg-color="white"
               :options="sessions"
               borderless
-              v-if="sessions.length"
             />
+          </div>
+          <div class="q-mb-md col-12 col-md-4" v-if="!showExistingSessions">
+            <q-btn
+              color="primary"
+              @click="showExistingSessions = !showExistingSessions"
+              style="height: 55px"
+              unelevated
+            >
+              Show Existing Sessions
+            </q-btn>
           </div>
         </div>
 
@@ -88,6 +100,7 @@ const session = ref(
   serviceStore.selectedSession ? serviceStore.selectedSession : null
 );
 const sessions = ref([]);
+const showExistingSessions = ref(false);
 
 watch(projectName, (projectValue) => {
   if (projectValue) {
@@ -101,12 +114,12 @@ watch(session, (sessionValue) => {
     getChatHistory();
   }
 });
-// watch(panel, (panelValue) => {
-//   if (panelValue) {
-//     serviceStore.selectedSession = sessionValue;
-//     getChatHistory();
-//   }
-// });
+watch(panel, (panelValue, OldValue) => {
+  if (panelValue !== OldValue) {
+    serviceStore.selectedSession = null;
+    serviceStore.chatHistory = [];
+  }
+});
 const fetchUserProjects = async () => {
   try {
     error.value = null;

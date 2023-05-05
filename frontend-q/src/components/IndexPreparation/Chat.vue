@@ -66,6 +66,7 @@ const submitQuery = async () => {
     );
     const res = await store.submitQuery({
       query: queryText.value,
+      sessionFrom: "ChatRoom",
     });
     await nextTick();
     scrollAreaRef.value.setScrollPosition(

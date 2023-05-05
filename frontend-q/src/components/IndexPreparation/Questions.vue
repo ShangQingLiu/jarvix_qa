@@ -118,6 +118,7 @@ const submitQuery = async () => {
     );
     const res = await store.submitQuery({
       query: queryText.value,
+      sessionFrom: "ValidationForum",
     });
     await nextTick();
 
