@@ -29,6 +29,20 @@ class Query(Resource):
         session_id = data.get('session_id')
         query = data.get('query')
 
+        if query != "":
+            url = "https://api.deepl.com/v2/translate"
+            headers = {
+                "Authorization": "DeepL-Auth-Key 2334a9ef-4325-44a5-be9c-362a30a0dc8b"
+            }
+            data = {
+                "text": f"{response}",
+                "target_lang": "EN"
+            }
+
+            query_translate = requests.post(url, headers=headers, data=data)
+
+            query = query_translate.json()["translations"][0]["text"]
+
         if project_name is None or session_id is None or query is None: 
             return jsonify({'error': 'No project name in the request'}), 400
 
