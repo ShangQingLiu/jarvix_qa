@@ -28,6 +28,7 @@ class Query(Resource):
         project_name = data.get('project_name')
         session_id = data.get('session_id')
         query = data.get('query')
+        query_origin = query
 
         if query != "":
             url = "https://api.deepl.com/v2/translate"
@@ -116,7 +117,7 @@ class Query(Resource):
         else:
             result =  response
         
-        record = {"query":query, "response":result} 
+        record = {"query":query_origin, "response":result} 
         if session_id not in chat_history.keys():
             chat_history[session_id] = [record]
         else:
