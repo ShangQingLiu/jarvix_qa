@@ -102,7 +102,6 @@ class UserResource(Resource):
 @user_ns.route('/forgot_password')
 class ForgotPassword(Resource):
     @user_ns.expect(forgot_password_model)
-    @jwt_required() 
     def post(self):
         data = user_ns.payload
         email = data.get('email')

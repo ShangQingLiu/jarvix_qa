@@ -5,16 +5,15 @@ from flask_mail import Mail
 from flask_restx import Api
 from models import db
 from dotenv import load_dotenv
+load_dotenv("/home/ubuntu/jarvix_qa/backend/.env")
 import os
 
 from config import Config
 from routes import configure_routes
 from globals import global_chatbots,mail
 
-load_dotenv()
 app = Flask(__name__)
 app.config.from_object(Config)
-print(app.config["UPLOAD_FOLDER"])
 # set OPEN_AI_KEY
 os.environ['OPENAI_API_KEY'] = os.environ.get('OPEN_API_KEY')
 
@@ -32,17 +31,20 @@ jwt._set_error_handler_callbacks(api)
 def expired_token_callback():
     return {"msg": "Token has expired"}, 401
 
-@jwt.invalid_token_loader
-def invalid_token_callback():
-    return {"msg": "Invalid token"}, 401
-
 #ns = api.namespace('/api/', description='test')
 
 @app.before_first_request
 def create_tables():
     db.create_all()
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
+
 app = configure_routes(api, app, mail, db, global_chatbots)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=2345)

@@ -2,7 +2,7 @@ from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required
 from flask import Flask,request,jsonify, current_app
 from utils import IndexUtils, DataType
-from globals import global_chatbots
+from globals import global_chatbots, project_session, chat_history
 from chatbot import ChatBot
 import os
 import requests
@@ -75,15 +75,20 @@ class Query(Resource):
             print("Index set: ", index_set)
             chatbot = ChatBot(index_set,None,project_name=project_name)
             global_chatbots[session_id] = chatbot
+            if project_name not in project_session.keys():
+                project_session[project_name] = [session_id]
+            else:
+                project_session[project_name].append(session_id)
         chatbot = global_chatbots[session_id]
         response = chatbot.run(query)
         print("Response: ", response)
-        return response
+        # return response
 
+        result = ""
         if response != "":
-            url = "https://api-free.deepl.com/v2/translate"
+            url = "https://api.deepl.com/v2/translate"
             headers = {
-                "Authorization": "DeepL-Auth-Key e2eac097-95e2-3107-90ce-13d51845862a:fx"
+                "Authorization": "DeepL-Auth-Key 2334a9ef-4325-44a5-be9c-362a30a0dc8b"
             }
             data = {
                 "text": f"{response}",
@@ -93,6 +98,39 @@ class Query(Resource):
             response = requests.post(url, headers=headers, data=data)
             print(response.json())
 
-            return response.json()["translations"][0]["text"]
+            result = response.json()["translations"][0]["text"]
         else:
-            return response
+            result =  response
+        
+        record = {"query":query, "response":result} 
+        if session_id not in chat_history.keys():
+            chat_history[session_id] = [record]
+        else:
+            chat_history[session_id].append(record)
+        
+        return result
+
+@service_ns.route("/sessions/<string:project_name>")
+@service_ns.param('project_name', 'Project name')
+class Sessions(Resource):
+    @jwt_required()
+    def get(self, project_name):
+        if project_name not in project_session.keys():
+            return {'error': 'Project name not found'}, 404
+
+        session_ids = project_session[project_name]
+        return {'sessions': session_ids}
+
+@service_ns.route("/chat_history/<string:session_id>")
+class ChatHistory(Resource):
+    @jwt_required()
+    def get(self, session_id):
+        if session_id not in chat_history.keys():
+            return jsonify({'error': 'Session ID not found'}), 404
+        history = chat_history[session_id]
+        # serialize response as JSON only if it's a string
+        history_serialized = [{'query': r['query'], 'response': r['response']} 
+                              for r in history if isinstance(r['response'], str)]
+
+        print(chat_history)
+        return {'chat_history': history_serialized}
