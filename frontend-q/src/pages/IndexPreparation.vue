@@ -4,7 +4,7 @@
       <div class="col-12">
         <q-btn
           :color="panel === 'chat' ? 'primary' : 'white'"
-          :text-color="panel === 'chat' ? 'dark' : 'dark-page'"
+          :text-color="panel === 'chat' ? 'white' : 'dark-page'"
           unelevated
           style="height: 55px"
           icon="img:src/assets/chat.svg"
@@ -13,7 +13,7 @@
         />
         <q-btn
           :color="panel === 'questions' ? 'primary' : 'white'"
-          :text-color="panel === 'questions' ? 'dark' : 'dark-page'"
+          :text-color="panel === 'questions' ? 'white' : 'dark-page'"
           unelevated
           style="height: 55px"
           icon="img:src/assets/questions.svg"
@@ -21,8 +21,11 @@
           @click="panel = 'questions'"
           class="q-ml-md"
         />
-        <q-tab-panels v-model="panel" class="bg-transparent q-px-none q-py-lg">
-          <q-tab-panel class="q-px-none" name="chat">
+        <q-tab-panels
+          v-model="panel"
+          class="bg-transparent q-px-none q-py-none"
+        >
+          <q-tab-panel class="q-px-none q-py-none" name="chat">
             <Chat />
           </q-tab-panel>
 
@@ -32,20 +35,18 @@
         </q-tab-panels>
       </div>
     </div>
-    <all-files />
   </div>
 </template>
 
 <script>
-import AllFiles from "../components/IndexPreparation/AllFiles.vue";
 import Chat from "../components/IndexPreparation/Chat.vue";
 import Questions from "../components/IndexPreparation/Questions.vue";
 export default {
-  components: { Questions, AllFiles, Chat },
+  components: { Questions, Chat },
   name: "IndexPreparation",
   data() {
     return {
-      panel: "questions",
+      panel: "chat",
     };
   },
 };

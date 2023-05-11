@@ -1,7 +1,7 @@
 <template>
   <div class="q-py-lg">
     <div class="chat-wrapper">
-      <q-scroll-area style="height: 400px">
+      <q-scroll-area class="chat-area">
         <q-chat-message
           v-for="n in 3"
           :key="n"
@@ -64,5 +64,8 @@ export default defineComponent({
   &::after {
     display: none;
   }
+}
+.chat-area {
+  height: calc(100vh - 300px);
 }
 </style>

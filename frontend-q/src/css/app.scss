@@ -7,6 +7,12 @@
 .text-dark-page {
   color: $dark-page;
 }
+.bg-dark1 {
+  background: $dark1;
+}
+.no-underline {
+  text-decoration: none;
+}
 // declare a class which applies it
 body {
   font-family: "customfont", sans-serif !important;

@@ -5,7 +5,7 @@
     </q-item-section>
 
     <q-item-section>
-      <q-item-label>{{ title }}</q-item-label>
+      <q-item-label class="text-white">{{ title }}</q-item-label>
     </q-item-section>
   </q-item>
 </template>
@@ -41,23 +41,18 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .q-item {
-  border-radius: 12px 0px 0px 12px;
+  // border-radius: 12px 0px 0px 12px;
 }
 .q-item__label {
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400;
   font-size: 19px;
-  line-height: 19px;
-  color: $dark-page;
+  line-height: 28px;
 }
-.q-router-link--exact-active {
-  background: linear-gradient(
-    90deg,
-    #45b3b2 0.01%,
-    rgba(69, 179, 178, 0) 99.99%
-  );
+.q-router-link--active {
+  background: linear-gradient(90deg, #138f8f 0%, #4dbcbc 99.99%);
   .q-item__label {
-    color: #087073;
+    color: $dark !important;
   }
 }
 </style>

@@ -12,23 +12,18 @@
             @click="toggleLeftDrawer"
             class="lt-md"
           />
-          <div class="row full-width">
-            <div class="col-xs-12 col-md-9">
-              <q-input
-                rounded
-                bg-color="white"
-                standout="bg-white text-dark"
-                class="elevation-0 q-mr-md full-width"
-                v-model="search"
-                placeholder="Search"
-                :input-style="{ color: '#878787' }"
-              >
-                <template v-slot:prepend>
-                  <q-icon name="search" color="dark-page" />
-                </template>
-              </q-input>
-            </div>
-            <div class="gt-md col-xs-12 col-md-3 q-py-none flex flex-center">
+
+          <div class="flex justify-end items-center full-width">
+            <q-btn
+              color="primary"
+              unelevated
+              class="text-capitalize"
+              text-color="white"
+              rounded
+              to="/user-authentication-and-management/login"
+              >Login</q-btn
+            >
+            <div class="gt-md flex flex-center">
               <q-item class="user-profile q-py-none">
                 <q-item-section top avatar>
                   <q-avatar size="60px">
@@ -46,13 +41,16 @@
         </q-toolbar>
       </q-header>
 
-      <q-drawer v-model="leftDrawerOpen" show-if-above :width="350">
+      <q-drawer
+        v-model="leftDrawerOpen"
+        class="left-sidebar"
+        show-if-above
+        :width="350"
+      >
         <div class="logo-container q-my-xl text-center">
           <img style="max-width: 200px" src="../assets/logo.svg" />
         </div>
-        <q-list class="q-ml-xl">
-          <q-item-label header>Main Menu</q-item-label>
-
+        <q-list class="">
           <EssentialLink
             v-for="link in essentialLinks"
             :key="link.title"
@@ -74,14 +72,14 @@ import EssentialLink from "components/EssentialLink.vue";
 
 const linksList = [
   {
-    title: "Project Management",
-    icon: "img:src/assets/project-management.svg",
-    link: "/",
-  },
-  {
     title: "User Authentication and User Management",
     icon: "img:src/assets/user-management.svg",
     link: "/user-authentication-and-management",
+  },
+  {
+    title: "Project Management",
+    icon: "img:src/assets/project-management.svg",
+    link: "/",
   },
   {
     title: "File Management",
@@ -89,7 +87,7 @@ const linksList = [
     link: "/file-management",
   },
   {
-    title: "Index Preparation",
+    title: "Services",
     icon: "img:src/assets/index-preparation.svg",
     link: "/index-preparation",
   },
@@ -119,7 +117,8 @@ export default defineComponent({
 
 <style lang="scss">
 .q-drawer--left {
-  border-radius: 0px 20px 20px 0px;
+  // border-radius: 0px 20px 20px 0px;
+  background: linear-gradient(90deg, #005055 0%, #006464 99.99%);
 }
 .user-profile {
   .q-item__label {
