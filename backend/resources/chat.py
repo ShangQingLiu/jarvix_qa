@@ -35,7 +35,7 @@ class Query(Resource):
                 "Authorization": "DeepL-Auth-Key 2334a9ef-4325-44a5-be9c-362a30a0dc8b"
             }
             data = {
-                "text": f"{response}",
+                "text": f"{query}",
                 "target_lang": "EN"
             }
 
