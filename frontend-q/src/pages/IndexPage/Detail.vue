@@ -1,0 +1,256 @@
+<template>
+  <div class="row">
+    <div class="col-12">
+      <q-card flat class="">
+        <q-card-section>
+          <div class="text-h6 text-weight-bold text-dark">
+            {{ currentProject && currentProject.name }}
+          </div>
+          <q-separator class="q-my-lg" />
+          <p class="text-dark-page">
+            {{ currentProject && currentProject.description }}
+          </p>
+          <q-separator class="q-my-lg" />
+          <!-- <div class="q-my-md" style="height: 80px">
+            <q-avatar
+              v-for="n in 5"
+              :key="n"
+              size="50px"
+              class="absolute"
+              :style="`left: ${n * 40}px`"
+            >
+              <img :src="`https://cdn.quasar.dev/img/avatar${n + 1}.jpg`" />
+            </q-avatar>
+            <q-avatar
+              color="primary"
+              text-color="white"
+              class="absolute numbered-avatar"
+              size="54px"
+              font-size="19px"
+              :style="`left: ${6 * 40}px; border: 2px solid white;`"
+            >
+              <span>+3</span>
+            </q-avatar>
+          </div> -->
+          <div class="row q-gutter-md">
+            <q-btn
+              color="primary"
+              unelevated
+              class="text-capitalize"
+              text-color="white"
+              @click="$router.push(`/invite/${$route.params.id}`)"
+              >Invite people</q-btn
+            >
+            <q-btn
+              color="primary"
+              unelevated
+              class="text-capitalize"
+              text-color="white"
+              @click="$router.push(`/edit/${$route.params.id}`)"
+              >Update Project</q-btn
+            >
+            <q-btn
+              color="dark1"
+              unelevated
+              class="text-capitalize"
+              text-color="white"
+              @click="indexProject"
+              >Index Project</q-btn
+            >
+            <q-btn
+              color="negative"
+              unelevated
+              class="text-capitalize"
+              text-color="white"
+              @click="deleteProject"
+              >Delete Project</q-btn
+            >
+          </div>
+        </q-card-section>
+      </q-card>
+    </div>
+    <div class="col-12 col-md-9">
+      <q-card flat class="bg-white q-my-lg">
+        <q-card-section class="q-pa-lg">
+          <div class="text-h6 text-weight-bold text-dark">Uploaded Files</div>
+          <q-separator class="q-my-lg" />
+          <div v-if="loading" class="q-py-lg flex justify-center">
+            <q-spinner color="dark" size="3em" />
+          </div>
+          <div v-if="error" class="q-py-sm flex justify-center">
+            <div class="text-h6 text-negative">
+              {{ error }}
+            </div>
+          </div>
+          <div class="row q-col-gutter-md" v-if="indexExist">
+            <div
+              v-for="(file, i) in projectFiles"
+              :key="i"
+              class="col-12 col-sm-6 col-md-4"
+            >
+              <div class="wrapper bg-accent">
+                <!-- <div class="img-container">
+                  <img src="~/assets/file-img.png" class="full-width" alt="" />
+                </div> -->
+                <div
+                  class="flex full-width justify-between items-center q-px-md q-py-sm"
+                >
+                  <div>
+                    <!-- Name -->
+                    <div class="text-dark text-h6 text-weight-bold">
+                      {{ file.split(".")[0] }}
+                    </div>
+                    <!-- Extension -->
+                    <div class="text-dark-page text-body">
+                      {{ file.split(".")[1] }}
+                    </div>
+                  </div>
+                  <q-btn
+                    round
+                    color="negative"
+                    unelevated
+                    class="q-mx-xs"
+                    icon="delete"
+                    size="sm"
+                    @click="deleteProjectFile(file)"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <q-btn
+            unelevated
+            color="primary"
+            class="q-mt-md"
+            text-color="white"
+            @click="indexProject"
+          >
+            Re-Index
+          </q-btn>
+        </q-card-section>
+      </q-card>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useProjectStore } from "src/stores/project";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+const $q = useQuasar();
+const route = useRoute();
+const router = useRouter();
+const store = useProjectStore();
+const loading = ref(false);
+const error = ref(null);
+const indexExist = ref(false);
+const projectFiles = computed(() => store.projectFiles);
+const currentProject = computed(() =>
+  store.projectsList.find((project) => project.id == route.params.id)
+);
+onMounted(async () => {
+  const p = store.projectsList.find((project) => project.id == route.params.id);
+  console.log(p);
+  if (!currentProject.value) {
+    router.push("/");
+  }
+  // await listProjectFiles();
+  await checkProjectIndex();
+});
+const deleteProject = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    console.log(route.params.id);
+    const res = await store.deleteProject(route.params.id);
+    console.log(res);
+    router.push("/");
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+const indexProject = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    const res = await store.indexProject({
+      project_name: currentProject.value.name,
+    });
+    if (res) {
+      $q.notify({
+        message: res.message,
+        position: "top-right",
+        color: "primary",
+      });
+      router.push("/");
+    }
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+const listProjectFiles = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    const res = await store.listProjectFiles({
+      project_name: currentProject.value.name,
+    });
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+const checkProjectIndex = async () => {
+  try {
+    const res = await store.checkProjectIndex({
+      project_name: currentProject.value.name,
+    });
+    console.log(res);
+    if (res.message === "Index exists") {
+      indexExist.value = true;
+      await listProjectFiles();
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+const deleteProjectFile = async (file) => {
+  try {
+    error.value = null;
+    loading.value = true;
+    console.log("Delete Project");
+    const res = await store.deleteProjectFile({
+      project_name: currentProject.value.name,
+      filename: file,
+    });
+    console.log(res);
+    router.push("/");
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + " - " + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
+
+<style lang="scss">
+.q-field--outlined .q-field__control:before {
+  border: 0.4px solid $dark-page;
+}
+
+.numbered-avatar .q-avatar__content {
+  width: 48px;
+  height: 50px;
+}
+</style>

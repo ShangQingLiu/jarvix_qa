@@ -1,0 +1,26 @@
+// app global css in SCSS form
+
+.text-dark-page {
+  color: $dark-page;
+}
+.bg-dark1 {
+  background: $dark1;
+}
+.no-underline {
+  text-decoration: none;
+}
+// declare a class which applies it
+
+.q-header {
+  .q-field__control {
+    &::after,
+    &::before {
+      display: none;
+    }
+    box-shadow: none !important;
+    height: 60px;
+    .q-field__prepend {
+      height: 60px;
+    }
+  }
+}
