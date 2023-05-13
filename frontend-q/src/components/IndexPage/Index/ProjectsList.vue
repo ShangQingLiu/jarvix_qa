@@ -2,7 +2,9 @@
   <div class="col-12 col-md-6">
     <q-card flat class="bg-white q-mb-lg">
       <q-card-section>
-        <div class="text-h6 text-weight-bold text-dark">All Projects</div>
+        <div class="text-h6 text-weight-bold text-dark">
+          {{ $t('pages.IndexPage.index.projectList.title') }}
+        </div>
         <q-separator class="q-my-lg" />
         <div v-if="loading" class="q-py-lg flex justify-center">
           <q-spinner color="dark" size="3em" />
@@ -42,6 +44,7 @@
                   icon="edit"
                   @click="$router.push(`/edit/${project.id}`)"
                   size="sm"
+                  v-if="authStore.user.role == 'Admin'"
                 />
                 <q-btn
                   round
@@ -49,6 +52,7 @@
                   unelevated
                   class="q-mx-xs"
                   icon="delete"
+                  v-if="authStore.user.role == 'Admin'"
                   @click="deleteProject(project.id)"
                   size="sm"
                 />
@@ -87,8 +91,9 @@
 import { computed, onMounted, ref } from "vue";
 import { useProjectStore } from "src/stores/project";
 import { useAuthStore } from "src/stores/auth";
+
 const store = useProjectStore();
-const projects = ref([]);
+const projects = computed(() => store.userProjects);
 const loading = ref(false);
 const error = ref(null);
 const numberOfProjectsToShow = ref(10);
@@ -99,7 +104,7 @@ const fetchUserProjects = async () => {
     error.value = null;
     loading.value = true;
     const res = await store.fetchUserProjects(authStore.user.id);
-    projects.value = res;
+    // projects.value = res;
   } catch (err) {
     console.log(err);
     error.value = err.response.status + " - " + err.response.statusText;

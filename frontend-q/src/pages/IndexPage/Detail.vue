@@ -39,6 +39,7 @@
               class="text-capitalize"
               text-color="white"
               @click="$router.push(`/invite/${$route.params.id}`)"
+              v-if="authStore.user.role == 'Admin'"
               >Invite people</q-btn
             >
             <q-btn
@@ -47,6 +48,7 @@
               class="text-capitalize"
               text-color="white"
               @click="$router.push(`/edit/${$route.params.id}`)"
+              v-if="authStore.user.role == 'Admin'"
               >Update Project</q-btn
             >
             <q-btn
@@ -55,6 +57,7 @@
               class="text-capitalize"
               text-color="white"
               @click="indexProject"
+              v-if="authStore.user.role == 'Admin'"
               >Index Project</q-btn
             >
             <q-btn
@@ -63,13 +66,14 @@
               class="text-capitalize"
               text-color="white"
               @click="deleteProject"
+              v-if="authStore.user.role == 'Admin'"
               >Delete Project</q-btn
             >
           </div>
         </q-card-section>
       </q-card>
     </div>
-    <div class="col-12 col-md-9">
+    <div class="col-12 col-md-9" v-if="authStore.user.role == 'Admin'">
       <q-card flat class="bg-white q-my-lg">
         <q-card-section class="q-pa-lg">
           <div class="text-h6 text-weight-bold text-dark">Uploaded Files</div>
@@ -82,6 +86,7 @@
               {{ error }}
             </div>
           </div>
+
           <div class="row q-col-gutter-md" v-if="indexExist">
             <div
               v-for="(file, i) in projectFiles"
@@ -92,17 +97,15 @@
                 <!-- <div class="img-container">
                   <img src="~/assets/file-img.png" class="full-width" alt="" />
                 </div> -->
-                <div
-                  class="flex full-width justify-between items-center q-px-md q-py-sm"
-                >
+                <div class="flex full-width justify-between items-center q-px-md q-py-sm">
                   <div>
                     <!-- Name -->
                     <div class="text-dark text-h6 text-weight-bold">
-                      {{ file.split(".")[0] }}
+                      {{ file.split('.')[0] }}
                     </div>
                     <!-- Extension -->
                     <div class="text-dark-page text-body">
-                      {{ file.split(".")[1] }}
+                      {{ file.split('.')[1] }}
                     </div>
                   </div>
                   <q-btn
@@ -124,6 +127,7 @@
             class="q-mt-md"
             text-color="white"
             @click="indexProject"
+            v-if="authStore.user.role == 'Admin'"
           >
             Re-Index
           </q-btn>
@@ -134,10 +138,12 @@
 </template>
 
 <script setup>
-import { useProjectStore } from "src/stores/project";
-import { computed, onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useQuasar } from "quasar";
+import { useProjectStore } from 'src/stores/project';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
+import { useAuthStore } from "src/stores/auth";
+
 const $q = useQuasar();
 const route = useRoute();
 const router = useRouter();
@@ -146,17 +152,20 @@ const loading = ref(false);
 const error = ref(null);
 const indexExist = ref(false);
 const projectFiles = computed(() => store.projectFiles);
+const authStore = useAuthStore();
+
 const currentProject = computed(() =>
-  store.projectsList.find((project) => project.id == route.params.id)
+  store.userProjects.find((project) => project.id == route.params.id)
 );
 onMounted(async () => {
-  const p = store.projectsList.find((project) => project.id == route.params.id);
+
+  const p = store.userProjects.find((project) => project.id == route.params.id);
   console.log(p);
   if (!currentProject.value) {
-    router.push("/");
+    router.push('/');
   }
   // await listProjectFiles();
-  await checkProjectIndex();
+  // await checkProjectIndex();
 });
 const deleteProject = async () => {
   try {
@@ -165,10 +174,10 @@ const deleteProject = async () => {
     console.log(route.params.id);
     const res = await store.deleteProject(route.params.id);
     console.log(res);
-    router.push("/");
+    router.push('/');
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -183,14 +192,14 @@ const indexProject = async () => {
     if (res) {
       $q.notify({
         message: res.message,
-        position: "top-right",
-        color: "primary",
+        position: 'top-right',
+        color: 'primary',
       });
-      router.push("/");
+      router.push('/');
     }
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -205,7 +214,7 @@ const listProjectFiles = async () => {
     console.log(res);
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -216,7 +225,7 @@ const checkProjectIndex = async () => {
       project_name: currentProject.value.name,
     });
     console.log(res);
-    if (res.message === "Index exists") {
+    if (res.message === 'Index exists') {
       indexExist.value = true;
       await listProjectFiles();
     }
@@ -228,16 +237,16 @@ const deleteProjectFile = async (file) => {
   try {
     error.value = null;
     loading.value = true;
-    console.log("Delete Project");
+    console.log('Delete Project');
     const res = await store.deleteProjectFile({
       project_name: currentProject.value.name,
       filename: file,
     });
     console.log(res);
-    router.push("/");
+    router.push('/');
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }

@@ -31,7 +31,7 @@ export const useAuthStore = defineStore("authStore", {
             password: form.password,
           });
           console.log(res);
-          await this.fetchUsers();
+          // await this.fetchUsers();
           resolve(res);
         } catch (error) {
           reject(error);

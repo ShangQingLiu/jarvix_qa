@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
+import { useAuthStore } from "src/stores/auth";
 
 export const useProjectStore = defineStore("projectStore", {
   state: () => ({
@@ -17,7 +18,9 @@ export const useProjectStore = defineStore("projectStore", {
             description: form.description,
           });
           console.log(res);
+          const authStore = useAuthStore();
           await this.fetchProjects();
+          await this.fetchUserProjects(authStore.user.id);
           resolve(res);
         } catch (error) {
           reject(error);

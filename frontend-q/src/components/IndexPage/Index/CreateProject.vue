@@ -45,11 +45,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useProjectStore } from "src/stores/project";
+import { ref } from 'vue';
+import { useProjectStore } from 'src/stores/project';
 const store = useProjectStore();
-const projectName = ref("");
-const description = ref("");
+const projectName = ref('');
+const description = ref('');
 const loading = ref(false);
 const error = ref(null);
 const createProject = async () => {
@@ -61,9 +61,13 @@ const createProject = async () => {
       description: description.value,
     });
     console.log(res);
+    if (res) {
+      projectName.value = '';
+      description.value = '';
+    }
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }

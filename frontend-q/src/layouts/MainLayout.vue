@@ -39,7 +39,7 @@
               class="gt-md flex flex-center"
             >
               <q-item class="user-profile q-py-none">
-                <q-item-section top avatar>
+                <q-item-section avatar>
                   <q-avatar size="60px">
                     <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
                   </q-avatar>
@@ -50,28 +50,33 @@
                     {{ store.user.username }}
                   </q-item-label>
                   <q-item-label caption>{{ store.user.email }}</q-item-label>
+                  <q-item-label class="text-dark">
+                    {{ store.user.role }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
             </div>
+            <q-select
+              v-model="locale"
+              :options="localeOptions"
+              bg-color="white"
+              text-color="dark"
+              emit-value
+              map-options
+
+              filled
+              style="min-width: 120px"
+            />
           </div>
         </q-toolbar>
       </q-header>
 
-      <q-drawer
-        v-model="leftDrawerOpen"
-        class="left-sidebar"
-        show-if-above
-        :width="350"
-      >
+      <q-drawer v-model="leftDrawerOpen" class="left-sidebar" show-if-above :width="350">
         <div class="logo-container q-my-xl text-center">
           <img style="max-width: 200px" src="/static/logo.svg" />
         </div>
         <q-list class="">
-          <EssentialLink
-            v-for="link in essentialLinks"
-            :key="link.title"
-            v-bind="link"
-          />
+          <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
         </q-list>
       </q-drawer>
 
@@ -83,34 +88,35 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
-import EssentialLink from "components/EssentialLink.vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "src/stores/auth";
+import { defineComponent, ref } from 'vue';
+import EssentialLink from 'components/EssentialLink.vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from 'src/stores/auth';
+import { useI18n } from 'vue-i18n';
 const linksList = [
   {
-    title: "User Authentication and User Management",
-    icon: "img:/static/user-management.svg",
-    link: "/user-authentication-and-management",
+    title: 'User Authentication and User Management',
+    icon: 'img:/static/user-management.svg',
+    link: '/user-authentication-and-management',
   },
   {
-    title: "Project Management",
-    icon: "img:/static/project-management.svg",
-    link: "/",
+    title: 'Project Management',
+    icon: 'img:/static/project-management.svg',
+    link: '/',
   },
   {
-    title: "File Management",
-    icon: "img:/static/file-management.svg",
-    link: "/file-management",
+    title: 'File Management',
+    icon: 'img:/static/file-management.svg',
+    link: '/file-management',
   },
   {
-    title: "Services",
-    icon: "img:/static/index-preparation.svg",
-    link: "/index-preparation",
+    title: 'Services',
+    icon: 'img:/static/index-preparation.svg',
+    link: '/index-preparation',
   },
 ];
 export default defineComponent({
-  name: "MainLayout",
+  name: 'MainLayout',
 
   components: {
     EssentialLink,
@@ -118,14 +124,15 @@ export default defineComponent({
 
   setup() {
     const leftDrawerOpen = ref(false);
-    const search = ref("");
+    const search = ref('');
     const router = useRouter();
     const store = useAuthStore();
+    const { locale } = useI18n({ useScope: 'global' });
 
     function logout() {
-      localStorage.removeItem("jarvixUser");
+      localStorage.removeItem('jarvixUser');
       store.user = {};
-      router.push("user-authentication-and-management/login");
+      router.push('user-authentication-and-management/login');
     }
     return {
       essentialLinks: linksList,
@@ -136,6 +143,11 @@ export default defineComponent({
       search,
       logout,
       store,
+      locale,
+      localeOptions: [
+        { value: 'en-US', label: 'English' },
+        { value: 'zhHans', label: 'Chineese' },
+      ],
     };
   },
 });

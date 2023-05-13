@@ -66,10 +66,12 @@
 <script setup>
 import { useAuthStore } from "src/stores/auth";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const username = ref("");
 const email = ref("");
 const password = ref("");
+const router = useRouter();
 
 const loading = ref(false);
 const error = ref(null);
@@ -84,12 +86,16 @@ const registerUser = async () => {
       password: password.value,
     });
     console.log(res);
+    if(res){
+      router.push("/user-authentication-and-management/login");
+    }
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = 'Please check the registration information and try to sign up again.';
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;
+
   }
 };
 </script>

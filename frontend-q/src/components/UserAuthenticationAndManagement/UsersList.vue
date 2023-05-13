@@ -18,7 +18,7 @@
             :key="i"
             class="q-py-none q-px-none list-item q-mb-lg"
           >
-            <q-item-section top avatar>
+            <q-item-section avatar>
               <q-avatar size="45px">
                 <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
               </q-avatar>
@@ -26,12 +26,13 @@
 
             <q-item-section>
               <q-item-label class="text-dark">
-                {{ user.username }}
+                {{ user.username }} ({{ user.role }})
               </q-item-label>
               <q-item-label caption>
                 {{ user.email }}
               </q-item-label>
             </q-item-section>
+
             <q-item-section side>
               <div class="flex">
                 <q-btn
@@ -41,9 +42,7 @@
                   class="q-mx-xs"
                   icon="visibility"
                   @click="
-                    $router.push(
-                      `/user-authentication-and-management/view/${user.id}`
-                    )
+                    $router.push(`/user-authentication-and-management/view/${user.id}`)
                   "
                   size="sm"
                 />
@@ -55,9 +54,7 @@
                   icon="edit"
                   v-if="store.user.id === user.id"
                   @click="
-                    $router.push(
-                      `/user-authentication-and-management/edit/${user.id}`
-                    )
+                    $router.push(`/user-authentication-and-management/edit/${user.id}`)
                   "
                   size="sm"
                 />
@@ -101,8 +98,8 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
-import { useAuthStore } from "src/stores/auth";
+import { computed, onMounted, ref } from 'vue';
+import { useAuthStore } from 'src/stores/auth';
 const store = useAuthStore();
 const users = computed(() => store.usersList);
 const loading = ref(false);
@@ -117,7 +114,7 @@ const fetchUsers = async () => {
     console.log(res);
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -130,7 +127,7 @@ const deleteUser = async (id) => {
     console.log(res);
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }

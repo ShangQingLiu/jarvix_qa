@@ -83,13 +83,16 @@ const loginUser = async () => {
       password: password.value,
     });
     console.log(res);
+    if(res){
+      router.push("/user-authentication-and-management");
+    }
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = 'Invalid user name or password, please try again.';
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;
-    router.push("/user-authentication-and-management");
+
   }
 };
 </script>

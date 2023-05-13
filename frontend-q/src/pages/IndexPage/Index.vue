@@ -1,6 +1,6 @@
 <template>
   <div class="row q-col-gutter-md">
-    <CreateProject />
+    <CreateProject v-if="authStore.user.role == 'Admin'" />
     <ProjectsList />
   </div>
 </template>
@@ -8,10 +8,8 @@
 <script setup>
 import ProjectsList from "src/components/IndexPage/Index/ProjectsList.vue";
 import CreateProject from "src/components/IndexPage/Index/CreateProject.vue";
-
-import { ref } from "vue";
-const projectName = ref("");
-const description = ref("");
+import { useAuthStore } from "src/stores/auth";
+const authStore = useAuthStore();
 </script>
 
 <style lang="scss">

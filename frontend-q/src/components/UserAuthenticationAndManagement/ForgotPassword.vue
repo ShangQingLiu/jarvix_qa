@@ -90,7 +90,7 @@ const getCode = async () => {
     }
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = 'Could not find any account belong to this email, please check the e-mail address and try again.';
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;
