@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Join Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <h1>You have successfully joined the {{ project.name }} project!</h1>
+    <p>Here are some details about the project:</p>
+    <ul>
+      <li>Project Name: {{ project.name }}</li>
+      <li>Description: {{ project.description }}</li>
+      <li>Created At: {{ project.created_at }}</li>
+      <li>Project Members:</li>
+      <ul>
+        {% for member in project.members %}
+          <li>{{ member.username }}</li>
+        {% endfor %}
+      </ul>
+    </ul>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </body>
+</html>

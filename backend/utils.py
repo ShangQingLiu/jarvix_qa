@@ -3,13 +3,14 @@ import openai
 from enum import Enum
 import pandas as pd
 import shutil
+from flask import current_app
 
-from gpt_index import download_loader, GPTSimpleVectorIndex, ServiceContext
+from llama_index import download_loader, GPTSimpleVectorIndex, ServiceContext
 from pathlib import Path
-from gpt_index import GPTListIndex, LLMPredictor
+from llama_index import GPTListIndex, LLMPredictor
 
 from langchain.chat_models import ChatOpenAI
-from gpt_index.indices.composability import ComposableGraph
+from llama_index.indices.composability import ComposableGraph
 
 class DataType(Enum):
     AUDIO = 1
@@ -18,6 +19,21 @@ class DataType(Enum):
     HTML = 4
     XLSX = 5
     # IMAGE = 5
+
+def check_dir_exists(dir_path):
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+def get_files_for_project(project_name):
+    # Assuming your uploaded files are stored in a folder named after the project_name
+    print(current_app.config['UPLOAD_FOLDER'])
+    project_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
+
+    f = []
+    for data_fd in  os.listdir(project_folder):
+        f.extend(os.listdir(os.path.join(project_folder,data_fd)))
+
+    return f
 
     
 class IndexUtils():
@@ -109,9 +125,10 @@ class IndexUtils():
 
     def loadIndexer(self, pathes:list):
         index_set = {}
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo"))
 
         for path in pathes:
-            cur_index = GPTSimpleVectorIndex.load_from_disk(Path(path))
+            cur_index = GPTSimpleVectorIndex.load_from_disk(Path(path),llm_predictor=llm_predictor)
             file_name = os.path.basename(path)
             index_set[file_name] = cur_index
 
@@ -123,7 +140,7 @@ class IndexUtils():
         graph_path = os.path.join(graph_path,file_name) 
 
         # set number of output tokens
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo"))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo"))
         service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor)
 
         if os.path.exists(graph_path):
