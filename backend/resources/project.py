@@ -49,13 +49,29 @@ def jwt_project_access_required(fn):
         return fn(*args, **kwargs)
     return wrapper
 
+def admin_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        verify_jwt_in_request()  # Ensure the JWT is present in the request
+        identity = get_jwt_identity()  # Get the identity from the JWT token
 
+        # Retrieve the user from the identity (e.g., querying from the database)
+        user = User.query.get(identity)
+
+        if user and user.role == 'Admin':
+            return fn(*args, **kwargs)
+        else:
+            return {'message': 'You do not have permission to access this resource.'}, 403
+
+    return wrapper
+
+# Admin
 @project_ns.route('/')
 class create_project(Resource): 
     @project_ns.doc('create_project')
     @project_ns.expect(project_model)
     @project_ns.marshal_with(get_project_model, code=201)
-    @jwt_required()
+    @admin_required
     def post(self):
         '''create project'''
         print("here")
@@ -72,11 +88,12 @@ class create_project(Resource):
         db.session.commit()
         return project, 201
 
+# Admin
 @project_ns.route('/<int:project_id>/invite')
 class invite(Resource):
     @project_ns.doc('invite people to the project')
     @project_ns.expect(project_invite_model)
-    @jwt_required()
+    @admin_required
     def post(self, project_id):
         '''send invitation'''
         data = request.get_json()
@@ -137,10 +154,11 @@ class Project_manage(Resource):
         if not project:
             current_app.api.abort(404, f'Project {project_id} not found')
         return project
-
+    # Admin
     @project_ns.expect(project_input_model)
     @project_ns.marshal_with(project_model)
     @jwt_project_access_required
+    @admin_required
     def put(self, project_id):
         '''Update project'''
         project = Project.query.get(project_id)
@@ -153,8 +171,9 @@ class Project_manage(Resource):
 
         db.session.commit()
         return project
-
+    # Admin
     @jwt_project_access_required
+    @admin_required
     def delete(self, project_id):
         '''Delete project'''
         project = Project.query.get(project_id)
@@ -168,7 +187,7 @@ class Project_manage(Resource):
 @project_ns.route('/user/<int:user_id>')
 class ProjectsByUser(Resource):
     @jwt_required()
-    @project_ns.marshal_with(project_model)
+    @project_ns.marshal_with(project_model_with_id)
     def get(self, user_id):
         '''get projects by user'''
         user = User.query.get(user_id)

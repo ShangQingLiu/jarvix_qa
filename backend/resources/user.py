@@ -46,7 +46,6 @@ class UserList(Resource):
     @user_ns.doc('create_user')
     @user_ns.expect(user_model)
     @user_ns.marshal_with(get_user_model, code=201)
-    @jwt_required() 
     def post(self):
         '''Create a new user'''
         data = request.get_json()
