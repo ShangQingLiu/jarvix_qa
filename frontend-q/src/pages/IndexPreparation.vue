@@ -10,7 +10,7 @@
               unelevated
               style="height: 55px"
               icon="img:/static/chat.svg"
-              label="Chat Room"
+              :label="$t('pages.IndexPreparation.chatBtn')"
               @click="panel = 'chat'"
             />
             <q-btn
@@ -19,7 +19,7 @@
               unelevated
               style="height: 55px"
               icon="img:/static/questions.svg"
-              label="Validation Forum"
+              :label="$t('pages.IndexPreparation.validationForum')"
               @click="panel = 'questions'"
               class="q-ml-md"
             />
@@ -28,7 +28,7 @@
             <q-select
               label="Choose Project"
               v-model="projectName"
-              placeholder="Choose Project"
+              :placeholder="$t('pages.IndexPreparation.chooseProject')"
               bg-color="white"
               :options="projects"
               option-value="name"
@@ -42,9 +42,9 @@
             v-if="sessions.length && showExistingSessions"
           >
             <q-select
-              label="Choose Session"
+              :label="$t('pages.IndexPreparation.chooseSession')"
               v-model="session"
-              placeholder="Choose Session"
+              :placeholder="$t('pages.IndexPreparation.chooseSession')"
               class="q-mb-md col-12 col-md-4"
               bg-color="white"
               :options="sessions"
@@ -58,15 +58,12 @@
               style="height: 55px"
               unelevated
             >
-              Show Existing Sessions
+              {{ $t('pages.IndexPreparation.showExistingSession') }}
             </q-btn>
           </div>
         </div>
 
-        <q-tab-panels
-          v-model="panel"
-          class="bg-transparent q-px-none q-py-none"
-        >
+        <q-tab-panels v-model="panel" class="bg-transparent q-px-none q-py-none">
           <q-tab-panel class="q-px-none q-py-none" name="chat">
             <Chat />
           </q-tab-panel>
@@ -81,24 +78,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import Chat from "../components/IndexPreparation/Chat.vue";
-import Questions from "../components/IndexPreparation/Questions.vue";
-import { useProjectStore } from "src/stores/project";
-import { useAuthStore } from "src/stores/auth";
-import { useServiceStore } from "src/stores/service";
+import { ref, onMounted, watch } from 'vue';
+import Chat from '../components/IndexPreparation/Chat.vue';
+import Questions from '../components/IndexPreparation/Questions.vue';
+import { useProjectStore } from 'src/stores/project';
+import { useAuthStore } from 'src/stores/auth';
+import { useServiceStore } from 'src/stores/service';
+import { useQuasar } from 'quasar';
+const $q = useQuasar();
 
 const serviceStore = useServiceStore();
 const store = useProjectStore();
-const panel = ref("chat");
-const projectName = ref(store.selectedProject ? store.selectedProject : "");
+const panel = ref('chat');
+const projectName = ref(store.selectedProject ? store.selectedProject : '');
 const loading = ref(false);
 const error = ref(null);
 const projects = ref([]);
 const authStore = useAuthStore();
-const session = ref(
-  serviceStore.selectedSession ? serviceStore.selectedSession : null
-);
+const session = ref(serviceStore.selectedSession ? serviceStore.selectedSession : null);
 const sessions = ref([]);
 const showExistingSessions = ref(false);
 
@@ -128,7 +125,7 @@ const fetchUserProjects = async () => {
     projects.value = res;
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -146,7 +143,12 @@ const getSessions = async () => {
   } catch (err) {
     console.log(err);
     sessions.value = [];
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
+    $q.notify({
+      message: error.value ? error.value : 'Something Went Wrong',
+      position: 'top-right',
+      color: 'negative',
+    });
   } finally {
     loading.value = false;
   }
@@ -158,7 +160,7 @@ const getChatHistory = async () => {
     const res = await serviceStore.getChatHistory();
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }

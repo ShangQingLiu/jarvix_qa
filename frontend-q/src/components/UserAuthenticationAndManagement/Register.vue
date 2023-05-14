@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold text-dark q-mb-md">Register</div>
+    <div class="text-h6 text-weight-bold text-dark q-mb-md">
+      {{ $t('pages.UserAuthenticationAndManagement.RegisterPage.Register.title') }}
+    </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
       <q-spinner color="dark" size="3em" />
     </div>
@@ -14,7 +16,11 @@
         <div class="col-12">
           <q-input
             v-model="username"
-            placeholder="User name"
+            :placeholder="
+              $t(
+                'pages.UserAuthenticationAndManagement.RegisterPage.Register.form.username'
+              )
+            "
             class="q-mb-md"
             borderless
             bg-color="white"
@@ -22,7 +28,9 @@
           />
           <q-input
             v-model="email"
-            placeholder="Email"
+            :placeholder="
+              $t('pages.UserAuthenticationAndManagement.RegisterPage.Register.form.email')
+            "
             class="q-mb-md"
             borderless
             type="email"
@@ -35,7 +43,11 @@
             bg-color="white"
             :input-style="{ padding: '0px 23px' }"
             v-model="password"
-            placeholder="Password"
+            :placeholder="
+              $t(
+                'pages.UserAuthenticationAndManagement.RegisterPage.Register.form.password'
+              )
+            "
             class="q-mb-md"
             type="password"
           />
@@ -49,28 +61,37 @@
         type="submit"
         square
         style="width: 200px"
-        >Sign Up</q-btn
       >
+        {{ $t('pages.UserAuthenticationAndManagement.RegisterPage.Register.form.btn') }}
+      </q-btn>
       <div class="text-subtitle1 text-dark-page q-mt-md q-mb-xs">
-        Already have an account?
+        {{
+          $t(
+            'pages.UserAuthenticationAndManagement.RegisterPage.Register.form.alreadyBtn'
+          )
+        }}
         <router-link
           to="/user-authentication-and-management/login"
           class="text-primary no-underline"
         >
-          Login
+          {{
+            $t(
+              'pages.UserAuthenticationAndManagement.RegisterPage.Register.form.loginBtn'
+            )
+          }}
         </router-link>
       </div>
     </q-form>
   </div>
 </template>
 <script setup>
-import { useAuthStore } from "src/stores/auth";
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { useAuthStore } from 'src/stores/auth';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const username = ref("");
-const email = ref("");
-const password = ref("");
+const username = ref('');
+const email = ref('');
+const password = ref('');
 const router = useRouter();
 
 const loading = ref(false);
@@ -86,8 +107,8 @@ const registerUser = async () => {
       password: password.value,
     });
     console.log(res);
-    if(res){
-      router.push("/user-authentication-and-management/login");
+    if (res) {
+      router.push('/user-authentication-and-management/login');
     }
   } catch (err) {
     console.log(err);
@@ -95,7 +116,6 @@ const registerUser = async () => {
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;
-
   }
 };
 </script>

@@ -22,7 +22,9 @@
               rounded
               to="/user-authentication-and-management/login"
               v-if="Object.keys(store.user).length === 0"
-              >Login</q-btn
+              >
+              {{ $t(`MainLayout.loginBtn`)  }}
+              </q-btn
             >
             <q-btn
               color="primary"
@@ -32,7 +34,9 @@
               rounded
               @click="logout"
               v-if="Object.keys(store.user).length !== 0"
-              >Logout</q-btn
+              >
+              {{ $t(`MainLayout.logoutBtn`)  }}
+              </q-btn
             >
             <div
               v-if="Object.keys(store.user).length !== 0"
@@ -63,9 +67,8 @@
               text-color="dark"
               emit-value
               map-options
-
               filled
-              style="min-width: 120px"
+              style="min-width: 160px"
             />
           </div>
         </q-toolbar>
@@ -93,19 +96,20 @@ import EssentialLink from 'components/EssentialLink.vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from 'src/stores/auth';
 import { useI18n } from 'vue-i18n';
+// Title here are translation files keys
 const linksList = [
   {
-    title: 'User Authentication and User Management',
+    title: 'UserAuthenticationAndManagement',
     icon: 'img:/static/user-management.svg',
     link: '/user-authentication-and-management',
   },
   {
-    title: 'Project Management',
+    title: 'Index',
     icon: 'img:/static/project-management.svg',
     link: '/',
   },
   {
-    title: 'File Management',
+    title: 'FileManagement',
     icon: 'img:/static/file-management.svg',
     link: '/file-management',
   },
@@ -146,7 +150,8 @@ export default defineComponent({
       locale,
       localeOptions: [
         { value: 'en-US', label: 'English' },
-        { value: 'zhHans', label: 'Chineese' },
+        { value: 'zhHans', label: 'Chineese ( Simplified )' },
+        { value: 'zhHant', label: 'Chineese ( Traditional )' },
       ],
     };
   },

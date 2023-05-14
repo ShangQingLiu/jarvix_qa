@@ -12,10 +12,16 @@
         </template>
 
         <q-breadcrumbs-el
-          label="User Authentication and User Management"
+          :label="
+            $t('pages.UserAuthenticationAndManagement.RegisterPage.breadcrumbs.label')
+          "
           to="/user-authentication-and-management"
         />
-        <q-breadcrumbs-el label="Sign Up" />
+        <q-breadcrumbs-el
+          :label="
+            $t('pages.UserAuthenticationAndManagement.RegisterPage.breadcrumbs.label2')
+          "
+        />
 
         /></q-breadcrumbs
       >
@@ -28,7 +34,7 @@
 </template>
 
 <script setup>
-import Register from "src/components/UserAuthenticationAndManagement/Register.vue";
+import Register from 'src/components/UserAuthenticationAndManagement/Register.vue';
 </script>
 
 <style lang="scss">

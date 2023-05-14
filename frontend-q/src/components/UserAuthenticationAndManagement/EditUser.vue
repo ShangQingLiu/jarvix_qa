@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold text-dark q-mb-md">Edit User</div>
+    <div class="text-h6 text-weight-bold text-dark q-mb-md">
+      {{ $t('pages.UserAuthenticationAndManagement.EditUserPage.EditUser.title') }}
+    </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
       <q-spinner color="dark" size="3em" />
     </div>
@@ -14,7 +16,11 @@
         <div class="col-12">
           <q-input
             v-model="username"
-            placeholder="User name"
+            :placeholder="
+              $t(
+                'pages.UserAuthenticationAndManagement.EditUserPage.EditUser.form.username'
+              )
+            "
             class="q-mb-md"
             borderless
             bg-color="white"
@@ -23,7 +29,9 @@
           />
           <q-input
             v-model="email"
-            placeholder="Email"
+            :placeholder="
+              $t('pages.UserAuthenticationAndManagement.EditUserPage.EditUser.form.email')
+            "
             class="q-mb-md"
             borderless
             type="email"
@@ -37,7 +45,11 @@
             bg-color="white"
             :input-style="{ padding: '0px 23px' }"
             v-model="password"
-            placeholder="Password"
+            :placeholder="
+              $t(
+                'pages.UserAuthenticationAndManagement.EditUserPage.EditUser.form.password'
+              )
+            "
             class="q-mb-md"
             type="password"
             required
@@ -52,20 +64,21 @@
         type="submit"
         square
         style="width: 200px"
-        >Edit User</q-btn
       >
+        {{ $t('pages.UserAuthenticationAndManagement.EditUserPage.EditUser.form.btn') }}
+      </q-btn>
     </q-form>
   </div>
 </template>
 <script setup>
-import { useAuthStore } from "src/stores/auth";
-import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useAuthStore } from 'src/stores/auth';
+import { ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
-const username = ref("");
-const email = ref("");
-const password = ref("");
+const username = ref('');
+const email = ref('');
+const password = ref('');
 
 const loading = ref(false);
 const error = ref(null);
@@ -85,11 +98,11 @@ const editUser = async () => {
     console.log(res);
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;
-    router.push("/user-authentication-and-management");
+    router.push('/user-authentication-and-management');
   }
 };
 </script>

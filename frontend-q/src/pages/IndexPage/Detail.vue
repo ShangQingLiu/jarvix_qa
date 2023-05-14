@@ -40,8 +40,9 @@
               text-color="white"
               @click="$router.push(`/invite/${$route.params.id}`)"
               v-if="authStore.user.role == 'Admin'"
-              >Invite people</q-btn
             >
+              {{ $t('pages.IndexPage.Detail.inviteBtn') }}
+            </q-btn>
             <q-btn
               color="primary"
               unelevated
@@ -49,8 +50,9 @@
               text-color="white"
               @click="$router.push(`/edit/${$route.params.id}`)"
               v-if="authStore.user.role == 'Admin'"
-              >Update Project</q-btn
             >
+              {{ $t('pages.IndexPage.Detail.updateBtn') }}
+            </q-btn>
             <q-btn
               color="dark1"
               unelevated
@@ -58,8 +60,9 @@
               text-color="white"
               @click="indexProject"
               v-if="authStore.user.role == 'Admin'"
-              >Index Project</q-btn
             >
+              {{ $t('pages.IndexPage.Detail.indexBtn') }}
+            </q-btn>
             <q-btn
               color="negative"
               unelevated
@@ -67,8 +70,9 @@
               text-color="white"
               @click="deleteProject"
               v-if="authStore.user.role == 'Admin'"
-              >Delete Project</q-btn
             >
+              {{ $t('pages.IndexPage.Detail.deleteBtn') }}
+            </q-btn>
           </div>
         </q-card-section>
       </q-card>
@@ -129,7 +133,7 @@
             @click="indexProject"
             v-if="authStore.user.role == 'Admin'"
           >
-            Re-Index
+            {{ $t('pages.IndexPage.Detail.reIndexBtn') }}
           </q-btn>
         </q-card-section>
       </q-card>
@@ -142,7 +146,7 @@ import { useProjectStore } from 'src/stores/project';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
-import { useAuthStore } from "src/stores/auth";
+import { useAuthStore } from 'src/stores/auth';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -158,7 +162,6 @@ const currentProject = computed(() =>
   store.userProjects.find((project) => project.id == route.params.id)
 );
 onMounted(async () => {
-
   const p = store.userProjects.find((project) => project.id == route.params.id);
   console.log(p);
   if (!currentProject.value) {

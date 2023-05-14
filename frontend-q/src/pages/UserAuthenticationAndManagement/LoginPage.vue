@@ -12,10 +12,15 @@
         </template>
 
         <q-breadcrumbs-el
-          label="User Authentication and User Management"
+          :label="$t('pages.UserAuthenticationAndManagement.LoginPage.breadcrumbs.label')"
           to="/user-authentication-and-management"
         />
-        <q-breadcrumbs-el label="Login" />
+
+        <q-breadcrumbs-el
+          :label="
+            $t('pages.UserAuthenticationAndManagement.LoginPage.breadcrumbs.label2')
+          "
+        />
 
         /></q-breadcrumbs
       >
@@ -28,9 +33,9 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue';
 
-import Login from "src/components/UserAuthenticationAndManagement/Login.vue";
+import Login from 'src/components/UserAuthenticationAndManagement/Login.vue';
 </script>
 
 <style lang="scss"></style>

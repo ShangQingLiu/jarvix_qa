@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold text-dark q-mb-md">New Password</div>
+    <div class="text-h6 text-weight-bold text-dark q-mb-md">
+      {{ $t('pages.UserAuthenticationAndManagement.NewPasswordPage.NewPassword.title') }}
+    </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
       <q-spinner color="dark" size="3em" />
     </div>
@@ -17,7 +19,11 @@
             bg-color="white"
             :input-style="{ padding: '0px 23px' }"
             v-model="password"
-            placeholder="Password"
+            :placeholder="
+              $t(
+                'pages.UserAuthenticationAndManagement.NewPasswordPage.NewPassword.form.password'
+              )
+            "
             class="q-mb-md"
             type="password"
           />
@@ -26,22 +32,17 @@
             bg-color="white"
             :input-style="{ padding: '0px 23px' }"
             v-model="confirmPassword"
-            placeholder="Confirm Password"
+            :placeholder="
+              $t(
+                'pages.UserAuthenticationAndManagement.NewPasswordPage.NewPassword.form.confirmPassword'
+              )
+            "
             class="q-mb-md"
             type="password"
           />
         </div>
       </div>
-      <!-- <q-btn
-        color="primary"
-        unelevated
-        class="text-capitalize q-mt-xl"
-        text-color="white"
-        type="submit"
-        square
-        style="width: 200px"
-        >Set New Password</q-btn
-      > -->
+
       <q-btn
         color="primary"
         unelevated
@@ -50,17 +51,20 @@
         to="/user-authentication-and-management/done"
         square
         style="width: 200px"
-        >Set New Password</q-btn
       >
+        {{
+          $t('pages.UserAuthenticationAndManagement.NewPasswordPage.NewPassword.form.btn')
+        }}
+      </q-btn>
     </q-form>
   </div>
 </template>
 <script setup>
-import { useAuthStore } from "src/stores/auth";
-import { ref } from "vue";
+import { useAuthStore } from 'src/stores/auth';
+import { ref } from 'vue';
 
-const username = ref("");
-const password = ref("");
+const username = ref('');
+const password = ref('');
 
 const loading = ref(false);
 const error = ref(null);
@@ -76,7 +80,7 @@ const loginUser = async () => {
     console.log(res);
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;

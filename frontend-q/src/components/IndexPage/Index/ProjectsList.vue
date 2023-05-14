@@ -3,7 +3,7 @@
     <q-card flat class="bg-white q-mb-lg">
       <q-card-section>
         <div class="text-h6 text-weight-bold text-dark">
-          {{ $t('pages.IndexPage.index.projectList.title') }}
+          {{ $t('pages.IndexPage.Index.ProjectList.title') }}
         </div>
         <q-separator class="q-my-lg" />
         <div v-if="loading" class="q-py-lg flex justify-center">
@@ -60,19 +60,19 @@
             </q-item-section>
           </q-item>
           <q-item v-if="projects.length === 0">
-            <q-item-section> No Projects Found </q-item-section>
+            <q-item-section>
+              {{ $t('pages.IndexPage.Index.ProjectList.noFound') }}
+            </q-item-section>
           </q-item>
         </q-list>
         <q-separator class="q-my-lg" />
         <q-item-label
           @click="numberOfProjectsToShow = projects.length"
-          v-if="
-            projects.length >= 10 && numberOfProjectsToShow !== projects.length
-          "
+          v-if="projects.length >= 10 && numberOfProjectsToShow !== projects.length"
           header
           class="text-primary cursor-pointer q-pl-none"
         >
-          View All Projects
+          {{ $t('pages.IndexPage.Index.ProjectList.viewAll') }}
         </q-item-label>
         <q-item-label
           @click="numberOfProjectsToShow = 10"
@@ -80,7 +80,7 @@
           header
           class="text-primary cursor-pointer q-pl-none"
         >
-          Show Less
+          {{ $t('pages.IndexPage.Index.ProjectList.viewLess') }}
         </q-item-label>
       </q-card-section>
     </q-card>
@@ -88,9 +88,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
-import { useProjectStore } from "src/stores/project";
-import { useAuthStore } from "src/stores/auth";
+import { computed, onMounted, ref } from 'vue';
+import { useProjectStore } from 'src/stores/project';
+import { useAuthStore } from 'src/stores/auth';
 
 const store = useProjectStore();
 const projects = computed(() => store.userProjects);
@@ -107,7 +107,7 @@ const fetchUserProjects = async () => {
     // projects.value = res;
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -121,7 +121,7 @@ const deleteProject = async (id) => {
     console.log(res);
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }

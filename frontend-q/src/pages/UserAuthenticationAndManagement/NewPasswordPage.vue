@@ -12,10 +12,16 @@
         </template>
 
         <q-breadcrumbs-el
-          label="User Authentication and User Management"
+          :label="
+            $t('pages.UserAuthenticationAndManagement.NewPasswordPage.breadcrumbs.label')
+          "
           to="/user-authentication-and-management"
         />
-        <q-breadcrumbs-el label="Set new pasword" />
+        <q-breadcrumbs-el
+          :label="
+            $t('pages.UserAuthenticationAndManagement.NewPasswordPage.breadcrumbs.label2')
+          "
+        />
 
         /></q-breadcrumbs
       >
@@ -28,9 +34,9 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue';
 
-import NewPassword from "src/components/UserAuthenticationAndManagement/NewPassword.vue";
+import NewPassword from 'src/components/UserAuthenticationAndManagement/NewPassword.vue';
 </script>
 
 <style lang="scss"></style>

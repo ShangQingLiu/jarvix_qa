@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold text-dark q-mb-md">Login</div>
+    <div class="text-h6 text-weight-bold text-dark q-mb-md">
+      {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.title') }}
+    </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
       <q-spinner color="dark" size="3em" />
     </div>
@@ -14,7 +16,9 @@
         <div class="col-12">
           <q-input
             v-model="username"
-            placeholder="User name"
+            :placeholder="
+              $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.username')
+            "
             class="q-mb-md"
             borderless
             bg-color="white"
@@ -26,7 +30,9 @@
             bg-color="white"
             :input-style="{ padding: '0px 23px' }"
             v-model="password"
-            placeholder="Password"
+            :placeholder="
+              $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.password')
+            "
             class="q-mb-md"
             type="password"
           />
@@ -40,35 +46,46 @@
         type="submit"
         square
         style="width: 200px"
-        >Login</q-btn
       >
+        {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.btn') }}
+      </q-btn>
       <div class="text-subtitle1 text-dark-page q-mt-md q-mb-xs">
-        Don’t have a account?
+        {{
+          $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontAccountText')
+        }}
         <router-link
           to="/user-authentication-and-management/register"
           class="text-primary no-underline"
         >
-          Sign Up
+          {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.signupBtn') }}
         </router-link>
       </div>
       <div class="text-subtitle1 text-dark-page">
-        If don’t remember your password,
+        {{
+          $t(
+            'pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontRememberText'
+          )
+        }},
         <router-link
           to="/user-authentication-and-management/forgot-password"
           class="text-primary no-underline"
         >
-          Forget Password
+          {{
+            $t(
+              'pages.UserAuthenticationAndManagement.LoginPage.Login.form.forgotPasswordBtn'
+            )
+          }}
         </router-link>
       </div>
     </q-form>
   </div>
 </template>
 <script setup>
-import { useAuthStore } from "src/stores/auth";
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-const username = ref("");
-const password = ref("");
+import { useAuthStore } from 'src/stores/auth';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+const username = ref('');
+const password = ref('');
 const router = useRouter();
 
 const loading = ref(false);
@@ -83,8 +100,8 @@ const loginUser = async () => {
       password: password.value,
     });
     console.log(res);
-    if(res){
-      router.push("/user-authentication-and-management");
+    if (res) {
+      router.push('/user-authentication-and-management');
     }
   } catch (err) {
     console.log(err);
@@ -92,7 +109,6 @@ const loginUser = async () => {
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;
-
   }
 };
 </script>

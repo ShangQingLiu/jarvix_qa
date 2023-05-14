@@ -33,17 +33,7 @@
           </div>
         </div>
       </div>
-      <!-- <q-btn
-        color="primary"
-        unelevated
-        class="text-capitalize q-mt-xl"
-        text-color="white"
-        type="submit"
-        square
-        style="width: 200px"
-        to="/user-authentication-and-management/otp-code"
-        >Continue</q-btn
-      > -->
+
       <q-btn
         color="primary"
         unelevated

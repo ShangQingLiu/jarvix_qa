@@ -3,12 +3,14 @@
     <div class="col-12 col-md-6">
       <q-card flat class="bg-white q-mb-lg">
         <q-card-section class="q-pa-lg">
-          <div class="text-h6 text-weight-bold text-dark">Add New Question</div>
+          <div class="text-h6 text-weight-bold text-dark">
+            {{ $t('pages.IndexPreparation.Question.questions.title') }}
+          </div>
           <q-separator class="q-my-lg" />
           <q-form @submit.prevent="submitQuery">
             <q-input
               v-model="queryText"
-              placeholder="Type your question here..."
+              :placeholder="$t('pages.IndexPreparation.Question.questions.queryText')"
               class="q-mb-md"
               bg-color="accent"
               :input-style="{ padding: '0px 23px' }"
@@ -17,7 +19,7 @@
             />
             <q-select
               v-model="questionType"
-              placeholder="Email"
+              :placeholder="$t('pages.IndexPreparation.Question.questions.questionType')"
               class="q-mb-md"
               bg-color="accent"
               :input-style="{ padding: '0px 23px' }"
@@ -34,14 +36,10 @@
                 text-color="white"
                 style="width: 204px"
                 type="submit"
-                >Add Question</q-btn
               >
-              <q-spinner
-                v-if="loading"
-                class="q-ml-auto"
-                color="negative"
-                size="2em"
-              />
+                {{ $t('pages.IndexPreparation.Question.questions.questionBtn') }}
+              </q-btn>
+              <q-spinner v-if="loading" class="q-ml-auto" color="negative" size="2em" />
             </div>
           </q-form>
           <q-separator class="q-my-lg" />
@@ -49,7 +47,8 @@
             <div v-for="(message, i) in chatHistory" :key="i" class="q-mb-md">
               <div>
                 <div class="text-body text-dark text-weight-bold">
-                  Question {{ i + 1 }} :
+                  {{ $t('pages.IndexPreparation.Question.questions.question') }}
+                  {{ i + 1 }} :
                 </div>
                 <div class="text-body text-dark q-ml-md text-weight-regular">
                   {{ message.query }}
@@ -64,14 +63,14 @@
       <q-card flat class="bg-white q-mb-lg">
         <q-card-section class="q-pa-lg">
           <div class="text-h6 text-weight-bold text-dark">
-            All Possible Answers
+            {{ $t('pages.IndexPreparation.Question.answers.title') }}
           </div>
           <q-separator class="q-my-lg" />
           <q-scroll-area ref="scrollAreaRef2" style="height: 300px">
             <div v-for="(message, i) in chatHistory" :key="i" class="q-mb-md">
               <div>
                 <div class="text-body text-dark text-weight-bold">
-                  Answer {{ i + 1 }} :
+                  {{ $t('pages.IndexPreparation.Question.answers.answer') }} {{ i + 1 }} :
                 </div>
                 <div class="text-body text-dark q-ml-md text-weight-regular">
                   {{ message.response }}
@@ -86,16 +85,16 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, ref } from "vue";
-import { useServiceStore } from "src/stores/service";
-import { useRoute } from "vue-router";
+import { computed, nextTick, onMounted, ref } from 'vue';
+import { useServiceStore } from 'src/stores/service';
+import { useRoute } from 'vue-router';
 const store = useServiceStore();
 const chatHistory = computed(() => store.chatHistory);
 const loading = ref(false);
 const error = ref(null);
-const queryText = ref("");
-const questionType = ref("");
-const questionTypes = ref(["True/False"]);
+const queryText = ref('');
+const questionType = ref('');
+const questionTypes = ref(['True/False']);
 const scrollAreaRef = ref(null);
 const scrollAreaRef2 = ref(null);
 
@@ -112,13 +111,13 @@ const submitQuery = async () => {
     const scrollTarget = scrollArea.getScrollTarget();
     const duration = 300;
     scrollAreaRef.value.setScrollPosition(
-      "vertical",
+      'vertical',
       scrollTarget.scrollHeight,
       duration
     );
     const res = await store.submitQuery({
       query: queryText.value,
-      sessionFrom: "ValidationForum",
+      sessionFrom: 'ValidationForum',
     });
     await nextTick();
 
@@ -127,16 +126,16 @@ const submitQuery = async () => {
     const scrollTarget2 = scrollArea2.getScrollTarget();
     const duration2 = 300;
     scrollAreaRef2.value.setScrollPosition(
-      "vertical",
+      'vertical',
       scrollTarget2.scrollHeight,
       duration2
     );
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
-    queryText.value = "";
+    queryText.value = '';
   }
 };
 </script>

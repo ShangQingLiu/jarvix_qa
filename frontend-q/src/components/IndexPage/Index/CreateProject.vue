@@ -15,7 +15,7 @@
             borderless
             bg-color="white"
             v-model="projectName"
-            placeholder="Project Name"
+            :placeholder="$t('pages.IndexPage.Index.CreateProject.form.projectName')"
             class="q-mb-md"
             :input-style="{ padding: '0px 23px' }"
             required
@@ -24,7 +24,7 @@
             borderless
             bg-color="white"
             v-model="description"
-            placeholder="Type project description here..."
+            :placeholder="$t('pages.IndexPage.Index.CreateProject.form.description')"
             type="textarea"
             class="q-mb-md"
             :input-style="{ padding: '20px 23px' }"
@@ -36,8 +36,9 @@
             class="text-capitalize"
             text-color="white"
             type="submit"
-            >Create Project</q-btn
           >
+            {{ $t('pages.IndexPage.Index.CreateProject.form.btn') }}
+          </q-btn>
         </q-form>
       </q-card-section>
     </q-card>

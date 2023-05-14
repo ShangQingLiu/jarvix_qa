@@ -2,7 +2,9 @@
   <div class="col-12">
     <q-card flat class="bg-white q-mb-lg">
       <q-card-section>
-        <div class="text-h6 text-weight-bold text-dark">All Users</div>
+        <div class="text-h6 text-weight-bold text-dark">
+          {{ $t('pages.UserAuthenticationAndManagement.IndexPage.UsersList.title') }}
+        </div>
         <q-separator class="q-my-lg" />
         <div v-if="loading" class="q-py-lg flex justify-center">
           <q-spinner color="dark" size="3em" />
@@ -72,7 +74,11 @@
             </q-item-section>
           </q-item>
           <q-item v-if="users.length === 0">
-            <q-item-section> No Users Found </q-item-section>
+            <q-item-section>
+              {{
+                $t('pages.UserAuthenticationAndManagement.IndexPage.UsersList.noFound')
+              }}
+            </q-item-section>
           </q-item>
         </q-list>
         <q-separator class="q-my-lg" />
@@ -82,7 +88,7 @@
           header
           class="text-primary cursor-pointer q-pl-none"
         >
-          View All Users
+          {{ $t('pages.UserAuthenticationAndManagement.IndexPage.UsersList.viewAll') }}
         </q-item-label>
         <q-item-label
           @click="numberOfUsersToShow = 10"
@@ -90,7 +96,7 @@
           header
           class="text-primary cursor-pointer q-pl-none"
         >
-          Show Less
+          {{ $t('pages.UserAuthenticationAndManagement.IndexPage.UsersList.viewLess') }}
         </q-item-label>
       </q-card-section>
     </q-card>

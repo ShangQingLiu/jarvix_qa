@@ -4,10 +4,12 @@
       <div class="col-12 col-md-9">
         <q-card flat class="bg-white q-mb-lg" style="border-radius: 16px">
           <q-card-section class="q-pa-lg">
-            <p class="text-h6 text-weight-bold">Please select a project</p>
+            <p class="text-h6 text-weight-bold">
+              {{ $t('pages.FileManagementPage.title') }}
+            </p>
             <q-select
               v-model="projectName"
-              placeholder="Choose Project"
+              :placeholder="$t('pages.FileManagementPage.projectName')"
               class="q-mb-md"
               bg-color="accent"
               borderless
@@ -20,7 +22,7 @@
           <q-card-section class="q-pa-lg">
             <div v-if="projectName" class="flex justify-between">
               <div class="text-h6 text-weight-bold text-dark">
-                Uploaded Files
+                {{ $t('pages.FileManagementPage.uploadFilesTitle') }}
               </div>
               <div class="text-h6 text-weight-bold text-dark">
                 {{ projectName }}
@@ -28,7 +30,7 @@
             </div>
             <div v-else class="flex justify-between">
               <div class="text-h6 text-weight-bold text-negative">
-                Select Project
+                {{ $t('pages.FileManagementPage.selectProjectTitle') }}
               </div>
             </div>
             <q-separator class="q-my-lg" />
@@ -45,11 +47,11 @@
                     <div>
                       <!-- Name -->
                       <div class="text-dark text-h6 text-weight-bold">
-                        {{ file.split(".")[0] }}
+                        {{ file.split('.')[0] }}
                       </div>
                       <!-- Extension -->
                       <div class="text-dark-page text-body">
-                        {{ file.split(".")[1] }}
+                        {{ file.split('.')[1] }}
                       </div>
                     </div>
                     <q-btn
@@ -69,7 +71,7 @@
               <q-spinner color="dark" size="3em" />
             </div>
             <div class="text-center q-py-lg" v-if="projectFiles.length === 0">
-              No Project Files. Please Index and Upload Files Now
+              {{ $t('pages.FileManagementPage.noFound') }}
             </div>
             <q-btn
               v-if="projectName"
@@ -79,7 +81,7 @@
               text-color="white"
               @click="indexProject"
             >
-              Re-Index
+              {{ $t('pages.FileManagementPage.indexBtn') }}
             </q-btn>
           </q-card-section>
         </q-card>
@@ -88,7 +90,7 @@
         <q-card flat class="bg-white q-mb-lg" style="border-radius: 10px">
           <q-card-section class="q-pa-md">
             <div class="text-h6 text-weight-bold text-dark">
-              Upload New File
+              {{ $t('pages.FileManagementPage.uploadNewFileTitle') }}
             </div>
             <q-separator class="q-my-lg" />
             <div v-if="uploadingFiles" class="q-py-lg flex justify-center">
@@ -130,8 +132,9 @@
               style="width: 120px"
               v-if="!uploadingFiles"
               @click="loadLocalFiles"
-              >Upload</q-btn
             >
+              {{ $t('pages.FileManagementPage.uploadBtn') }}
+            </q-btn>
           </q-card-section>
         </q-card>
       </div>
@@ -140,16 +143,16 @@
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from "vue";
-import { api } from "src/boot/axios";
-import { useProjectStore } from "src/stores/project";
-import { useAuthStore } from "src/stores/auth";
+import { ref, watch, computed, onMounted } from 'vue';
+import { api } from 'src/boot/axios';
+import { useProjectStore } from 'src/stores/project';
+import { useAuthStore } from 'src/stores/auth';
 
-import { useQuasar } from "quasar";
-import { useServiceStore } from "src/stores/service";
+import { useServiceStore } from 'src/stores/service';
+import { useQuasar } from 'quasar';
 
-const serviceStore = useServiceStore();
 const $q = useQuasar();
+const serviceStore = useServiceStore();
 const authStore = useAuthStore();
 
 const filesRef = ref(null);
@@ -159,7 +162,7 @@ const error = ref(null);
 const uploadingFiles = ref(false);
 const uploadingError = ref(null);
 const success = ref(null);
-const projectName = ref(store.selectedProject ? store.selectedProject : "");
+const projectName = ref(store.selectedProject ? store.selectedProject : '');
 const projectFiles = computed(() => store.projectFiles);
 const projectList = ref([]);
 const userProjects = ref([]);
@@ -175,8 +178,7 @@ const fetchUserProjects = async () => {
     userProjects.value = res;
   } catch (err) {
     console.log(err);
-    uploadingError.value =
-      err.response.status + " - " + err.response.statusText;
+    uploadingError.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     uploadingFiles.value = false;
   }
@@ -190,16 +192,12 @@ const uploadFiles = async (e) => {
     console.log(e.target.files);
     for (var i = 0; i < e.target.files.length; i++) {
       let file = e.target.files[i];
-      formData.append("files", file);
-      res = await api.post(
-        `file/upload?project_name=${projectName.value}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      formData.append('files', file);
+      res = await api.post(`file/upload?project_name=${projectName.value}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
     }
     await listProjectFiles();
   } catch (err) {
@@ -212,7 +210,7 @@ const deleteProjectFile = async (file) => {
   try {
     error.value = null;
     loading.value = true;
-    console.log("Delete Project");
+    console.log('Delete Project');
     const res = await store.deleteProjectFile({
       project_name: projectName.value,
       filename: file,
@@ -220,7 +218,7 @@ const deleteProjectFile = async (file) => {
     console.log(res);
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -234,7 +232,7 @@ const listProjectFiles = async () => {
     });
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -261,7 +259,7 @@ const fetchProjects = async () => {
     projectList.value = projects;
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -276,13 +274,13 @@ const indexProject = async () => {
     if (res) {
       $q.notify({
         message: res.message,
-        position: "top-right",
-        color: "primary",
+        position: 'top-right',
+        color: 'primary',
       });
     }
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -298,7 +296,7 @@ const getSessions = async () => {
     }
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }

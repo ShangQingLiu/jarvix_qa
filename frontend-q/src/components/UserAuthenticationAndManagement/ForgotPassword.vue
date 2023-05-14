@@ -1,7 +1,11 @@
 <template>
   <div>
     <div class="text-h6 text-weight-bold text-dark q-mb-md">
-      Forgot Password
+      {{
+        $t(
+          'pages.UserAuthenticationAndManagement.ForgotPasswordPage.ForgotPassword.title'
+        )
+      }}
     </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
       <q-spinner color="dark" size="3em" />
@@ -16,7 +20,11 @@
         <div class="col-12">
           <q-input
             v-model="email"
-            placeholder="Email"
+            :placeholder="
+              $t(
+                'pages.UserAuthenticationAndManagement.ForgotPasswordPage.ForgotPassword.form.email'
+              )
+            "
             class="q-mb-md"
             borderless
             type="email"
@@ -35,19 +43,13 @@
           square
           style="width: 200px"
           to="/user-authentication-and-management/login"
-          >Go back to login</q-btn
         >
-        <!-- <q-btn
-          color="primary"
-          unelevated
-          class="text-capitalize"
-          text-color="white"
-          type="submit"
-          square
-          style="width: 200px"
-          to="/UserAuthenticationAndManagement/otp-code"
-          >Send code</q-btn
-        > -->
+          {{
+            $t(
+              'pages.UserAuthenticationAndManagement.ForgotPasswordPage.ForgotPassword.form.btn'
+            )
+          }}
+        </q-btn>
         <q-btn
           color="primary"
           unelevated
@@ -56,18 +58,23 @@
           square
           style="width: 200px"
           type="submit"
-          >Send code</q-btn
         >
+          {{
+            $t(
+              'pages.UserAuthenticationAndManagement.ForgotPasswordPage.ForgotPassword.form.btn2'
+            )
+          }}
+        </q-btn>
       </div>
     </q-form>
   </div>
 </template>
 <script setup>
-import { useAuthStore } from "src/stores/auth";
-import { ref } from "vue";
-import { useQuasar } from "quasar";
+import { useAuthStore } from 'src/stores/auth';
+import { ref } from 'vue';
+import { useQuasar } from 'quasar';
 
-const email = ref("");
+const email = ref('');
 const $q = useQuasar();
 
 const loading = ref(false);
@@ -84,13 +91,14 @@ const getCode = async () => {
     if (res) {
       $q.notify({
         message: res.message,
-        position: "top-right",
-        color: "primary",
+        position: 'top-right',
+        color: 'primary',
       });
     }
   } catch (err) {
     console.log(err);
-    error.value = 'Could not find any account belong to this email, please check the e-mail address and try again.';
+    error.value =
+      'Could not find any account belong to this email, please check the e-mail address and try again.';
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;

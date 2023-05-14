@@ -39,16 +39,16 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, nextTick } from "vue";
-import { useServiceStore } from "src/stores/service";
-import { useRoute } from "vue-router";
+import { computed, ref, nextTick } from 'vue';
+import { useServiceStore } from 'src/stores/service';
+import { useQuasar } from "quasar";
+const $q = useQuasar();
 const store = useServiceStore();
 const chatHistory = computed(() => store.chatHistory);
 const loading = ref(false);
 const error = ref(null);
-const queryText = ref("");
+const queryText = ref('');
 const scrollAreaRef = ref(null);
-const position = ref(1);
 const submitQuery = async () => {
   try {
     error.value = null;
@@ -60,26 +60,31 @@ const submitQuery = async () => {
     const scrollTarget = scrollArea.getScrollTarget();
     const duration = 300;
     scrollAreaRef.value.setScrollPosition(
-      "vertical",
+      'vertical',
       scrollTarget.scrollHeight,
       duration
     );
     const res = await store.submitQuery({
       query: queryText.value,
-      sessionFrom: "ChatRoom",
+      sessionFrom: 'ChatRoom',
     });
     await nextTick();
     scrollAreaRef.value.setScrollPosition(
-      "vertical",
+      'vertical',
       scrollTarget.scrollHeight,
       duration
     );
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
+    $q.notify({
+      message: error.value ? error.value : 'Something Went Wrong',
+      position: 'top-right',
+      color: 'negative',
+    });
   } finally {
     loading.value = false;
-    queryText.value = "";
+    queryText.value = '';
   }
 };
 </script>

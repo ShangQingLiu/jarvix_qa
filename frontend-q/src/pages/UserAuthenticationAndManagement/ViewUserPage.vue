@@ -2,7 +2,9 @@
   <div class="col-12 col-md-6">
     <q-card flat class="bg-white q-mb-lg">
       <q-card-section>
-        <div class="text-h6 text-weight-bold text-dark">User Projects</div>
+        <div class="text-h6 text-weight-bold text-dark">
+          {{ $t('pages.UserAuthenticationAndManagement.ViewUserPage.title') }}
+        </div>
         <q-separator class="q-my-lg" />
         <div v-if="loading" class="q-py-lg flex justify-center">
           <q-spinner color="dark" size="3em" />
@@ -25,7 +27,9 @@
             </q-item-section>
           </q-item>
           <q-item v-if="projects.length === 0 && !loading">
-            <q-item-section> No User Projects Found </q-item-section>
+            <q-item-section>
+              {{ $t('pages.UserAuthenticationAndManagement.ViewUserPage.noFound') }}
+            </q-item-section>
           </q-item>
         </q-list>
       </q-card-section>
@@ -34,9 +38,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
-import { useProjectStore } from "src/stores/project";
-import { useRoute } from "vue-router";
+import { onMounted, ref } from 'vue';
+import { useProjectStore } from 'src/stores/project';
+import { useRoute } from 'vue-router';
 const store = useProjectStore();
 const route = useRoute();
 const projects = ref([]);
@@ -51,7 +55,7 @@ const fetchUserProjects = async () => {
     console.log(res);
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }

@@ -12,10 +12,20 @@
         </template>
 
         <q-breadcrumbs-el
-          label="User Authentication and User Management"
+          :label="
+            $t(
+              'pages.UserAuthenticationAndManagement.ForgotPasswordPage.breadcrumbs.label'
+            )
+          "
           to="/user-authentication-and-management"
         />
-        <q-breadcrumbs-el label="Forget Password" />
+        <q-breadcrumbs-el
+          :label="
+            $t(
+              'pages.UserAuthenticationAndManagement.ForgotPasswordPage.breadcrumbs.label2'
+            )
+          "
+        />
 
         /></q-breadcrumbs
       >
@@ -28,7 +38,7 @@
 </template>
 
 <script setup>
-import ForgotPassword from "src/components/UserAuthenticationAndManagement/ForgotPassword.vue";
+import ForgotPassword from 'src/components/UserAuthenticationAndManagement/ForgotPassword.vue';
 </script>
 
 <style lang="scss"></style>

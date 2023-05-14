@@ -1,9 +1,12 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold text-dark q-mb-md">All done!!</div>
+    <div class="text-h6 text-weight-bold text-dark q-mb-md">
+      {{ $t('pages.UserAuthenticationAndManagement.DonePage.Done.title') }}
+      !!
+    </div>
 
     <div class="text-subtitle1 text-dark-page q-mt-md q-mb-md">
-      Your password has been reset.
+      {{ $t('pages.UserAuthenticationAndManagement.DonePage.Done.subtitle') }}
     </div>
     <q-btn
       color="primary"
@@ -13,8 +16,9 @@
       square
       style="width: 200px"
       to="/user-authentication-and-management/login"
-      >Login</q-btn
     >
+      {{ $t('pages.UserAuthenticationAndManagement.DonePage.Done.loginBtn') }}
+    </q-btn>
   </div>
 </template>
 <script setup></script>

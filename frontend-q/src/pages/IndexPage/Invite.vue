@@ -4,7 +4,9 @@
       <div class="col-12">
         <q-card flat class="bg-white q-mb-lg">
           <q-card-section>
-            <div class="text-h6 text-weight-bold text-dark">Invite People</div>
+            <div class="text-h6 text-weight-bold text-dark">
+              {{ $t('pages.IndexPage.Invite.title') }}
+            </div>
             <q-separator class="q-my-lg" />
             <div v-if="loading" class="q-py-lg flex justify-center">
               <q-spinner color="dark" size="3em" />
@@ -19,7 +21,7 @@
                 <div class="col-10">
                   <q-input
                     v-model="inviteEmail"
-                    placeholder="Email"
+                    :placeholder="$t('pages.IndexPage.Invite.email')"
                     class="q-mb-md"
                     type="email"
                     bg-color="accent"
@@ -36,8 +38,9 @@
                     class="text-dark text-capitalize full-width"
                     text-color="white"
                     type="submit"
-                    >Invite</q-btn
                   >
+                    {{ $t('pages.IndexPage.Invite.inviteBtn') }}
+                  </q-btn>
                 </div>
               </div>
             </q-form>
@@ -49,16 +52,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted } from 'vue';
 
-import { useRoute, useRouter } from "vue-router";
-import { useProjectStore } from "src/stores/project";
+import { useRoute, useRouter } from 'vue-router';
+import { useProjectStore } from 'src/stores/project';
 // inside of a Vue file
-import { useQuasar } from "quasar";
+import { useQuasar } from 'quasar';
 const store = useProjectStore();
 const route = useRoute();
 const router = useRouter();
-const inviteEmail = ref("");
+const inviteEmail = ref('');
 const loading = ref(false);
 const error = ref(null);
 const $q = useQuasar();
@@ -73,14 +76,14 @@ const sendProjectInvitation = async () => {
     if (res) {
       $q.notify({
         message: res.message,
-        position: "top-right",
-        color: "primary",
+        position: 'top-right',
+        color: 'primary',
       });
-      router.push("/");
+      router.push('/');
     }
   } catch (err) {
     console.log(err);
-    error.value = err.response.status + " - " + err.response.statusText;
+    error.value = err.response.status + ' - ' + err.response.statusText;
   } finally {
     loading.value = false;
   }
@@ -90,7 +93,7 @@ const currentProject = computed(() => {
 });
 onMounted(() => {
   if (!currentProject.value) {
-    router.push("/");
+    router.push('/');
   }
 });
 </script>
