@@ -51,13 +51,11 @@
               borderless
             />
           </div>
-          <div class="q-mb-md col-12 col-md-4" v-if="!showExistingSessions">
-            <q-btn
-              color="primary"
-              @click="showExistingSessions = !showExistingSessions"
-              style="height: 55px"
-              unelevated
-            >
+          <div
+            class="q-mb-md col-12 col-md-4"
+            v-if="!showExistingSessions && sessions.length > 0"
+          >
+            <q-btn color="primary" @click="toggleShow" style="height: 55px" unelevated>
               {{ $t('pages.IndexPreparation.showExistingSession') }}
             </q-btn>
           </div>
@@ -78,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import Chat from '../components/IndexPreparation/Chat.vue';
 import Questions from '../components/IndexPreparation/Questions.vue';
 import { useProjectStore } from 'src/stores/project';
@@ -96,8 +94,12 @@ const error = ref(null);
 const projects = ref([]);
 const authStore = useAuthStore();
 const session = ref(serviceStore.selectedSession ? serviceStore.selectedSession : null);
-const sessions = ref([]);
-const showExistingSessions = ref(false);
+const sessions = computed(() => serviceStore.sessions);
+const showExistingSessions = computed(() => serviceStore.showExistingSessions);
+
+const toggleShow = () => {
+  serviceStore.showExistingSessions = !serviceStore.showExistingSessions;
+};
 
 watch(projectName, (projectValue) => {
   if (projectValue) {
@@ -117,6 +119,10 @@ watch(panel, (panelValue, OldValue) => {
     serviceStore.chatHistory = [];
   }
 });
+serviceStore.$subscribe((mutation, state) => {
+ console.log(state);
+ session.value = state.selectedSession
+})
 const fetchUserProjects = async () => {
   try {
     error.value = null;
@@ -136,7 +142,7 @@ const getSessions = async () => {
     loading.value = true;
     if (store.selectedProject) {
       const res = await serviceStore.getSessions();
-      sessions.value = res.sessions;
+      // sessions.value = res.sessions;
     } else {
       return;
     }

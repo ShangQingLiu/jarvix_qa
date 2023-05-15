@@ -14,6 +14,7 @@ export const useServiceStore = defineStore("ServiceStore", {
     sessions: [],
     selectedSession: null,
     sessionId: null,
+    showExistingSessions: false,
   }),
   actions: {
     submitQuery(form) {
@@ -34,7 +35,11 @@ export const useServiceStore = defineStore("ServiceStore", {
               session_id: sessionId,
             });
             this.sessionId = sessionId;
+            // Test Line
+            this.selectedSession = sessionId
             // this.chatHistory.push({ type: "bot-message", text: data });
+            // Test Line
+            await this.getSessions();
             await this.getChatHistory();
             resolve(data);
           } else {
@@ -46,7 +51,7 @@ export const useServiceStore = defineStore("ServiceStore", {
       });
     },
     addUserMessage(message) {
-      this.chatHistory.push({ type: "user-message", text: message });
+      this.chatHistory.push({ text: message });
     },
     getSessions() {
       return new Promise(async (resolve, reject) => {
