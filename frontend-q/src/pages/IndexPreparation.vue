@@ -148,13 +148,14 @@ const getSessions = async () => {
     }
   } catch (err) {
     console.log(err);
-    sessions.value = [];
+    // sessions.value = [];
     error.value = err.response.status + ' - ' + err.response.statusText;
-    $q.notify({
-      message: error.value ? error.value : 'Something Went Wrong',
-      position: 'top-right',
-      color: 'negative',
-    });
+    console.log(error.value ? error.value : 'Something Went Wrong');
+    // $q.notify({
+    //   message: error.value ? error.value : 'Something Went Wrong',
+    //   position: 'top-right',
+    //   color: 'negative',
+    // });
   } finally {
     loading.value = false;
   }
