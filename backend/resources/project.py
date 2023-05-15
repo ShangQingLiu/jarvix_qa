@@ -74,7 +74,6 @@ class create_project(Resource):
     @admin_required
     def post(self):
         '''create project'''
-        print("here")
         data = request.get_json()
         name = data.get('name')
         description = data.get('description')

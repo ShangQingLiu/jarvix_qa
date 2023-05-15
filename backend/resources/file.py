@@ -55,7 +55,7 @@ class UploadFile(Resource):
             if file.filename == '':
                 return {'error': 'No file selected'}, 400
             upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
-            print(file_extension)
+            # print(file_extension)
             if file_extension[1:].lower() == 'm4a':
                 upload_folder = os.path.join(upload_folder, 'audio')
             elif file_extension[1:].lower() == 'mp3':
@@ -97,7 +97,7 @@ class prepare_index(Resource):
                 check_dir_exists(docx_path)
                 doc_pathes = os.listdir(docx_path)
                 doc_pathes = [os.path.join(docx_path, doc_path) for doc_path in doc_pathes]
-                print("doc_pathes: ", doc_pathes)
+                print("doc_pathes number: ", len(doc_pathes))
                 if len(doc_pathes) == 0:
                     continue
                 print("Loading data...DOCX")
@@ -158,7 +158,7 @@ class DeleteFile(Resource):
         project_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
         file_type_path = os.path.join(project_dir,file_extension)
         file_path = os.path.join(file_type_path, filename)
-        print(file_path)
+        # print(file_path)
 
         if not os.path.exists(file_path):
             return {'error': f'File {filename} not found in project {project_name}'}, 404

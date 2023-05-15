@@ -52,7 +52,6 @@ class IndexUtils():
             DocxReader = download_loader("DocxReader")
             reader = DocxReader()
         elif data_type == DataType.PDF:
-            #TODO: not tested
             PDFReader = download_loader("PDFReader")
             reader = PDFReader()
         elif data_type == DataType.AUDIO:
@@ -125,7 +124,8 @@ class IndexUtils():
 
     def loadIndexer(self, pathes:list):
         index_set = {}
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo"))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo"))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
 
         for path in pathes:
             cur_index = GPTSimpleVectorIndex.load_from_disk(Path(path),llm_predictor=llm_predictor)
@@ -140,7 +140,8 @@ class IndexUtils():
         graph_path = os.path.join(graph_path,file_name) 
 
         # set number of output tokens
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo"))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo"))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
         service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor)
 
         if os.path.exists(graph_path):
