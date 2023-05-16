@@ -41,7 +41,7 @@
 <script setup>
 import { computed, ref, nextTick } from 'vue';
 import { useServiceStore } from 'src/stores/service';
-import { useQuasar } from "quasar";
+import { useQuasar } from 'quasar';
 const $q = useQuasar();
 const store = useServiceStore();
 const chatHistory = computed(() => store.chatHistory);

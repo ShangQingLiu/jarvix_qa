@@ -45,8 +45,6 @@ export const useAuthStore = defineStore("authStore", {
             username: form.username,
             password: form.password,
           });
-          console.log(data);
-
           const parsedData = parseJwt(data.access_token);
           localStorage.setItem(
             "jarvixUser",

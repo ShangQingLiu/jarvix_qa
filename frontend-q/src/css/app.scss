@@ -24,3 +24,29 @@
     }
   }
 }
+
+.q-table__card {
+  box-shadow: none !important;
+}
+.q-table th {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 28px;
+  padding-block: 22px;
+}
+.q-table tbody td{
+  height: 57px;
+  font-size: 19px;
+  line-height: 28px;
+}
+.q-table--horizontal-separator thead th,
+.q-table--horizontal-separator tbody tr:not(:last-child) > td{
+  border-width: 0px;
+}
+.q-table--horizontal-separator thead th{
+  background: $accent;
+}
+tr:nth-child(even) {
+  background-color: $accent;
+}

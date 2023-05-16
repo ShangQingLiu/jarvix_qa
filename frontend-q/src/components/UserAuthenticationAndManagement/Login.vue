@@ -99,7 +99,6 @@ const loginUser = async () => {
       username: username.value,
       password: password.value,
     });
-    console.log(res);
     if (res) {
       router.push('/user-authentication-and-management');
     }

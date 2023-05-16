@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12">
         <div class="row flex q-col-gutter-sm justify-between align-center">
-          <div>
+          <div class="col-12 col-md-4">
             <q-btn
               :color="panel === 'chat' ? 'primary' : 'white'"
               :text-color="panel === 'chat' ? 'white' : 'dark-page'"
@@ -14,50 +14,58 @@
               @click="panel = 'chat'"
             />
             <q-btn
-              :color="panel === 'questions' ? 'primary' : 'white'"
-              :text-color="panel === 'questions' ? 'white' : 'dark-page'"
+              :color="panel === 'validation-forum' ? 'primary' : 'white'"
+              :text-color="panel === 'validation-forum' ? 'white' : 'dark-page'"
               unelevated
               style="height: 55px"
               icon="img:/static/questions.svg"
               :label="$t('pages.IndexPreparation.validationForum')"
-              @click="panel = 'questions'"
+              @click="panel = 'validation-forum'"
               class="q-ml-md"
             />
           </div>
-          <div class="q-mb-md col-12 col-md-4">
-            <q-select
-              label="Choose Project"
-              v-model="projectName"
-              :placeholder="$t('pages.IndexPreparation.chooseProject')"
-              bg-color="white"
-              :options="projects"
-              option-value="name"
-              option-label="name"
-              emit-value
-              borderless
-            />
-          </div>
-          <div
-            class="q-mb-md col-12 col-md-4"
-            v-if="sessions.length && showExistingSessions"
-          >
-            <q-select
-              :label="$t('pages.IndexPreparation.chooseSession')"
-              v-model="session"
-              :placeholder="$t('pages.IndexPreparation.chooseSession')"
-              class="q-mb-md col-12 col-md-4"
-              bg-color="white"
-              :options="sessions"
-              borderless
-            />
-          </div>
-          <div
-            class="q-mb-md col-12 col-md-4"
-            v-if="!showExistingSessions && sessions.length > 0"
-          >
-            <q-btn color="primary" @click="toggleShow" style="height: 55px" unelevated>
-              {{ $t('pages.IndexPreparation.showExistingSession') }}
-            </q-btn>
+          <div class="q-mb-md col-12 col-md-8">
+            <div class="row flex justify-around align-center">
+              <q-select
+                label="Choose Project"
+                v-model="projectName"
+                :placeholder="$t('pages.IndexPreparation.chooseProject')"
+                bg-color="white"
+                :options="projects"
+                option-value="name"
+                option-label="name"
+                class="col-4"
+                emit-value
+                borderless
+              />
+              <q-btn
+                v-if="projectName"
+                color="primary"
+                @click="generateNewSession"
+                unelevated
+                class="q-ml-sm"
+              >
+                Generate New Session
+              </q-btn>
+              <q-select
+                v-if="sessions.length && showExistingSessions"
+                :label="$t('pages.IndexPreparation.chooseSession')"
+                v-model="session"
+                :placeholder="$t('pages.IndexPreparation.chooseSession')"
+                class="col-12 col-md-3"
+                bg-color="white"
+                :options="sessions"
+                borderless
+              />
+              <q-btn
+                v-if="!showExistingSessions && sessions.length > 0"
+                color="primary"
+                @click="toggleShow"
+                unelevated
+              >
+                {{ $t('pages.IndexPreparation.showExistingSession') }}
+              </q-btn>
+            </div>
           </div>
         </div>
 
@@ -66,8 +74,11 @@
             <Chat />
           </q-tab-panel>
 
-          <q-tab-panel class="q-px-none" name="questions">
+          <!-- <q-tab-panel class="q-px-none" name="questions">
             <Questions />
+          </q-tab-panel> -->
+          <q-tab-panel class="q-px-none" name="validation-forum">
+            <ValidationForum />
           </q-tab-panel>
         </q-tab-panels>
       </div>
@@ -78,10 +89,13 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import Chat from '../components/IndexPreparation/Chat.vue';
-import Questions from '../components/IndexPreparation/Questions.vue';
+// import Questions from '../components/IndexPreparation/Questions.vue';
+import ValidationForum from '../components/IndexPreparation/ValidationForum.vue';
+
 import { useProjectStore } from 'src/stores/project';
 import { useAuthStore } from 'src/stores/auth';
 import { useServiceStore } from 'src/stores/service';
+import { guidGenerator } from 'src/utils';
 import { useQuasar } from 'quasar';
 const $q = useQuasar();
 
@@ -107,22 +121,33 @@ watch(projectName, (projectValue) => {
     getSessions();
   }
 });
-watch(session, (sessionValue) => {
+watch(session, async (sessionValue) => {
   if (sessionValue) {
     serviceStore.selectedSession = sessionValue;
-    getChatHistory();
+    serviceStore.sessionId = sessionValue;
+    await getChatHistory();
   }
 });
 watch(panel, (panelValue, OldValue) => {
   if (panelValue !== OldValue) {
     serviceStore.selectedSession = null;
     serviceStore.chatHistory = [];
+    let sessionFrom = panelValue === 'chat' ? 'ChatRoom' : 'ValidationForum';
+    serviceStore.sessionFrom = sessionFrom;
   }
 });
 serviceStore.$subscribe((mutation, state) => {
- console.log(state);
- session.value = state.selectedSession
-})
+  session.value = state.selectedSession;
+});
+const generateNewSession = async () => {
+  let sessionFrom = panel === 'chat' ? 'ChatRoom' : 'ValidationForum';
+  serviceStore.sessionFrom = sessionFrom;
+  let sessionId = store.selectedProject + '-' + sessionFrom + '-' + guidGenerator();
+  serviceStore.sessionId = sessionId;
+  session.value = sessionId;
+  serviceStore.chatHistory = [];
+  await getSessions();
+};
 const fetchUserProjects = async () => {
   try {
     error.value = null;
@@ -147,15 +172,7 @@ const getSessions = async () => {
       return;
     }
   } catch (err) {
-    console.log(err);
-    // sessions.value = [];
     error.value = err.response.status + ' - ' + err.response.statusText;
-    console.log(error.value ? error.value : 'Something Went Wrong');
-    // $q.notify({
-    //   message: error.value ? error.value : 'Something Went Wrong',
-    //   position: 'top-right',
-    //   color: 'negative',
-    // });
   } finally {
     loading.value = false;
   }

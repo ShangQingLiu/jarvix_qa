@@ -3,63 +3,7 @@
     <q-layout class="q-pa-md" view="lHh Lpr lFf">
       <q-header class="bg-transparent q-pa-md">
         <q-toolbar>
-          <q-btn
-            flat
-            dense
-            round
-            icon="menu"
-            aria-label="Menu"
-            @click="toggleLeftDrawer"
-            class="lt-md"
-          />
-
-          <div class="flex justify-end items-center full-width">
-            <q-btn
-              color="primary"
-              unelevated
-              class="text-capitalize"
-              text-color="white"
-              rounded
-              to="/user-authentication-and-management/login"
-              v-if="Object.keys(store.user).length === 0"
-              >
-              {{ $t(`MainLayout.loginBtn`)  }}
-              </q-btn
-            >
-            <q-btn
-              color="primary"
-              unelevated
-              class="text-capitalize"
-              text-color="white"
-              rounded
-              @click="logout"
-              v-if="Object.keys(store.user).length !== 0"
-              >
-              {{ $t(`MainLayout.logoutBtn`)  }}
-              </q-btn
-            >
-            <div
-              v-if="Object.keys(store.user).length !== 0"
-              class="gt-md flex flex-center"
-            >
-              <q-item class="user-profile q-py-none">
-                <q-item-section avatar>
-                  <q-avatar size="60px">
-                    <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
-                  </q-avatar>
-                </q-item-section>
-
-                <q-item-section>
-                  <q-item-label class="text-dark">
-                    {{ store.user.username }}
-                  </q-item-label>
-                  <q-item-label caption>{{ store.user.email }}</q-item-label>
-                  <q-item-label class="text-dark">
-                    {{ store.user.role }}
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
-            </div>
+          <div class="flex justify-between items-center full-width">
             <q-select
               v-model="locale"
               :options="localeOptions"
@@ -70,6 +14,62 @@
               filled
               style="min-width: 160px"
             />
+            <q-btn
+              flat
+              dense
+              round
+              icon="menu"
+              aria-label="Menu"
+              @click="toggleLeftDrawer"
+              class="lt-md"
+            />
+
+            <div class="flex justify-end items-center">
+              <q-btn
+                color="primary"
+                unelevated
+                class="text-capitalize"
+                text-color="white"
+                rounded
+                to="/user-authentication-and-management/login"
+                v-if="Object.keys(store.user).length === 0"
+              >
+                {{ $t(`MainLayout.loginBtn`) }}
+              </q-btn>
+              <q-btn
+                color="primary"
+                unelevated
+                class="text-capitalize"
+                text-color="white"
+                rounded
+                @click="logout"
+                v-if="Object.keys(store.user).length !== 0"
+              >
+                {{ $t(`MainLayout.logoutBtn`) }}
+              </q-btn>
+              <div
+                v-if="Object.keys(store.user).length !== 0"
+                class="gt-md flex flex-center"
+              >
+                <q-item class="user-profile q-py-none">
+                  <q-item-section avatar>
+                    <q-avatar size="60px">
+                      <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+                    </q-avatar>
+                  </q-item-section>
+
+                  <q-item-section>
+                    <q-item-label class="text-dark">
+                      {{ store.user.username }}
+                    </q-item-label>
+                    <q-item-label caption>{{ store.user.email }}</q-item-label>
+                    <q-item-label class="text-dark">
+                      {{ store.user.role }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </div>
+            </div>
           </div>
         </q-toolbar>
       </q-header>
@@ -91,10 +91,12 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import EssentialLink from 'components/EssentialLink.vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from 'src/stores/auth';
+import { useServiceStore } from 'src/stores/service';
+
 import { useI18n } from 'vue-i18n';
 // Title here are translation files keys
 const linksList = [
@@ -131,6 +133,7 @@ export default defineComponent({
     const search = ref('');
     const router = useRouter();
     const store = useAuthStore();
+    const serviceStore = useServiceStore();
     const { locale } = useI18n({ useScope: 'global' });
 
     function logout() {
@@ -138,6 +141,11 @@ export default defineComponent({
       store.user = {};
       router.push('user-authentication-and-management/login');
     }
+    watch(locale, (val) => {
+      val == 'en-US'
+        ? (serviceStore.currentLanguage = 'EN')
+        : (serviceStore.currentLanguage = 'ZH');
+    });
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
