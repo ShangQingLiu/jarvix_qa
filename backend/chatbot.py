@@ -49,6 +49,16 @@ class ChatBot():
         input_variables=["query"],
     )
 
+        yes_no_prompt = """
+"I want you to act as a simple AI which only answer by "Yes" or "No" to my questions."
+"Do no write explanations. If you can't answer by Yes or No, type"I can't answer","
+"but do not type anythins else.\n"
+"The questio is: {query}""" 
+        self.yes_no_prompt = PromptTemplate(
+        template=yes_no_prompt,
+        input_variables=["query"],
+    )
+
     def run(self,query)->str:
         agent_prompt = self.prompt.format(query=query)
         try:
@@ -60,7 +70,18 @@ class ChatBot():
             response = response.removeprefix("Could not parse LLM output: `").removesuffix("`")
         return response 
 
-        # define query configs for graph 
+
+    def run_yes_no(self,query)->str:
+        agent_prompt = self.yes_no_prompt.format(query=query)
+        try:
+            response = self.agent.run(input=agent_prompt).strip()
+        except ValueError as e:
+            response = str(e)
+            if not response.startswith("Could not parse LLM output: `"):
+                raise e
+            response = response.removeprefix("Could not parse LLM output: `").removesuffix("`")
+        return response 
+
     def get_query_configs(self):
         llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo"))
         decompose_transform = DecomposeQueryTransform(

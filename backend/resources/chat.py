@@ -16,16 +16,158 @@ query_model = service_ns.model('Query', {
     'project_name': fields.String(required=True, description='Focus Project Name'),
     'session_id': fields.String(required=True, description='Remain the talk in the same session'),
     'query': fields.String(required=True, description='query string from customer'),
+    'language': fields.String(description='return language'),
 })
 
-def get_all_upload_files(upload_dir:str, file_type:str):
+validation_form_model = service_ns.model('ValidationForm', {
+    'validation_form': fields.String(required=True, description='Validation form string'),
+    'project_name': fields.String(required=True, description='Focus Project Name'),
+    'session_id': fields.String(required=True, description='Remain the talk in the same session'),
+})
+
+answer_model = service_ns.model('Answer', {
+    'question': fields.String(required=True, description='Question'),
+    'expect_answer': fields.String(required=True, description='Expected Answer'),
+    'query_answer': fields.String(required=True, description='Queried Answer'),
+    'is_correct': fields.Boolean(required=True, description='Is the Answer Correct?')
+})
+
+response_model = service_ns.model('Response', {
+    'answer': fields.List(fields.Nested(answer_model), required=True, description='List of Answer Objects'),
+    'correct_number': fields.Integer(required=True, description='Number of Correct Answers'),
+    'wrong_number': fields.Integer(required=True, description='Number of Wrong Answers'),
+    'total_number': fields.Integer(required=True, description='Total Number of Answers')
+})
+
+def get_files(upload_dir:str, file_type:str):
     file_dir = os.path.join(upload_dir, file_type) 
     if not os.path.exists(file_dir):
         os.makedirs(file_dir)
     file_pathes = os.listdir(file_dir)
     result = [os.path.join(upload_dir, file_type, file_path) for file_path in file_pathes]
-
     return result
+
+def get_all_upload_files(upload_dir:str, file_type:str):
+    # for pdf extract also tabular data and image data
+    result = []
+    if file_type == "pdf":
+        pass
+        # tabular
+        result += get_files(upload_dir,"pdf_tabular")
+    
+    result += get_files(upload_dir,file_type)
+     
+    return result
+
+def answer(project_name,session_id, query, is_yes_no_q=False):
+    # Prepare Index
+    upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
+    if session_id not in global_chatbots.keys():
+        # Make sure the project directory exists
+        if not os.path.exists(upload_dir):
+            os.makedirs(upload_dir)
+
+        indexUtils = IndexUtils(current_app.config["INDEX_SAVE_PATH"],project_name)
+
+        # Read all files in the project directory
+        index_set = {}
+        for data_type in DataType:
+            file_pathes = get_all_upload_files(upload_dir,data_type.name.lower())
+            index_set.update(indexUtils.dataLoader(file_pathes, data_type))
+
+        # print("Index set: ", index_set)
+        chatbot = ChatBot(index_set,None,project_name=project_name)
+        global_chatbots[session_id] = chatbot
+        if project_name not in project_session.keys():
+            project_session[project_name] = [session_id]
+        else:
+            project_session[project_name].append(session_id)
+    # Find Answer
+    chatbot = global_chatbots[session_id]
+    if is_yes_no_q:
+        response = chatbot.run_yes_no(query)
+    else:
+        response = chatbot.run(query)
+    return response
+
+def translate(text,language:str): # language: ZH, EN
+    result = ""
+
+    if text != "":
+        url = "https://api.deepl.com/v2/translate"
+        headers = {
+            "Authorization": f"DeepL-Auth-Key {os.environ.get('DEEP_L_KEY')}"
+        }
+        data = {
+            "text": f"{text}",
+            "target_lang": f"{language}"
+        }
+
+        text = requests.post(url, headers=headers, data=data)
+        # print(response.json())
+
+        result = text.json()["translations"][0]["text"]
+    else:
+        result =  text
+    return result
+
+def get_query_answer(project_name,session_id, query):
+    response = answer(project_name,session_id, query, is_yes_no_q=True)
+    # response = translate(response,"ZH")
+    return response
+
+@service_ns.route("/validation_form")
+class ValidationForm(Resource):
+    @service_ns.expect(validation_form_model)
+    @service_ns.marshal_with(response_model)
+    @jwt_required()
+    def post(self):
+        data = request.get_json()
+        validation_form = data.get('validation_form')
+        project_name = data.get('project_name')
+        session_id = data.get('session_id')
+
+        if project_name is None or session_id is None: 
+            return {'error': 'No project name or session id  in the request'}, 400
+
+        if validation_form is None:
+            return {'error': 'No validation form in the request'}, 400
+
+        # Assuming the validation form string format is: "Q1,ExpectedAnswer\nQ2,ExpectedAnswer\n..."
+        form_lines = validation_form.split('\n')
+        
+        answer_list = []
+        correct_number = 0
+        wrong_number = 0
+
+        for line in form_lines:
+            question, expect_answer = line.split(',')
+
+            # Assuming the function get_query_answer(question) is available and returns the answer to a given question
+            query_answer = get_query_answer(project_name,session_id,question)
+            is_correct = (expect_answer.lower() in query_answer.lower())
+
+            answer_list.append({
+                'question': question,
+                'expect_answer': expect_answer,
+                'query_answer': query_answer,
+                'is_correct': is_correct
+            })
+
+            if is_correct:
+                correct_number += 1
+            else:
+                wrong_number += 1
+
+        response = {
+            'answer': answer_list,
+            'correct_number': correct_number,
+            'wrong_number': wrong_number,
+            'total_number': correct_number + wrong_number
+        }
+
+        return response
+        
 
 @service_ns.route("/query")
 class Query(Resource):
@@ -37,28 +179,15 @@ class Query(Resource):
         project_name = data.get('project_name')
         session_id = data.get('session_id')
         query = data.get('query')
+        language = data.get('language')
+        language = language if language is not None else "ZH"
         query_origin = query
-
-        # Translate to English give better finding result in the text
-        # if query != "":
-        #     url = "https://api.deepl.com/v2/translate"
-        #     headers = {
-        #         "Authorization": "DeepL-Auth-Key 2334a9ef-4325-44a5-be9c-362a30a0dc8b"
-        #     }
-        #     data = {
-        #         "text": f"{query}",
-        #         "target_lang": "EN"
-        #     }
-
-        #     query_translate = requests.post(url, headers=headers, data=data)
-
-        #     query = query_translate.json()["translations"][0]["text"]
 
         if project_name is None or session_id is None or query is None: 
             return {'error': 'No project name in the request'}, 400
 
+        # Prepare Index
         upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
-
         if session_id not in global_chatbots.keys():
             # Make sure the project directory exists
             if not os.path.exists(upload_dir):
@@ -79,30 +208,15 @@ class Query(Resource):
                 project_session[project_name] = [session_id]
             else:
                 project_session[project_name].append(session_id)
+        # Find Answer
         chatbot = global_chatbots[session_id]
         response = chatbot.run(query)
-        # print("Response: ", response)
-        # return response
-
-        result = ""
-        if response != "":
-            url = "https://api.deepl.com/v2/translate"
-            headers = {
-                "Authorization": "DeepL-Auth-Key 2334a9ef-4325-44a5-be9c-362a30a0dc8b"
-            }
-            data = {
-                "text": f"{response}",
-                "target_lang": "ZH"
-            }
-
-            response = requests.post(url, headers=headers, data=data)
-            # print(response.json())
-
-            result = response.json()["translations"][0]["text"]
-        else:
-            result =  response
+        # Translate
+        result = translate(response, language)
         
         record = {"query":query_origin, "response":result} 
+
+        # Record 
         if session_id not in chat_history.keys():
             chat_history[session_id] = [record]
         else:
