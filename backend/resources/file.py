@@ -182,9 +182,11 @@ class CheckIndex(Resource):
 
         # Check if the project index exists
         index_file_path = os.path.join(current_app.config["ROOT_PATH"],current_app.config["INDEX_SAVE_PATH"])
-        if len(os.listdir(index_file_path))!=0:
+        project_file_path = os.path.join(index_file_path,project_name)
+
+        if os.path.exists(project_file_path) and len(os.listdir(project_file_path))!=0:
             return {"message": "Index exists"}, 200
         else:
-            return {"message": "Index does not exist"}, 404
+            return {"message": "Index does not exist"}, 200 
 
 

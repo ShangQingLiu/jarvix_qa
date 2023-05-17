@@ -93,7 +93,7 @@ class ChatBot():
                 "query_mode": "default",
                 "query_kwargs": {
                     "similarity_top_k": 3,
-                    # "include_summary": True
+                    "include_summary": True
                 },
                 "query_transform": decompose_transform
             },

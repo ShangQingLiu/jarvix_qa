@@ -78,11 +78,13 @@ class UserResource(Resource):
     def put(self, user_id):
         '''Update a user given its identifier'''
         data = request.get_json()
+        print(data)
         user = User.query.get(user_id)
         if not user:
             current_app.api.abort(404)
-        user.username = data.get('username', user.username)
-        user.email = data.get('email', user.email)
+        user.username = data.get('username')
+        user.email = data.get('email')
+        user.set_password(data.get('password'))
         db.session.commit()
         return user
 

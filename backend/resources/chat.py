@@ -1,9 +1,10 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Flask,request,jsonify, current_app
 from utils import IndexUtils, DataType
 from globals import global_chatbots, project_session, chat_history
 from chatbot import ChatBot
+from models import Project, User
 import os
 import requests
 
@@ -230,9 +231,22 @@ class Sessions(Resource):
     @jwt_required()
     def get(self, project_name):
         if project_name not in project_session.keys():
-            return {'error': 'Project name not found'}, 404
+            return {'sessions': []}
 
         session_ids = project_session[project_name]
+        return {'sessions': session_ids}
+
+@service_ns.route("/sessions/<string:project_id>")
+@service_ns.param('project_id', 'Project ID')
+class Sessions(Resource):
+    @jwt_required()
+    def get(self, project_id):
+        user_id = get_jwt_identity()
+        project = Project.query.filter_by(id=project_id).filter(Project.members.any(User.id == user_id)).first()
+        if project.name not in project_session.keys():
+            return {'sessions': []}
+
+        session_ids = project_session[project.name]
         return {'sessions': session_ids}
 
 # TODO: Long time storage in the file system
