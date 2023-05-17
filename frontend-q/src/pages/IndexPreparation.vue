@@ -27,7 +27,7 @@
           <div class="q-mb-md col-12 col-md-8">
             <div class="row flex justify-around align-center">
               <q-select
-                label="Choose Project"
+                :label="$t('pages.IndexPreparation.chooseProject')"
                 v-model="projectName"
                 :placeholder="$t('pages.IndexPreparation.chooseProject')"
                 bg-color="white"
@@ -45,7 +45,8 @@
                 unelevated
                 class="q-ml-sm"
               >
-                Generate New Session
+              {{ $t('pages.IndexPreparation.generateNewSession')  }}
+
               </q-btn>
               <q-select
                 v-if="sessions.length && showExistingSessions"
@@ -132,6 +133,7 @@ watch(panel, (panelValue, OldValue) => {
   if (panelValue !== OldValue) {
     serviceStore.selectedSession = null;
     serviceStore.chatHistory = [];
+    console.log(panelValue);
     let sessionFrom = panelValue === 'chat' ? 'ChatRoom' : 'ValidationForum';
     serviceStore.sessionFrom = sessionFrom;
   }
@@ -140,20 +142,30 @@ serviceStore.$subscribe((mutation, state) => {
   session.value = state.selectedSession;
 });
 const generateNewSession = async () => {
-  let sessionFrom = panel === 'chat' ? 'ChatRoom' : 'ValidationForum';
+  let sessionFrom = panel.value === 'chat' ? 'ChatRoom' : 'ValidationForum';
+  console.log(sessionFrom);
+
   serviceStore.sessionFrom = sessionFrom;
   let sessionId = store.selectedProject + '-' + sessionFrom + '-' + guidGenerator();
   serviceStore.sessionId = sessionId;
   session.value = sessionId;
   serviceStore.chatHistory = [];
-  await getSessions();
+  serviceStore.sessions.push(sessionId);
+  // await getSessions();
 };
 const fetchUserProjects = async () => {
   try {
     error.value = null;
     loading.value = true;
+
     const res = await store.fetchUserProjects(authStore.user.id);
-    projects.value = res;
+    const indexedProjects = await store.getIndexedProjects();
+    const filteredProjects = res.filter((project, index) => {
+      if (indexedProjects[index].message === 'Index exists') {
+        return project;
+      }
+    });
+    projects.value = filteredProjects;
   } catch (err) {
     console.log(err);
     error.value = err.response.status + ' - ' + err.response.statusText;
@@ -191,7 +203,6 @@ const getChatHistory = async () => {
 };
 onMounted(async () => {
   await fetchUserProjects();
-  await getSessions();
   if (serviceStore.selectedSession) {
     await getChatHistory();
   }

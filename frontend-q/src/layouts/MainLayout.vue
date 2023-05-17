@@ -7,12 +7,13 @@
             <q-select
               v-model="locale"
               :options="localeOptions"
-              bg-color="white"
+              outlined
               text-color="dark"
               emit-value
               map-options
-              filled
               style="min-width: 160px"
+              dense
+              class="language-dropdown"
             />
             <q-btn
               flat
@@ -185,5 +186,26 @@ export default defineComponent({
     line-height: 21px;
     color: $dark-page;
   }
+}
+.language-dropdown {
+  border: 1px solid #878787;
+  .q-field--auto-height.q-field--dense .q-field__control {
+    height: 30px;
+  }
+  .q-field__native {
+    font-weight: 400 !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    color: #000 !important;
+    span {
+      font-weight: 400 !important;
+      font-size: 12px !important;
+      line-height: 16px !important;
+      color: #000 !important;
+    }
+  }
+}
+.q-header .q-field__control {
+  height: 30px;
 }
 </style>

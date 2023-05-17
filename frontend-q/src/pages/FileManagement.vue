@@ -175,7 +175,14 @@ const fetchUserProjects = async () => {
     uploadingError.value = null;
     uploadingFiles.value = true;
     const res = await store.fetchUserProjects(authStore.user.id);
-    userProjects.value = res;
+    const indexedProjects = await store.getIndexedProjects();
+    console.log(indexedProjects);
+    const filteredProjects = res.filter((project, index) => {
+      if (indexedProjects[index].message === 'Index exists') {
+        return project;
+      }
+    });
+    userProjects.value = filteredProjects;
   } catch (err) {
     console.log(err);
     uploadingError.value = err.response.status + ' - ' + err.response.statusText;

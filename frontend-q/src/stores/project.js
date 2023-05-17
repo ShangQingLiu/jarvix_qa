@@ -43,7 +43,7 @@ export const useProjectStore = defineStore("projectStore", {
         try {
           const { data } = await api.delete(`project-management/${projectId}`);
           console.log(data);
-          this.projectsList = this.projectsList.filter(
+          this.userProjects = this.userProjects.filter(
             (project) => project.id != projectId
           );
           resolve(data);
@@ -115,7 +115,6 @@ export const useProjectStore = defineStore("projectStore", {
         }
       });
     },
-
     listProjectFiles(payload) {
       return new Promise(async (resolve, reject) => {
         try {
@@ -133,7 +132,7 @@ export const useProjectStore = defineStore("projectStore", {
       return new Promise(async (resolve, reject) => {
         try {
           const { data } = await api.post(`file/checkIndex`, {
-            project_name: payload.project_name,
+            project_name: payload,
           });
 
           resolve(data);
@@ -160,6 +159,12 @@ export const useProjectStore = defineStore("projectStore", {
           reject(error);
         }
       });
+    },
+    async getIndexedProjects() {
+      const projects = this.userProjects.map((p) => {
+        return this.checkProjectIndex(p.name);
+      });
+      return Promise.all(projects);
     },
   },
 });

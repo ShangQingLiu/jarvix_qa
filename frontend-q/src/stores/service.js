@@ -52,8 +52,9 @@ export const useServiceStore = defineStore("ServiceStore", {
     },
     getSessions() {
       return new Promise(async (resolve, reject) => {
+        const store = useProjectStore();
         try {
-          const store = useProjectStore();
+          // If don't have any project nothing todo
           if (store.selectedProject) {
             const { data } = await api.get(
               `service/sessions/${store.selectedProject}`
@@ -61,13 +62,25 @@ export const useServiceStore = defineStore("ServiceStore", {
             // this.chatHistory.push({ type: "bot-message", text: data });
             console.log(data);
             this.sessions = data.sessions;
+            this.selectedSession = data.sessions[this.sessions.length - 1];
+            this.sessionId = data.sessions[this.sessions.length - 1];
             resolve(data);
           } else {
             this.sessions = [];
             reject(new Error("Something Wrong"));
           }
         } catch (error) {
+
           this.sessions = [];
+          // If there are no session then
+          this.sessionId =
+            store.selectedProject +
+            "-" +
+            this.sessionFrom +
+            "-" +
+            guidGenerator(this.sessionId);
+          this.sessions.push(this.sessionId);
+          this.selectedSession = this.sessionId;
           reject(error);
         }
       });
@@ -90,6 +103,7 @@ export const useServiceStore = defineStore("ServiceStore", {
           }
           // this.chatHistory.push({ type: "bot-message", text: data });
         } catch (error) {
+          this.chatHistory = []
           reject(error);
         }
       });
@@ -115,7 +129,7 @@ export const useServiceStore = defineStore("ServiceStore", {
             });
             this.selectedSession = this.sessionId;
             await this.getSessions();
-            this.validationForumContent = data
+            this.validationForumContent = data;
             console.log(data);
             resolve(data);
           } else {

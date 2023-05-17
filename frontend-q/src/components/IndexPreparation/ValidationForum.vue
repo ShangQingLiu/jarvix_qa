@@ -4,8 +4,9 @@
       <q-card flat class="bg-white q-mb-lg">
         <q-card-section class="q-pa-lg">
           <div class="text-h6 text-weight-bold text-dark">
-            Add your Question (Must end with . )
-            <!-- {{ $t('pages.IndexPreparation.Question.questions.title') }} -->
+            {{ $t('pages.IndexPreparation.ValidationForum.hint1') }} <br />
+            {{ $t('pages.IndexPreparation.ValidationForum.hint2') }} <br />
+            {{ $t('pages.IndexPreparation.ValidationForum.hint3') }} <br />
           </div>
           <q-separator class="q-my-lg" />
           <q-input
@@ -17,8 +18,8 @@
             borderless
             dense
             type="textarea"
-            hint="Must add . after each question / End of question"
           />
+          <!-- :hint="$t('pages.IndexPreparation.ValidationForum.hint1') $t('pages.IndexPreparation.ValidationForum.hint2') $t('pages.IndexPreparation.ValidationForum.hint3')" -->
 
           <div class="flex">
             <q-btn
@@ -30,7 +31,7 @@
             >
               <!-- {{ $t('pages.IndexPreparation.Question.questions.questionBtn') }} -->
 
-              Preview Question Document
+              {{ $t(`pages.IndexPreparation.ValidationForum.previewBtn`) }}
             </q-btn>
             <!-- <q-spinner v-if="loading" class="q-ml-auto" color="negative" size="2em" /> -->
           </div>
@@ -41,7 +42,7 @@
       <q-card flat class="bg-white q-mb-lg">
         <q-card-section class="q-pa-lg">
           <div class="text-h6 text-weight-bold text-dark">
-            Validation Form
+            {{ $t(`pages.IndexPreparation.validationForum`) }}
             <!-- {{ $t('pages.IndexPreparation.Question.questions.title') }} -->
           </div>
           <q-separator class="q-my-lg" />
@@ -66,7 +67,7 @@
               text-color="white"
               @click="submitQuestionsList"
             >
-              Submit
+              {{ $t(`pages.IndexPreparation.ValidationForum.submitBtn`) }}
             </q-btn>
             <q-btn
               color="primary"
@@ -75,7 +76,7 @@
               text-color="white"
               type="submit"
             >
-              Upload Questions Document
+              {{ $t(`pages.IndexPreparation.ValidationForum.uploadQuestionBtn`) }}
             </q-btn>
           </div>
         </q-card-section>
@@ -84,13 +85,17 @@
     <div class="col-12" v-if="rows.length > 0">
       <q-card flat class="bg-white q-mb-lg">
         <q-card-section class="q-pa-lg">
-          <div class="text-h6 text-weight-bold text-dark">Validation Form</div>
+          <div class="text-h6 text-weight-bold text-dark">
+            {{ $t(`pages.IndexPreparation.validationForum`) }}
+          </div>
           <q-separator class="q-my-lg" />
           <q-scroll-area class="bg-white q-pa-lg" style="height: 600px">
             <q-table :rows="rows" hide-bottom :columns="columns" row-key="name">
               <template v-slot:header-cell="props">
                 <q-th class="" :props="props">
-                  {{ props.col.label }}
+                  {{
+                    $t(`pages.IndexPreparation.ValidationForum.labels.${props.col.label}`)
+                  }}
                 </q-th>
               </template>
               <template v-slot:body="props">
@@ -115,7 +120,8 @@
         <div class="q-pa-lg">
           <q-card-section class="q-pa-lg">
             <div class="text-subtitle1 text-dark">
-              Summary Score:
+              {{ $t(`pages.IndexPreparation.ValidationForum.summaryScore`) }}
+
               <span class="text-weight-bold"
                 >{{ store.validationForumContent.correct_number }}/{{
                   store.validationForumContent.total_number
@@ -136,20 +142,20 @@ import { useRoute } from 'vue-router';
 const columns = [
   {
     name: 'question',
-    label: 'Question',
+    label: 'question',
     align: 'left',
     field: 'question',
   },
   {
     name: 'expect_answer',
     align: 'center',
-    label: 'Expected Answer',
+    label: 'expect_answer',
     field: 'expect_answer',
   },
-  { name: 'query_answer', label: 'Query Answer', field: 'query_answer', align: 'center' },
+  { name: 'query_answer', label: 'query_answer', field: 'query_answer', align: 'center' },
   {
     name: 'is_correct',
-    label: 'Correct(True/False)',
+    label: 'is_correct',
     field: 'is_correct',
     align: 'center',
   },

@@ -77,6 +77,9 @@
         </q-card-section>
       </q-card>
     </div>
+    <!--
+
+
     <div class="col-12 col-md-9" v-if="authStore.user.role == 'Admin'">
       <q-card flat class="bg-white q-my-lg">
         <q-card-section class="q-pa-lg">
@@ -98,16 +101,14 @@
               class="col-12 col-sm-6 col-md-4"
             >
               <div class="wrapper bg-accent">
-                <!-- <div class="img-container">
-                  <img src="~/assets/file-img.png" class="full-width" alt="" />
-                </div> -->
+
                 <div class="flex full-width justify-between items-center q-px-md q-py-sm">
                   <div>
-                    <!-- Name -->
+
                     <div class="text-dark text-h6 text-weight-bold">
                       {{ file.split('.')[0] }}
                     </div>
-                    <!-- Extension -->
+
                     <div class="text-dark-page text-body">
                       {{ file.split('.')[1] }}
                     </div>
@@ -138,6 +139,7 @@
         </q-card-section>
       </q-card>
     </div>
+     -->
   </div>
 </template>
 

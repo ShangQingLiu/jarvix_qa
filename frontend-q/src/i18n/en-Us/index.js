@@ -33,7 +33,7 @@ export default {
       Invite: {
         email: "Email",
         inviteBtn: "Invite",
-        title: 'Invite People'
+        title: "Invite People",
       },
     },
     UserAuthenticationAndManagement: {
@@ -166,6 +166,7 @@ export default {
       chooseProject: "Choose Project",
       chooseSession: "Choose Session",
       showExistingSession: " Show Existing Sessions",
+      generateNewSession: "Generate New Session",
       Question: {
         questions: {
           title: "Add New Question",
@@ -179,16 +180,32 @@ export default {
           answer: "Answer",
         },
       },
+      ValidationForum: {
+        hint1: "1. Each line specify one question and one expected answer",
+        hint2: "2. The question and expected answer need to seperate by comma ",
+        hint3: "3. Each line need to end by .",
+        previewBtn: " Preview Question Document ",
+        submitBtn: "Submit",
+        uploadQuestionBtn: "Upload Questions Document",
+        summaryScore: "Summary Score:",
+        labels: {
+          question: "Question",
+          expect_answer: "Expected Answer",
+          query_answer: "Query Answer",
+          is_correct: "Correct(True/False)",
+        },
+      },
     },
   },
   MainLayout: {
     loginBtn: "Login",
     logoutBtn: "Logout",
-    links:{
-      UserAuthenticationAndManagement: 'User Authentication and User Management',
-      Index: 'Project Management',
-      FileManagement: 'File Management',
-      Services: 'Services'
-    }
+    links: {
+      UserAuthenticationAndManagement:
+        "User Authentication and User Management",
+      Index: "Project Management",
+      FileManagement: "File Management",
+      Services: "Services",
+    },
   },
 };
