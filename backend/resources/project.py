@@ -97,9 +97,14 @@ class invite(Resource):
         '''send invitation'''
         data = request.get_json()
         recipient_email = data.get('email')
+
+         # Check if the user is already a member of the project
         project = Project.query.get(project_id)
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
+        if current_user in project.members:
+            return {"message": "User is already a member of the project."}
+
         sender = current_user
         invitation = Invitation(sender=sender, recipient_email=recipient_email, project=project)
         db.session.add(invitation)

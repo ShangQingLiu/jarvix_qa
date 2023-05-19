@@ -1,3 +1,4 @@
+from flask import current_app
 from langchain.agents import Tool
 from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.chat_models import ChatOpenAI
@@ -7,21 +8,27 @@ from langchain.agents import initialize_agent
 from langchain import OpenAI, PromptTemplate
 from langchain.agents.agent_types import AgentType
 
-from llama_index import  LLMPredictor,ServiceContext
+from llama_index.vector_stores.faiss import FaissVectorStore
+from llama_index import  LLMPredictor,ServiceContext, load_index_from_storage, StorageContext
 from llama_index.indices.query.query_transform.base import DecomposeQueryTransform
-from llama_index.langchain_helpers.agents import  LlamaToolkit, create_llama_chat_agent,GraphToolConfig,IndexToolConfig
+from llama_index.langchain_helpers.agents import  LlamaToolkit, create_llama_chat_agent,IndexToolConfig
 from llama_index.indices.composability import ComposableGraph
+from llama_index.retrievers import VectorIndexRetriever
+from llama_index import ResponseSynthesizer
+from llama_index.query_engine import RetrieverQueryEngine
 import os
 
 
 class ChatBot():
     def __init__(self,index_set,graph,project_name,chunk_size_limit=512,index_saved_path="index_data") -> None:
+        self.using_FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
+        self.index_root_path = current_app.config["INDEX_SAVE_PATH"]
+        self.project_name = project_name
         self.query_configs = self.get_query_configs()
         self.index_configs = self.getIndexConfigs(index_set)
         self.graph_config =  None if graph == None else self.getGraphConfig(index_saved_path,project_name,chunk_size_limit)
         self.toolKit = self.getToolKit()
         self.agent = self.getAgent(self.toolKit) 
-        self.project_name = project_name
         pre_promt =  f"You are a personal assistant for Synergies company, your job is to answer questions. First check graph index as reference."
 #  Use only context index_{self.project_name}.json 
 #         act_prompt = """We have provided context information below. \n"
@@ -62,7 +69,10 @@ class ChatBot():
     def run(self,query)->str:
         agent_prompt = self.prompt.format(query=query)
         try:
-            response = self.agent.run(input=agent_prompt).strip()
+            if self.using_FAISS:
+                response = self.agent.query(agent_prompt)
+            else:
+                response = self.agent.run(input=agent_prompt).strip()
         except ValueError as e:
             response = str(e)
             if not response.startswith("Could not parse LLM output: `"):
@@ -74,7 +84,10 @@ class ChatBot():
     def run_yes_no(self,query)->str:
         agent_prompt = self.yes_no_prompt.format(query=query)
         try:
-            response = self.agent.run(input=agent_prompt).strip()
+            if self.using_FAISS:
+                response = self.agent.query(agent_prompt)
+            else:
+                response = self.agent.run(input=agent_prompt).strip()
         except ValueError as e:
             response = str(e)
             if not response.startswith("Could not parse LLM output: `"):
@@ -111,30 +124,36 @@ class ChatBot():
     def getToolKit(self):
         toolkit = None
 
-        if self.graph_config == None:
-            toolkit = LlamaToolkit(
-                index_configs=self.index_configs,
-            )
+        if self.using_FAISS:
+            pass
+
         else:
-            toolkit = LlamaToolkit(
-                index_configs=self.index_configs,
-                graph_configs=[self.graph_config]
-            ) 
+            if self.graph_config == None:
+                toolkit = LlamaToolkit(
+                    index_configs=self.index_configs,
+                )
+            else:
+                toolkit = LlamaToolkit(
+                    index_configs=self.index_configs,
+                    graph_configs=[self.graph_config]
+                ) 
 
         return toolkit
     
     def getIndexConfigs(self,index_set):
         index_configs = []
-
-        for key in index_set.keys():
-            tool_config = IndexToolConfig(
-                index=index_set[key], 
-                name=f"Vector Index {key}",
-                description=f"useful for when you want to answer queries about specific question",
-                index_query_kwargs={"similarity_top_k": 3},
-                tool_kwargs={"return_direct": True}
-            )
-            index_configs.append(tool_config)
+        if self.using_FAISS:
+            pass
+        else:
+            for key in index_set.keys():
+                tool_config = IndexToolConfig(
+                    index=index_set[key], 
+                    name=f"Vector Index {key}",
+                    description=f"useful for when you want to answer queries about specific question",
+                    index_query_kwargs={"similarity_top_k": 3},
+                    tool_kwargs={"return_direct": True}
+                )
+                index_configs.append(tool_config)
 
         return index_configs
 
@@ -145,23 +164,39 @@ class ChatBot():
         self.graph = ComposableGraph.load_from_disk( graph_path, 
             service_context=service_context,
         )
-        graph_config = GraphToolConfig(
-            graph=self.graph,
-            name=f"Graph Index",
-            description="useful for when you want to answer queries that require analyzing multiple uploaded documents.",
-            query_configs=self.query_configs,
-            tool_kwargs={"return_direct": True}
-)
-
-        return graph_config
+#         graph_config = GraphToolConfig(
+#             graph=self.graph,
+#             name=f"Graph Index",
+#             description="useful for when you want to answer queries that require analyzing multiple uploaded documents.",
+#             query_configs=self.query_configs,
+#             tool_kwargs={"return_direct": True}
+# )
+        return None
+        # return graph_config
 
     def getAgent(self,toolkit):
-        memory = ConversationBufferMemory(memory_key="chat_history")
-        llm=ChatOpenAI(temperature=0.2, max_tokens=512)
-        agent = create_llama_chat_agent( toolkit,
-            llm,
-            memory=memory,
-            verbose=True,
-            # max_iterations=10
-        )
+        agent = None
+        if self.using_FAISS:
+            # load index from disk
+            index_save_path = os.path.join(self.index_root_path,self.project_name)
+            vector_store = FaissVectorStore.from_persist_dir(index_save_path)
+            storage_context = StorageContext.from_defaults(vector_store=vector_store, persist_dir=index_save_path)
+            vector_index = load_index_from_storage(storage_context=storage_context)
+            vector_retriever = VectorIndexRetriever(index=vector_index, similarity_top_k=2)
+            # define response synthesizer
+            response_synthesizer = ResponseSynthesizer.from_args()
+            # vector query engine
+            agent = RetrieverQueryEngine(
+                retriever=vector_retriever,
+                response_synthesizer=response_synthesizer,
+            )
+        else:
+            memory = ConversationBufferMemory(memory_key="chat_history")
+            llm=ChatOpenAI(temperature=0.2, max_tokens=512)
+            agent = create_llama_chat_agent( toolkit,
+                llm,
+                memory=memory,
+                verbose=True,
+                # max_iterations=10
+            )
         return agent

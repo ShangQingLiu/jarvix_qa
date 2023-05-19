@@ -91,50 +91,54 @@ class prepare_index(Resource):
         # Read all files in the project directory
         print("Reading files...")
         index_set = {}
-        for data_type in DataType:
-            if data_type == DataType.DOCX:
-                docx_path = os.path.join(project_dir, "docx")
-                check_dir_exists(docx_path)
-                doc_pathes = os.listdir(docx_path)
-                doc_pathes = [os.path.join(docx_path, doc_path) for doc_path in doc_pathes]
-                print("doc_pathes number: ", len(doc_pathes))
-                if len(doc_pathes) == 0:
-                    continue
-                print("Loading data...DOCX")
-                index_set.update(indexUtils.dataLoader(doc_pathes, data_type))
-            elif data_type == DataType.PDF:
-                pdf_path = os.path.join(project_dir, "pdf")
-                check_dir_exists(pdf_path)
-                pdf_pathes = os.listdir(pdf_path)
-                pdf_pathes = [os.path.join(pdf_path, pdf_e) for pdf_e in pdf_pathes]
-                if len(pdf_pathes) == 0:
-                    continue
-                index_set.update(indexUtils.dataLoader(pdf_pathes, data_type))
-            elif data_type == DataType.HTML:
-                html_path = os.path.join(project_dir, "html")
-                check_dir_exists(html_path)
-                html_pathes = os.listdir(html_path)
-                html_pathes = [os.path.join(html_path, html_e) for html_e in html_pathes]
-                if len(html_pathes) == 0:
-                    continue
-                index_set.update(indexUtils.dataLoader(html_pathes, data_type))
-            elif data_type == DataType.AUDIO:
-                audio_path = os.path.join(project_dir, "audio")
-                check_dir_exists(audio_path)
-                audio_pathes = os.listdir(audio_path)
-                audio_pathes = [os.path.join(audio_path, audio_e) for audio_e in audio_pathes]
-                if len(audio_pathes) == 0:
-                    continue
-                index_set.update(indexUtils.dataLoader(audio_pathes, data_type))
-            elif data_type == DataType.XLSX:
-                xlsx_path = os.path.join(project_dir, "xlsx")
-                check_dir_exists(xlsx_path)
-                xlsx_pathes = os.listdir(xlsx_path)
-                xlsx_pathes = [os.path.join(xlsx_path, xlsx_e) for xlsx_e in xlsx_pathes]
-                print(f"xlsx_pathes", xlsx_pathes)
-                if len(xlsx_pathes) == 0:
-                    continue
-                index_set.update(indexUtils.dataLoader(xlsx_pathes, data_type))
+        _FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
+        if _FAISS:
+            indexUtils.save_loader([], None)
+        else:
+            for data_type in DataType:
+                if data_type == DataType.DOCX:
+                    docx_path = os.path.join(project_dir, "docx")
+                    check_dir_exists(docx_path)
+                    doc_pathes = os.listdir(docx_path)
+                    doc_pathes = [os.path.join(docx_path, doc_path) for doc_path in doc_pathes]
+                    print("doc_pathes number: ", len(doc_pathes))
+                    if len(doc_pathes) == 0:
+                        continue
+                    print("Loading data...DOCX")
+                    index_set.update(indexUtils.dataLoader(doc_pathes, data_type))
+                elif data_type == DataType.PDF:
+                    pdf_path = os.path.join(project_dir, "pdf")
+                    check_dir_exists(pdf_path)
+                    pdf_pathes = os.listdir(pdf_path)
+                    pdf_pathes = [os.path.join(pdf_path, pdf_e) for pdf_e in pdf_pathes]
+                    if len(pdf_pathes) == 0:
+                        continue
+                    index_set.update(indexUtils.dataLoader(pdf_pathes, data_type))
+                elif data_type == DataType.HTML:
+                    html_path = os.path.join(project_dir, "html")
+                    check_dir_exists(html_path)
+                    html_pathes = os.listdir(html_path)
+                    html_pathes = [os.path.join(html_path, html_e) for html_e in html_pathes]
+                    if len(html_pathes) == 0:
+                        continue
+                    index_set.update(indexUtils.dataLoader(html_pathes, data_type))
+                elif data_type == DataType.AUDIO:
+                    audio_path = os.path.join(project_dir, "audio")
+                    check_dir_exists(audio_path)
+                    audio_pathes = os.listdir(audio_path)
+                    audio_pathes = [os.path.join(audio_path, audio_e) for audio_e in audio_pathes]
+                    if len(audio_pathes) == 0:
+                        continue
+                    index_set.update(indexUtils.dataLoader(audio_pathes, data_type))
+                elif data_type == DataType.XLSX:
+                    xlsx_path = os.path.join(project_dir, "xlsx")
+                    check_dir_exists(xlsx_path)
+                    xlsx_pathes = os.listdir(xlsx_path)
+                    xlsx_pathes = [os.path.join(xlsx_path, xlsx_e) for xlsx_e in xlsx_pathes]
+                    print(f"xlsx_pathes", xlsx_pathes)
+                    if len(xlsx_pathes) == 0:
+                        continue
+                    index_set.update(indexUtils.dataLoader(xlsx_pathes, data_type))
 
         return {'message': 'Index created successfully'}, 200
         

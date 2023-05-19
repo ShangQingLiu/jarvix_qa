@@ -72,9 +72,13 @@ def answer(project_name,session_id, query, is_yes_no_q=False):
 
         # Read all files in the project directory
         index_set = {}
-        for data_type in DataType:
-            file_pathes = get_all_upload_files(upload_dir,data_type.name.lower())
-            index_set.update(indexUtils.dataLoader(file_pathes, data_type))
+        _FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
+        if _FAISS: 
+            index_set = indexUtils.dataLoader([], None)
+        else:
+            for data_type in DataType:
+                file_pathes = get_all_upload_files(upload_dir,data_type.name.lower())
+                index_set.update(indexUtils.dataLoader(file_pathes, data_type))
 
         # print("Index set: ", index_set)
         chatbot = ChatBot(index_set,None,project_name=project_name)
@@ -198,9 +202,13 @@ class Query(Resource):
 
             # Read all files in the project directory
             index_set = {}
-            for data_type in DataType:
-                file_pathes = get_all_upload_files(upload_dir,data_type.name.lower())
-                index_set.update(indexUtils.dataLoader(file_pathes, data_type))
+            _FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
+            if _FAISS: 
+                index_set = indexUtils.dataLoader([], None)
+            else:
+                for data_type in DataType:
+                    file_pathes = get_all_upload_files(upload_dir,data_type.name.lower())
+                    index_set.update(indexUtils.dataLoader(file_pathes, data_type))
 
             # print("Index set: ", index_set)
             chatbot = ChatBot(index_set,None,project_name=project_name)
