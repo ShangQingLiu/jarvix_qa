@@ -26,9 +26,9 @@ export default {
       Detail: {
         inviteBtn: "邀请人员",
         updateBtn: "更新项目",
-        indexBtn: "索引项目",
+        indexBtn: "项目训练",
         deleteBtn: "删除项目",
-        reIndexBtn: "重新索引",
+        reIndexBtn: "重新训练",
       },
       Invite: {
         email: "电子邮件",
@@ -156,7 +156,7 @@ export default {
       uploadFilesTitle: "已上传的文件",
       selectProjectTitle: "选择项目",
       noFound: "没有项目文件，请立即索引并上传文件",
-      indexBtn: "重新索引",
+      indexBtn: "重新训练",
       uploadNewFileTitle: "上传新文件",
       uploadBtn: "上传",
     },

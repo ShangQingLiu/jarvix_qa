@@ -26,9 +26,9 @@ export default {
       Detail: {
         inviteBtn: "邀請成員",
         updateBtn: "更新專案",
-        indexBtn: "索引專案",
+        indexBtn: "專案訓練",
         deleteBtn: "刪除專案",
-        reIndexBtn: "重新索引",
+        reIndexBtn: "重新訓練",
       },
       Invite: {
         email: "電子郵件",
@@ -156,7 +156,7 @@ export default {
       uploadFilesTitle: "上傳的檔案",
       selectProjectTitle: "選擇專案",
       noFound: "沒有專案檔案。請現在索引並上傳檔案",
-      indexBtn: "重新索引",
+      indexBtn: "重新訓練",
       uploadNewFileTitle: "上傳新檔案",
       uploadBtn: "上傳",
     },

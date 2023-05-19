@@ -26,9 +26,9 @@ export default {
       Detail: {
         inviteBtn: "Invite people",
         updateBtn: "Update Project",
-        indexBtn: "Index Project",
+        indexBtn: "Project Training",
         deleteBtn: "Delete Project",
-        reIndexBtn: "Re-Index",
+        reIndexBtn: "Re-Training",
       },
       Invite: {
         email: "Email",
@@ -155,8 +155,8 @@ export default {
       projectName: "Choose Project",
       uploadFilesTitle: "Uploaded Files",
       selectProjectTitle: "Select Project",
-      noFound: "No Project Files. Please Index and Upload Files Now",
-      indexBtn: "Re-Index",
+      noFound: "No Project Files. Please Upload Files Now and do the Training",
+      indexBtn: "Re-Training",
       uploadNewFileTitle: "Upload New File",
       uploadBtn: "Upload",
     },
