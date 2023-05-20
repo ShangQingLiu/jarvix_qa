@@ -5,12 +5,17 @@ import pandas as pd
 import shutil
 from flask import current_app
 
-from llama_index import download_loader, GPTSimpleVectorIndex, ServiceContext
+from llama_index import download_loader, GPTVectorStoreIndex,\
+    ServiceContext, GPTListIndex, LLMPredictor, SimpleDirectoryReader,\
+        GPTVectorStoreIndex, StorageContext, load_index_from_storage
+from llama_index.vector_stores.faiss import FaissVectorStore
 from pathlib import Path
-from llama_index import GPTListIndex, LLMPredictor
 
 from langchain.chat_models import ChatOpenAI
 from llama_index.indices.composability import ComposableGraph
+from globals import upload_hashes
+
+import faiss
 
 class DataType(Enum):
     AUDIO = 1
@@ -40,78 +45,127 @@ class IndexUtils():
     def __init__(self, root_path, project_name="default"):
         self.root_path = root_path # index saved root path
         self.project_name = project_name # would later used as graph index name
+        self.faiss_index = faiss.IndexFlatL2(1536) # dimensions of text-ada-embedding-002
+        self.upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
+
+    def save_loader(self, file_pathes: list, data_type: DataType, project_dir=None):
+        _FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
+        if _FAISS: 
+            index_save_path = os.path.join(self.root_path,self.project_name)
+            if not os.path.exists(index_save_path):
+                os.makedirs(index_save_path)
+
+            # load documents
+            upload_files =[]
+            print(self.upload_path)
+            for r,d,f in os.walk(self.upload_path):
+                for file in f:
+                    upload_files.append(os.path.join(r,file))
+            print("Detecting is repeating index...")    
+            # Upload Hash comparison
+            if self.project_name in upload_hashes.keys() and \
+                upload_hashes[self.project_name] == hash(tuple(upload_files)):
+                # Already has good index
+                pass
+            else:
+                # DEBUG
+                # Regenerate index
+                upload_hashes[self.project_name] = hash(tuple(upload_files))
+                print(upload_files)
+                documents = SimpleDirectoryReader(input_files=upload_files).load_data()
+                vector_store = FaissVectorStore(faiss_index=self.faiss_index)
+                storage_context = StorageContext.from_defaults(vector_store=vector_store)
+                index = GPTVectorStoreIndex.from_documents(documents, storage_context=storage_context)
+
+                # save index to disk
+                print("Successful store new index...")    
+                index.storage_context.persist(index_save_path)
+        else:
+            raise NotImplementedError
         
     # Load data and return index_sets
     def dataLoader(self, file_pathes: list, data_type: DataType): 
         print("Loading data...all file pathes: ", file_pathes)
-        reader = None
-        if data_type == DataType.HTML:
-            UnstructuredReader = download_loader("UnstructuredReader", refresh_cache=True)
-            reader = UnstructuredReader()
-        elif data_type == DataType.DOCX: 
-            DocxReader = download_loader("DocxReader")
-            reader = DocxReader()
-        elif data_type == DataType.PDF:
-            PDFReader = download_loader("PDFReader")
-            reader = PDFReader()
-        elif data_type == DataType.AUDIO:
-            StringIterableReader = download_loader("StringIterableReader")
-            reader = StringIterableReader()
-        elif data_type == DataType.XLSX:
-            PandasCSVReader = download_loader("PandasCSVReader")
-            reader = PandasCSVReader()
+        index_save_path = os.path.join(self.root_path,self.project_name)
+        _FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
+        if _FAISS: 
+            self.save_loader(file_pathes,data_type)
 
-        if reader is None:
-            raise ValueError("The data type is not supported!")
-        
+            # load index from disk
+            vector_store = FaissVectorStore.from_persist_dir(index_save_path)
+            storage_context = StorageContext.from_defaults(vector_store=vector_store, persist_dir=index_save_path)
+            index = load_index_from_storage(storage_context=storage_context)
 
-        unsaved_doc_set = {}
-        saved_doc_path = [] 
-        for file_path_str in file_pathes:
-            file_name = os.path.basename(file_path_str)
-            # check if index already exists
-            index_name = "index_" + file_name
-            index_path = os.path.join(self.root_path,index_name)
-            index_path = os.path.join(self.project_name,index_path)
-            if os.path.exists(index_path):
-                saved_doc_path.append(index_path)
-                continue 
-
-            if data_type == DataType.AUDIO:
-                audio_path = file_path_str
-                openai.api_key = os.getenv("OPENAI_API_KEY")
-                audio_file = open(audio_path, "rb")
-                transcript = openai.Audio.transcribe("whisper-1", audio_file)
-                unsaved_doc_set[file_name] = reader.load_data(transcript.text.split())
+            return index 
+        else:
+            reader = None
+            if data_type == DataType.HTML:
+                UnstructuredReader = download_loader("UnstructuredReader", refresh_cache=True)
+                reader = UnstructuredReader()
+            elif data_type == DataType.DOCX: 
+                DocxReader = download_loader("DocxReader")
+                reader = DocxReader()
+            elif data_type == DataType.PDF:
+                PDFReader = download_loader("PDFReader")
+                reader = PDFReader()
+            elif data_type == DataType.AUDIO:
+                StringIterableReader = download_loader("StringIterableReader")
+                reader = StringIterableReader()
             elif data_type == DataType.XLSX:
-                dfs = pd.read_excel(file_path_str, sheet_name=None)
-                tmp_save_root = "./tmp"
-                if not os.path.exists(tmp_save_root):
-                    os.makedirs(tmp_save_root)
-                sheet_names = list(dfs.keys())
-                for sheet_name in sheet_names:
-                    save_path = os.path.join(tmp_save_root,sheet_name) 
-                    dfs[sheet_name].to_csv(save_path) 
-                    unsaved_doc_set[sheet_name] = reader.load_data(save_path)  
-                # Remove tmp files
-                shutil.rmtree(tmp_save_root)
-                
-            else:
-                unsaved_doc_set[file_name] = reader.load_data(Path(file_path_str))
+                PandasCSVReader = download_loader("PandasCSVReader")
+                reader = PandasCSVReader()
 
-        index_set = {} 
-        index_set.update(self.saveIndexer(1024, unsaved_doc_set))
-        graph = self.buildGraphIndexer(index_set)
-        index_set.update(self.loadIndexer(saved_doc_path))
+            if reader is None:
+                raise ValueError("The data type is not supported!")
+            
 
-        return index_set
+            unsaved_doc_set = {}
+            saved_doc_path = [] 
+            for file_path_str in file_pathes:
+                file_name = os.path.basename(file_path_str)
+                # check if index already exists
+                index_name = "index_" + file_name
+                index_path = os.path.join(self.root_path,index_name)
+                index_path = os.path.join(self.project_name,index_path)
+                if os.path.exists(index_path):
+                    saved_doc_path.append(index_path)
+                    continue 
+
+                if data_type == DataType.AUDIO:
+                    audio_path = file_path_str
+                    openai.api_key = os.getenv("OPENAI_API_KEY")
+                    audio_file = open(audio_path, "rb")
+                    transcript = openai.Audio.transcribe("whisper-1", audio_file)
+                    unsaved_doc_set[file_name] = reader.load_data(transcript.text.split())
+                elif data_type == DataType.XLSX:
+                    dfs = pd.read_excel(file_path_str, sheet_name=None)
+                    tmp_save_root = "./tmp"
+                    if not os.path.exists(tmp_save_root):
+                        os.makedirs(tmp_save_root)
+                    sheet_names = list(dfs.keys())
+                    for sheet_name in sheet_names:
+                        index_save_path = os.path.join(tmp_save_root,sheet_name) 
+                        dfs[sheet_name].to_csv(index_save_path) 
+                        unsaved_doc_set[sheet_name] = reader.load_data(index_save_path)  
+                    # Remove tmp files
+                    shutil.rmtree(tmp_save_root)
+                    
+                else:
+                    unsaved_doc_set[file_name] = reader.load_data(Path(file_path_str))
+
+            index_set = {} 
+            index_set.update(self.saveIndexer(1024, unsaved_doc_set))
+            graph = self.buildGraphIndexer(index_set)
+            index_set.update(self.loadIndexer(saved_doc_path))
+
+            return index_set
     
     def saveIndexer(self, chunk_size_limit, doc_set):
         index_set = {}
         openai.api_key = os.environ.get("OPENAI_API_KEY")
         service_context = ServiceContext.from_defaults(chunk_size_limit=chunk_size_limit)
         for key in doc_set.keys():
-            cur_index = GPTSimpleVectorIndex.from_documents(doc_set[key], service_context=service_context)
+            cur_index = GPTVectorStoreIndex.from_documents(doc_set[key], service_context=service_context)
             index_set[key] = cur_index
             save_path = os.path.join(self.root_path,self.project_name)
             if not os.path.exists(save_path):
@@ -128,7 +182,7 @@ class IndexUtils():
         llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
 
         for path in pathes:
-            cur_index = GPTSimpleVectorIndex.load_from_disk(Path(path),llm_predictor=llm_predictor)
+            cur_index = GPTVectorStoreIndex.load_from_disk(Path(path),llm_predictor=llm_predictor)
             file_name = os.path.basename(path)
             index_set[file_name] = cur_index
 
