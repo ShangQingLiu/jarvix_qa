@@ -60,7 +60,17 @@ export const useAuthStore = defineStore("authStore", {
       return new Promise(async (resolve, reject) => {
         try {
           const { data } = await api.get("user-management/user_list");
-          this.usersList = data;
+          let currentUser;
+          if (Object.keys(this.user).length === 0) {
+            currentUser = await this.getLoggedInUserData();
+          } else {
+            currentUser = this.user;
+          }
+          if (currentUser.role == "Admin") {
+            this.usersList = data;
+          } else {
+            this.usersList = data.filter((user) => user.id === currentUser.id);
+          }
           resolve(data);
         } catch (error) {
           reject(error);
