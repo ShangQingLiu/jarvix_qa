@@ -2,7 +2,10 @@
   <div>
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-9">
-        <q-card flat class="bg-white q-mb-lg" style="border-radius: 16px">
+        <div v-if="loading || uploadingFiles" class="q-py-lg flex justify-center">
+          <q-spinner color="dark" size="3em" />
+        </div>
+        <q-card v-else flat class="bg-white q-mb-lg" style="border-radius: 16px">
           <q-card-section class="q-pa-lg">
             <p class="text-h6 text-weight-bold">
               {{ $t('pages.FileManagementPage.title') }}
@@ -13,7 +16,7 @@
               class="q-mb-md"
               bg-color="accent"
               borderless
-              :options="projectList"
+              :options="userProjects"
               option-value="name"
               option-label="name"
               emit-value
@@ -67,9 +70,7 @@
                 </div>
               </div>
             </div>
-            <div v-if="loading" class="q-py-lg flex justify-center">
-              <q-spinner color="dark" size="3em" />
-            </div>
+
             <div class="text-center q-py-lg" v-if="projectFiles.length === 0">
               {{ $t('pages.FileManagementPage.noFound') }}
             </div>
@@ -164,7 +165,7 @@ const uploadingError = ref(null);
 const success = ref(null);
 const projectName = ref(store.selectedProject ? store.selectedProject : '');
 const projectFiles = computed(() => store.projectFiles);
-const projectList = ref([]);
+// const projectList = ref([]);
 const userProjects = ref([]);
 
 const loadLocalFiles = () => {
@@ -175,14 +176,15 @@ const fetchUserProjects = async () => {
     uploadingError.value = null;
     uploadingFiles.value = true;
     const res = await store.fetchUserProjects(authStore.user.id);
-    const indexedProjects = await store.getIndexedProjects();
-    console.log(indexedProjects);
-    const filteredProjects = res.filter((project, index) => {
-      if (indexedProjects[index].message === 'Index exists') {
-        return project;
-      }
-    });
-    userProjects.value = filteredProjects;
+    // const indexedProjects = await store.getIndexedProjects();
+    // console.log(indexedProjects);
+    // const filteredProjects = res.filter((project, index) => {
+    //   if (indexedProjects[index].message === 'Index exists') {
+    //     return project;
+    //   }
+    // });
+    console.log(res);
+    userProjects.value = res;
   } catch (err) {
     console.log(err);
     uploadingError.value = err.response.status + ' - ' + err.response.statusText;
@@ -252,25 +254,25 @@ watch(projectName, (projectValue) => {
     getSessions();
   }
 });
-const fetchProjects = async () => {
-  try {
-    error.value = null;
-    loading.value = true;
-    const res = await store.fetchProjects();
-    console.log(res);
-    var projects = res.filter(function (o1) {
-      return userProjects.value.some(function (o2) {
-        return o1.name === o2.name; // return the ones with equal id
-      });
-    });
-    projectList.value = projects;
-  } catch (err) {
-    console.log(err);
-    error.value = err.response.status + ' - ' + err.response.statusText;
-  } finally {
-    loading.value = false;
-  }
-};
+// const fetchProjects = async () => {
+//   try {
+//     error.value = null;
+//     loading.value = true;
+//     const res = await store.fetchProjects();
+//     console.log(res);
+//     var projects = res.filter(function (o1) {
+//       return userProjects.value.some(function (o2) {
+//         return o1.name === o2.name; // return the ones with equal id
+//       });
+//     });
+//     projectList.value = projects;
+//   } catch (err) {
+//     console.log(err);
+//     error.value = err.response.status + ' - ' + err.response.statusText;
+//   } finally {
+//     loading.value = false;
+//   }
+// };
 const indexProject = async () => {
   try {
     error.value = null;
@@ -310,7 +312,7 @@ const getSessions = async () => {
 };
 onMounted(async () => {
   await fetchUserProjects();
-  await fetchProjects();
+  // await fetchProjects();
 });
 </script>
 <style lang="scss" scoped></style>

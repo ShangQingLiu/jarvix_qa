@@ -115,10 +115,24 @@ const showExistingSessions = computed(() => serviceStore.showExistingSessions);
 const toggleShow = () => {
   serviceStore.showExistingSessions = !serviceStore.showExistingSessions;
 };
-
+const listProjectFiles = async () => {
+  try {
+    error.value = null;
+    loading.value = true;
+    const res = await store.listProjectFiles({
+      project_name: projectName.value,
+    });
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + ' - ' + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
 watch(projectName, (projectValue) => {
   if (projectValue) {
     store.selectedProject = projectValue;
+    listProjectFiles();
     getSessions();
   }
 });
