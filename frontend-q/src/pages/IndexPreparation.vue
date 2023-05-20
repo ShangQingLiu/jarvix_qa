@@ -39,7 +39,7 @@
                 borderless
               />
               <q-btn
-                v-if="projectName"
+                v-if="projectName && existingChat.length > 0"
                 color="primary"
                 @click="generateNewSession"
                 unelevated
@@ -111,6 +111,8 @@ const authStore = useAuthStore();
 const session = ref(serviceStore.selectedSession ? serviceStore.selectedSession : null);
 const sessions = computed(() => serviceStore.sessions);
 const showExistingSessions = computed(() => serviceStore.showExistingSessions);
+const existingChat = computed(() => serviceStore.chatHistory);
+
 
 const toggleShow = () => {
   serviceStore.showExistingSessions = !serviceStore.showExistingSessions;

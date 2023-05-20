@@ -2,7 +2,12 @@
   <div class="row">
     <div class="col-12">
       <q-card flat class="">
-        <q-card-section>
+        <q-card-section v-if="loading">
+          <div class="q-py-lg flex justify-center">
+            <q-spinner color="dark" size="3em" />
+          </div>
+        </q-card-section>
+        <q-card-section v-else>
           <div class="text-h6 text-weight-bold text-dark">
             {{ currentProject && currentProject.name }}
           </div>
@@ -59,7 +64,7 @@
               class="text-capitalize"
               text-color="white"
               @click="indexProject"
-              v-if="authStore.user.role == 'Admin'"
+              v-if="authStore.user.role == 'Admin' && projectFiles.length != 0"
             >
               {{ $t('pages.IndexPage.Detail.indexBtn') }}
             </q-btn>
@@ -157,7 +162,7 @@ const store = useProjectStore();
 const loading = ref(false);
 const error = ref(null);
 const indexExist = ref(false);
-const projectFiles = computed(() => store.projectFiles);
+const projectFiles = ref([]);
 const authStore = useAuthStore();
 
 const currentProject = computed(() =>
@@ -169,7 +174,7 @@ onMounted(async () => {
   if (!currentProject.value) {
     router.push('/');
   }
-  // await listProjectFiles();
+  await listProjectFiles();
   // await checkProjectIndex();
 });
 const deleteProject = async () => {
@@ -216,7 +221,9 @@ const listProjectFiles = async () => {
     const res = await store.listProjectFiles({
       project_name: currentProject.value.name,
     });
-    console.log(res);
+
+    projectFiles.value = res.files;
+    console.log(res.files.length);
   } catch (err) {
     console.log(err);
     error.value = err.response.status + ' - ' + err.response.statusText;

@@ -89,9 +89,11 @@ const sendProjectInvitation = async () => {
   }
 };
 const currentProject = computed(() => {
-  return store.projectsList.find((project) => project.id == route.params.id);
+  return store.userProjects.find((project) => project.id == route.params.id);
 });
 onMounted(() => {
+  console.log(currentProject.value);
+
   if (!currentProject.value) {
     router.push('/');
   }
