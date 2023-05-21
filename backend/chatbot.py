@@ -182,7 +182,7 @@ class ChatBot():
             vector_store = FaissVectorStore.from_persist_dir(index_save_path)
             storage_context = StorageContext.from_defaults(vector_store=vector_store, persist_dir=index_save_path)
             vector_index = load_index_from_storage(storage_context=storage_context)
-            vector_retriever = VectorIndexRetriever(index=vector_index, similarity_top_k=2)
+            vector_retriever = VectorIndexRetriever(index=vector_index, similarity_top_k=3)
             # define response synthesizer
             response_synthesizer = ResponseSynthesizer.from_args()
             # vector query engine
