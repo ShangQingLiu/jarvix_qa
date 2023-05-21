@@ -1,4 +1,4 @@
-from flask import request, render_template, make_response, current_app
+from flask import request, render_template, make_response, current_app , redirect, url_for, flash, get_flashed_messages
 from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
 from flask_restx import Namespace, Resource, fields
 from flask_cors import cross_origin
@@ -29,12 +29,20 @@ get_project_model = project_ns.model('get project', {
 
 project_invite_model = project_ns.model('invite model', {
     'email': fields.String(required=True, description='New memeber email'),
+    'role': fields.String(description='New memeber role'),
 })
 
 # define a data model for the project input
 project_input_model = project_ns.model('ProjectInput', {
     'name': fields.String(required=True, description='Project name'),
     'description': fields.String(required=False, description='Project description'),
+})
+
+user_model = project_ns.model('User', {
+    'id': fields.String(required=True, description='User ID'),
+    'username': fields.String(required=True, description='User name'),
+    'email': fields.String(required=True, description='User email'),
+    'role': fields.String(required=True, description='User role'),
 })
 
 def jwt_project_access_required(fn):
@@ -97,16 +105,19 @@ class invite(Resource):
         '''send invitation'''
         data = request.get_json()
         recipient_email = data.get('email')
+        role = data.get('role', 'User')
 
-         # Check if the user is already a member of the project
         project = Project.query.get(project_id)
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
-        if current_user in project.members:
+
+        # Check if the invite user is already a member of the project
+        invited_user = User.query.filter_by(email=recipient_email).first()
+        if invited_user is not None and  invited_user in project.members:
             return {"message": "User is already a member of the project."}
 
         sender = current_user
-        invitation = Invitation(sender=sender, recipient_email=recipient_email, project=project)
+        invitation = Invitation(sender=sender, recipient_email=recipient_email, project=project, role=role)
         db.session.add(invitation)
         db.session.commit()
 
@@ -120,33 +131,54 @@ class invite(Resource):
 @project_ns.route('/invitation/<int:invitation_id>/accept')
 class accept_invitation(Resource):
     def get(self, invitation_id):
-        '''Invitation Accept page'''
+        '''Process the invitation acceptance and render the project join successful page'''
         invitation = Invitation.query.get(invitation_id)
-        headers = {'Content-Type': 'text/html'}
-        return make_response(render_template('accept_invitation.html', invitation=invitation),200,
-                                              headers)
-    
-    def post(self, invitation_id):
-        '''Project join successful page'''
-        invitation = Invitation.query.get(invitation_id)
+        if invitation:
+            if not invitation.accepted:
+                # Mark the invitation as accepted
+                invitation.accepted = True
+                db.session.commit()
+                # Check if user already exists
+                user = User.query.filter_by(email=invitation.recipient_email).first()
+                new_user_details = None
+                if not user:
+                    # Create new user
+                    print("Create New User")
+                    username = invitation.recipient_email.split('@')[0]
+                    password = "HiSoSupreme"  # Generate default password
+                    user = User(username=username, email=invitation.recipient_email, password=password, role=invitation.role)
+                    db.session.add(user)
+                    db.session.commit()
+                    # Flash message with username and password
+                    # Pass the username and password to the template
+                    new_user_details = {
+                        'username': username,
+                        'default_password': password
+                    }
+                    
 
-        # check if user already exists
-        user = User.query.filter_by(email=invitation.recipient_email).first()
-        if not user:
-            # create new user
-            username = invitation.recipient_email.split('@')[0]
-            password = os.urandom(8).hex()  # generate random password
-            user = User(username=username, email=invitation.recipient_email, password=password)
-            db.session.add(user)
-            db.session.commit()
+                # Add user to project
+                project = invitation.project
+                project.members.append(user)
+                db.session.commit()
+                print(new_user_details)
+                return make_response(render_template('join_project.html', invitation=invitation, project=project, new_user_details=new_user_details), 200, {'Content-Type': 'text/html'})
+            else:
+                user = User.query.filter_by(email=invitation.recipient_email).first()
+                project = invitation.project
+                if user.verify_password("HiSoSupreme"):
+                    new_user_details = {
+                        'username': user.username,
+                        'default_password': "HiSoSupreme"
+                    }
+                else:
+                    new_user_details = {
+                        'username': user.username,
+                    }
+                return make_response(render_template('join_project.html', invitation=invitation, project=project, new_user_details=new_user_details), 200, {'Content-Type': 'text/html'})
+        else:
+            return make_response("Invalid invitation ID", 404)
 
-        # add user to project
-        project = invitation.project
-        project.members.append(user)
-        db.session.commit()
-        headers = {'Content-Type': 'text/html'}
-        return make_response(render_template('join_project.html', invitation=invitation,project=project),200,
-                                              headers)
 
 @project_ns.route('/<int:project_id>')
 class Project_manage(Resource):
@@ -207,4 +239,41 @@ class ProjectList(Resource):
     def get(self):
         projects = Project.query.all()
         return projects, 200
+
+@project_ns.route('/<int:project_id>/users')
+class UsersByProject(Resource):
+    @jwt_required()
+    @admin_required
+    @project_ns.marshal_with(user_model)
+    def get(self, project_id):
+        '''Get all users by project'''
+        project = Project.query.get(project_id)
+        if not project:
+            project_ns.abort(404, f'Project {project_id} not found')
+        
+        users = project.members
+        return users
+
+@project_ns.route('/<int:project_id>/user/<int:user_id>/remove')
+class RemoveUserFromProject(Resource):
+    @jwt_required()
+    @admin_required
+    def delete(self, project_id, user_id):
+        '''Remove user from project'''
+        project = Project.query.get(project_id)
+        user = User.query.get(user_id)
+
+        if not project:
+            project_ns.abort(404, f'Project {project_id} not found')
+
+        if not user:
+            project_ns.abort(404, f'User {user_id} not found')
+
+        if user not in project.members:
+            return {'message': 'The user is not a member of the project'}, 400
+
+        project.members.remove(user)
+        db.session.commit()
+
+        return {'message': f'Removed user {user_id} from project {project_id}'}, 200
 

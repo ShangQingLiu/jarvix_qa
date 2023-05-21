@@ -71,7 +71,9 @@ class IndexUtils():
                 # DEBUG
                 # Regenerate index
                 upload_hashes[self.project_name] = hash(tuple(upload_files))
-                print(upload_files)
+                # print(upload_files)
+                if len(upload_files) == 0:
+                    return "Nothing need to index" 
                 documents = SimpleDirectoryReader(input_files=upload_files).load_data()
                 vector_store = FaissVectorStore(faiss_index=self.faiss_index)
                 storage_context = StorageContext.from_defaults(vector_store=vector_store)

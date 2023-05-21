@@ -10,9 +10,11 @@ class Invitation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     recipient_email = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='User')
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     project = db.relationship('Project', backref=db.backref('invitations', lazy='dynamic'))
     sender = db.relationship('User', backref=db.backref('sent_invitations', lazy='dynamic'))
+    accepted = db.Column(db.Boolean, default=False)
 
 
 class Project(db.Model):
@@ -39,12 +41,13 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), nullable=False, default='User')
 
 
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password, role='User'):
         self.username = username
         self.email = email
         self.password = hashlib.sha256(
             (password + os.environ.get('SALT', 'default_salt')).encode('utf-8')
         ).hexdigest()
+        self.role = role
 
     def verify_password(self, password):
         return self.password == hashlib.sha256(

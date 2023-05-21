@@ -18,12 +18,19 @@
         {% endfor %}
       </ul>
     </ul>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div class="flash-message">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    {% if new_user_details %}
+      <div class="new-user-details">
+        <p>New User Details:</p>
+        <p>Username: {{ new_user_details.username }}</p>
+        <p>
+          {% if new_user_details.default_password %}
+            Default Password: HiSoSupreme
+          {% else %}
+            Password: (hidden)
+          {% endif %}
+        </p>
+      </div>
+    {% endif %}
+    <button onclick="location.href='http://so-supreme.sis.ai'" type="button">Go to Login Page</button>
   </body>
 </html>

@@ -95,7 +95,10 @@ class UserResource(Resource):
         '''Delete a user given its identifier'''
         user = User.query.get(user_id)
         if not user:
-            current_app.api.abort(404)
+            return {"message":"Invalid User ID"}, 404
+
+        user.projects = []
+        
         db.session.delete(user)
         db.session.commit()
         return '', 204
@@ -139,4 +142,25 @@ class UserInfo(Resource):
             return {'error': 'User not found'}, 404
         user_info = {'id': user.id, 'username': user.username, 'email': user.email, 'role':user.role}
         return user_info, 200
+
+@user_ns.route('/create_user')
+class CreateUser(Resource):
+    def post(self):
+        data = request.get_json()
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+        role = data.get('role', 'User')  # Default role is 'User' if not specified
+
+        # Check if the user already exists
+        user = User.query.filter_by(username=username).first()
+        if user:
+            return {"message": "User already exists."}, 400
+
+        # Create the new user and save it to the database
+        user = User(username=username, email=email, password=password, role=role)
+        db.session.add(user)
+        db.session.commit()
+
+        return {"message": f"User {username} created with role {role}."}
 
