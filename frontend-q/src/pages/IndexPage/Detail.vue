@@ -4,7 +4,7 @@
       <q-card flat class="">
         <q-card-section v-if="loading">
           <div class="q-py-lg flex justify-center">
-            <q-spinner color="dark" size="3em" />
+            <q-spinner-oval color="primary" size="2rem" />
           </div>
         </q-card-section>
         <q-card-section v-else>
@@ -16,27 +16,6 @@
             {{ currentProject && currentProject.description }}
           </p>
           <q-separator class="q-my-lg" />
-          <!-- <div class="q-my-md" style="height: 80px">
-            <q-avatar
-              v-for="n in 5"
-              :key="n"
-              size="50px"
-              class="absolute"
-              :style="`left: ${n * 40}px`"
-            >
-              <img :src="`https://cdn.quasar.dev/img/avatar${n + 1}.jpg`" />
-            </q-avatar>
-            <q-avatar
-              color="primary"
-              text-color="white"
-              class="absolute numbered-avatar"
-              size="54px"
-              font-size="19px"
-              :style="`left: ${6 * 40}px; border: 2px solid white;`"
-            >
-              <span>+3</span>
-            </q-avatar>
-          </div> -->
           <div class="row q-gutter-md">
             <q-btn
               color="primary"
@@ -82,69 +61,7 @@
         </q-card-section>
       </q-card>
     </div>
-    <!--
-
-
-    <div class="col-12 col-md-9" v-if="authStore.user.role == 'Admin'">
-      <q-card flat class="bg-white q-my-lg">
-        <q-card-section class="q-pa-lg">
-          <div class="text-h6 text-weight-bold text-dark">Uploaded Files</div>
-          <q-separator class="q-my-lg" />
-          <div v-if="loading" class="q-py-lg flex justify-center">
-            <q-spinner color="dark" size="3em" />
-          </div>
-          <div v-if="error" class="q-py-sm flex justify-center">
-            <div class="text-h6 text-negative">
-              {{ error }}
-            </div>
-          </div>
-
-          <div class="row q-col-gutter-md" v-if="indexExist">
-            <div
-              v-for="(file, i) in projectFiles"
-              :key="i"
-              class="col-12 col-sm-6 col-md-4"
-            >
-              <div class="wrapper bg-accent">
-
-                <div class="flex full-width justify-between items-center q-px-md q-py-sm">
-                  <div>
-
-                    <div class="text-dark text-h6 text-weight-bold">
-                      {{ file.split('.')[0] }}
-                    </div>
-
-                    <div class="text-dark-page text-body">
-                      {{ file.split('.')[1] }}
-                    </div>
-                  </div>
-                  <q-btn
-                    round
-                    color="negative"
-                    unelevated
-                    class="q-mx-xs"
-                    icon="delete"
-                    size="sm"
-                    @click="deleteProjectFile(file)"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <q-btn
-            unelevated
-            color="primary"
-            class="q-mt-md"
-            text-color="white"
-            @click="indexProject"
-            v-if="authStore.user.role == 'Admin'"
-          >
-            {{ $t('pages.IndexPage.Detail.reIndexBtn') }}
-          </q-btn>
-        </q-card-section>
-      </q-card>
-    </div>
-     -->
+    <ProjectUsers v-if="authStore.user.role == 'Admin'" />
   </div>
 </template>
 
@@ -154,6 +71,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { useAuthStore } from 'src/stores/auth';
+import ProjectUsers from 'src/components/IndexPage/Detail/ProjectUsers.vue';
 
 const $q = useQuasar();
 const route = useRoute();

@@ -4,7 +4,7 @@
       {{ $t('pages.UserAuthenticationAndManagement.EditUserPage.EditUser.title') }}
     </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
-      <q-spinner color="dark" size="3em" />
+      <q-spinner-oval color="primary" size="2rem" />
     </div>
     <div v-if="error" class="q-py-sm flex justify-center">
       <div class="text-h6 text-negative">
@@ -74,6 +74,8 @@
 import { useAuthStore } from 'src/stores/auth';
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
+const $q = useQuasar();
 const route = useRoute();
 const router = useRouter();
 const username = ref('');
@@ -95,6 +97,14 @@ const editUser = async () => {
       },
       userId: route.params.id,
     });
+    if (res) {
+      $q.notify({
+        message: 'User Updated successfully',
+        position: 'top-right',
+        color: 'primary',
+      });
+      router.push('/user-authentication-and-management');
+    }
     console.log(res);
   } catch (err) {
     console.log(err);
@@ -102,7 +112,6 @@ const editUser = async () => {
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;
-    router.push('/user-authentication-and-management');
   }
 };
 </script>

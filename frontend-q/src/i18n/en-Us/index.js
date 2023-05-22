@@ -8,6 +8,7 @@ export default {
           viewAll: "View All Projects",
           viewLess: " Show Less",
         },
+
         CreateProject: {
           form: {
             projectName: "Project Name",
@@ -29,6 +30,12 @@ export default {
         indexBtn: "Project Training",
         deleteBtn: "Delete Project",
         reIndexBtn: "Re-Training",
+        ProjectUsers: {
+          title: "Project Users",
+          noFound: "No Users Found in Project",
+          viewAll: "View All Users of Project",
+          viewLess: " Show Less",
+        },
       },
       Invite: {
         email: "Email",
@@ -206,6 +213,11 @@ export default {
       Index: "Project Management",
       FileManagement: "File Management",
       Services: "Services",
+    },
+    languages: {
+      english: "English",
+      chineeseSimplified: "Chineese ( Simplified )",
+      chineeseTraditional: "Chineese ( Traditional )",
     },
   },
 };

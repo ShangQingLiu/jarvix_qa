@@ -3,7 +3,7 @@
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-9">
         <div v-if="loading || uploadingFiles" class="q-py-lg flex justify-center">
-          <q-spinner color="dark" size="3em" />
+          <q-spinner-oval color="primary" size="2rem" />
         </div>
         <q-card v-else flat class="bg-white q-mb-lg" style="border-radius: 16px">
           <q-card-section class="q-pa-lg">
@@ -95,7 +95,7 @@
             </div>
             <q-separator class="q-my-lg" />
             <div v-if="uploadingFiles" class="q-py-lg flex justify-center">
-              <q-spinner color="dark" size="3em" />
+              <q-spinner-oval color="primary" size="2rem" />
             </div>
             <div v-if="uploadingError" class="q-py-sm flex justify-center">
               <div class="text-h6 text-negative">
@@ -118,7 +118,7 @@
               <q-icon name="add" color="dark"></q-icon>
             </q-btn>
             <input
-              accept=".docx,.pdf,.html,.mp3,.m4a"
+              accept=".docx,.pdf,.html,.mp3,.m4a,.xlsx"
               @change="uploadFiles"
               multiple
               type="file"

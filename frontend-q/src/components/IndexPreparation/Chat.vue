@@ -15,9 +15,10 @@
           />
         </div>
         <!-- <div v-if="!loading" class="flex flex-center q-py-lg">
-          <q-spinner color="dark" size="3em" />
+         <q-spinner-oval color="primary" size="2rem" />
         </div> -->
       </q-scroll-area>
+
       <q-form @submit.prevent="submitQuery">
         <q-input
           rounded
@@ -27,6 +28,7 @@
           v-model="queryText"
           placeholder="Search"
           :input-style="{ color: '#878787' }"
+          :disable="projectName ? false : true"
         >
           <template v-slot:append>
             <q-icon v-if="!loading" name="/send.svg" />
@@ -42,8 +44,12 @@
 import { computed, ref, nextTick } from 'vue';
 import { useServiceStore } from 'src/stores/service';
 import { useQuasar } from 'quasar';
+import { useProjectStore } from 'src/stores/project';
+
 const $q = useQuasar();
 const store = useServiceStore();
+const projectStore = useProjectStore();
+const projectName = computed(() => projectStore.selectedProject);
 const chatHistory = computed(() => store.chatHistory);
 const loading = ref(false);
 const error = ref(null);

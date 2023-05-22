@@ -47,7 +47,7 @@
           </div>
           <q-separator class="q-my-lg" />
           <div v-if="loading" class="q-py-lg flex justify-center">
-            <q-spinner color="dark" size="3em" />
+           <q-spinner-oval color="primary" size="2rem" />
           </div>
           <q-scroll-area class="bg-accent q-pa-lg" style="height: 600px">
             <div v-for="(question, i) in questionsList" :key="i" class="q-mb-md">

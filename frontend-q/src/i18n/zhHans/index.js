@@ -206,5 +206,10 @@ export default {
       FileManagement: "文件管理",
       Services: "服务",
     },
+    languages: {
+      english: "英文",
+      chineeseSimplified: "简体中文",
+      chineeseTraditional: "繁体中文",
+    },
   },
 };

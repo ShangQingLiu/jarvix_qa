@@ -3,7 +3,7 @@
     <q-card flat class="bg-transparent q-px-none q-mb-lg">
       <q-card-section class="q-px-none">
         <div v-if="loading" class="q-py-lg flex justify-center">
-          <q-spinner color="dark" size="3em" />
+         <q-spinner-oval color="primary" size="2rem" />
         </div>
         <div v-if="error" class="q-py-sm flex justify-center">
           <div class="text-h6 text-negative">

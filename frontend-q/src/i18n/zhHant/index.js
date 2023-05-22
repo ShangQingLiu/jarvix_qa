@@ -205,6 +205,11 @@ export default {
       Index: '專案管理',
       FileManagement: '檔案管理',
       Services: '服務'
-    }
+    },
+    languages: {
+      english: "英文",
+      chineeseSimplified: "中文（简体）",
+      chineeseTraditional: "中文（繁體）",
+    },
   },
 };

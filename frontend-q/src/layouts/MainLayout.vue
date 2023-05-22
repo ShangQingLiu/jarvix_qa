@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md">
     <q-layout class="q-pa-md" view="lHh Lpr lFf">
-      <q-header class="bg-transparent q-pa-md">
+      <q-header class="bg-white q-px-md q-py-sm">
         <q-toolbar>
           <div class="flex justify-between items-center full-width">
             <q-select
@@ -14,7 +14,20 @@
               style="min-width: 160px"
               dense
               class="language-dropdown"
-            />
+            >
+              <template v-slot:selected>
+                {{ $t(`MainLayout.languages.${selectedLabel(locale)}`) }}
+              </template>
+              <template v-slot:option="scope">
+                <q-item v-bind="scope.itemProps">
+                  <q-item-section>
+                    <q-item-label>
+                      {{ $t(`MainLayout.languages.${scope.opt.label}`) }}</q-item-label
+                    >
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
             <q-btn
               flat
               dense
@@ -60,11 +73,11 @@
                   </q-item-section>
 
                   <q-item-section>
-                    <q-item-label class="text-dark">
+                    <q-item-label class="text-dark text-weight-regular">
                       {{ store.user.username }}
                     </q-item-label>
                     <q-item-label caption>{{ store.user.email }}</q-item-label>
-                    <q-item-label class="text-dark">
+                    <q-item-label class="text-dark text-weight-regular">
                       {{ store.user.role }}
                     </q-item-label>
                   </q-item-section>
@@ -147,6 +160,16 @@ export default defineComponent({
         ? (serviceStore.currentLanguage = 'EN')
         : (serviceStore.currentLanguage = 'ZH');
     });
+    const localeOptions = ref([
+      { value: 'en-US', label: 'english' },
+      { value: 'zhHans', label: 'chineeseSimplified' },
+      { value: 'zhHant', label: 'chineeseTraditional' },
+    ]);
+    const selectedLabel = (item) => {
+      const option = localeOptions.value.find((i) => i.value == item);
+      return option.label;
+    };
+
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
@@ -157,11 +180,8 @@ export default defineComponent({
       logout,
       store,
       locale,
-      localeOptions: [
-        { value: 'en-US', label: 'English' },
-        { value: 'zhHans', label: 'Chineese ( Simplified )' },
-        { value: 'zhHant', label: 'Chineese ( Traditional )' },
-      ],
+      localeOptions,
+      selectedLabel,
     };
   },
 });
@@ -175,8 +195,8 @@ export default defineComponent({
 .user-profile {
   .q-item__label {
     font-style: normal;
-    font-weight: 600;
-    font-size: 19px;
+    font-weight: 500;
+    font-size: 17px;
     line-height: 19px;
   }
   .q-item__label--caption {

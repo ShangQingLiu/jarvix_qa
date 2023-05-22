@@ -8,6 +8,7 @@ export const useProjectStore = defineStore("projectStore", {
     userProjects: [],
     projectFiles: [],
     selectedProject: null,
+    projectUsers: [],
   }),
   actions: {
     createProject(form) {
@@ -165,6 +166,36 @@ export const useProjectStore = defineStore("projectStore", {
         return this.checkProjectIndex(p.name);
       });
       return Promise.all(projects);
+    },
+    fetchProjectUsers(projectId) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const { data } = await api.get(
+            `project-management/${projectId}/users`
+          );
+          console.log(data);
+          this.projectUsers = data;
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    deleteProjectUser(payload) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          console.log(payload);
+          const { data } = await api.delete(
+            `project-management/${payload.projectId}/user/${payload.userId}/remove`
+          );
+          this.projectUsers = this.projectUsers.filter(
+            (user) => payload.userId !== user.id
+          );
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      });
     },
   },
 });
