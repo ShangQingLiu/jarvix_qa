@@ -30,7 +30,7 @@
         /></q-breadcrumbs
       >
     </div>
-    <div class="col-6">
+    <div class="col-12 col-md-6">
       <!-- Login -->
       <ForgotPassword />
     </div>

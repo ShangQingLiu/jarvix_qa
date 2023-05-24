@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col-12"></div>
-    <div class="col-6">
+    <div class="col-12 col-md-6">
       <!-- Login -->
       <Done />
     </div>

@@ -4,7 +4,7 @@
       <q-card flat class="">
         <q-card-section v-if="loading">
           <div class="q-py-lg flex justify-center">
-            <q-spinner-oval color="primary" size="2rem" />
+            <q-spinner-oval color="primary" size="3rem" />
           </div>
         </q-card-section>
         <q-card-section v-else>

@@ -8,7 +8,7 @@
       }}
     </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
-     <q-spinner-oval color="primary" size="2rem" />
+     <q-spinner-oval color="primary" size="3rem" />
     </div>
     <div v-if="error" class="q-py-sm flex justify-center">
       <div class="text-h6 text-negative">
@@ -38,7 +38,7 @@
         <q-btn
           color="white"
           unelevated
-          class="text-capitalize"
+          class="text-capitalize md-block q-mx-auto q-mx-md-none"
           text-color="dark"
           square
           style="width: 200px"
@@ -53,7 +53,7 @@
         <q-btn
           color="primary"
           unelevated
-          class="text-capitalize"
+          class="text-capitalize md-block q-mx-auto q-mx-md-none"
           text-color="white"
           square
           style="width: 200px"

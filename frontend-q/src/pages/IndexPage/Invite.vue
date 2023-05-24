@@ -9,7 +9,7 @@
             </div>
             <q-separator class="q-my-lg" />
             <div v-if="loading" class="q-py-lg flex justify-center">
-             <q-spinner-oval color="primary" size="2rem" />
+             <q-spinner-oval color="primary" size="3rem" />
             </div>
             <div v-if="error" class="q-py-sm flex justify-center">
               <div class="text-h6 text-negative">

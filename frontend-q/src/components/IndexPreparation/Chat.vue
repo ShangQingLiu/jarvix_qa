@@ -15,7 +15,7 @@
           />
         </div>
         <!-- <div v-if="!loading" class="flex flex-center q-py-lg">
-         <q-spinner-oval color="primary" size="2rem" />
+         <q-spinner-oval color="primary" size="3rem" />
         </div> -->
       </q-scroll-area>
 

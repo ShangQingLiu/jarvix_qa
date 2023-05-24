@@ -4,7 +4,7 @@
       {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.title') }}
     </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
-     <q-spinner-oval color="primary" size="2rem" />
+      <q-spinner-oval color="primary" size="3rem" />
     </div>
     <div v-if="error" class="q-py-sm flex justify-center">
       <div class="text-h6 text-negative">
@@ -41,7 +41,7 @@
       <q-btn
         color="primary"
         unelevated
-        class="text-capitalize q-mt-xl"
+        class="text-capitalize q-mt-xl md-block q-mx-auto q-mx-md-none"
         text-color="white"
         type="submit"
         square
@@ -49,7 +49,7 @@
       >
         {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.btn') }}
       </q-btn>
-      <div class="text-subtitle1 text-dark-page q-mt-md q-mb-xs">
+      <div class="text-subtitle1 text-dark-page q-mt-md q-mb-xs text-md-center">
         {{
           $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontAccountText')
         }}
@@ -60,7 +60,7 @@
           {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.signupBtn') }}
         </router-link>
       </div>
-      <div class="text-subtitle1 text-dark-page">
+      <div class="text-subtitle1 text-dark-page text-md-center">
         {{
           $t(
             'pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontRememberText'

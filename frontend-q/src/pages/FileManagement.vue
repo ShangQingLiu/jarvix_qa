@@ -3,7 +3,7 @@
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-9">
         <div v-if="loading || uploadingFiles" class="q-py-lg flex justify-center">
-          <q-spinner-oval color="primary" size="2rem" />
+          <q-spinner-oval color="primary" size="3rem" />
         </div>
         <q-card v-else flat class="bg-white q-mb-lg" style="border-radius: 16px">
           <q-card-section class="q-pa-lg">
@@ -95,7 +95,7 @@
             </div>
             <q-separator class="q-my-lg" />
             <div v-if="uploadingFiles" class="q-py-lg flex justify-center">
-              <q-spinner-oval color="primary" size="2rem" />
+              <q-spinner-oval color="primary" size="3rem" />
             </div>
             <div v-if="uploadingError" class="q-py-sm flex justify-center">
               <div class="text-h6 text-negative">

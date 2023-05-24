@@ -1,75 +1,71 @@
 <template>
   <div>
+    <div class="row flex-wrap q-py-md q-col-gutter-sm">
+      <div class="col-6 col-md-4">
+        <q-btn
+          :color="panel === 'chat' ? 'primary' : 'white'"
+          :text-color="panel === 'chat' ? 'white' : 'dark-page'"
+          unelevated
+          style="height: 55px"
+          icon="img:/static/chat.svg"
+          :label="$t('pages.IndexPreparation.chatBtn')"
+          @click="panel = 'chat'"
+          class="full-width"
+        />
+      </div>
+      <div class="col-6 col-md-4">
+        <q-btn
+          :color="panel === 'validation-forum' ? 'primary' : 'white'"
+          :text-color="panel === 'validation-forum' ? 'white' : 'dark-page'"
+          unelevated
+          style="height: 55px"
+          icon="img:/static/questions.svg"
+          :label="$t('pages.IndexPreparation.validationForum')"
+          @click="panel = 'validation-forum'"
+          class="full-width"
+        />
+      </div>
+      <div class="col-6 col-md-4">
+        <q-select
+          :label="$t('pages.IndexPreparation.chooseProject')"
+          v-model="projectName"
+          :placeholder="$t('pages.IndexPreparation.chooseProject')"
+          bg-color="white"
+          :options="projects"
+          option-value="name"
+          option-label="name"
+          style="min-width: 160px"
+          emit-value
+          borderless
+          class="full-width"
+        />
+      </div>
+      <div v-if="projectName && existingChat.length > 0" class="col-6 col-md-4">
+        <q-btn color="primary" @click="generateNewSession" unelevated class="full-width">
+          {{ $t('pages.IndexPreparation.generateNewSession') }}
+        </q-btn>
+      </div>
+      <div v-if="sessions.length && showExistingSessions" class="col-6 col-md-4">
+        <q-select
+          :label="$t('pages.IndexPreparation.chooseSession')"
+          v-model="session"
+          :placeholder="$t('pages.IndexPreparation.chooseSession')"
+          style="min-width: 160px"
+          bg-color="white"
+          :options="sessions"
+          borderless
+          class="full-width"
+        />
+      </div>
+
+      <div v-if="!showExistingSessions && sessions.length > 0" class="col-6 col-md-4">
+        <q-btn color="primary" @click="toggleShow" unelevated class="full-width">
+          {{ $t('pages.IndexPreparation.showExistingSession') }}
+        </q-btn>
+      </div>
+    </div>
     <div class="row">
       <div class="col-12">
-        <div class="row flex q-col-gutter-sm justify-between align-center">
-          <div class="col-12 col-md-4">
-            <q-btn
-              :color="panel === 'chat' ? 'primary' : 'white'"
-              :text-color="panel === 'chat' ? 'white' : 'dark-page'"
-              unelevated
-              style="height: 55px"
-              icon="img:/static/chat.svg"
-              :label="$t('pages.IndexPreparation.chatBtn')"
-              @click="panel = 'chat'"
-            />
-            <q-btn
-              :color="panel === 'validation-forum' ? 'primary' : 'white'"
-              :text-color="panel === 'validation-forum' ? 'white' : 'dark-page'"
-              unelevated
-              style="height: 55px"
-              icon="img:/static/questions.svg"
-              :label="$t('pages.IndexPreparation.validationForum')"
-              @click="panel = 'validation-forum'"
-              class="q-ml-md"
-            />
-          </div>
-          <div class="q-mb-md col-12 col-md-8">
-            <div class="row flex justify-around align-center">
-              <q-select
-                :label="$t('pages.IndexPreparation.chooseProject')"
-                v-model="projectName"
-                :placeholder="$t('pages.IndexPreparation.chooseProject')"
-                bg-color="white"
-                :options="projects"
-                option-value="name"
-                option-label="name"
-                class="col-4"
-                emit-value
-                borderless
-              />
-              <q-btn
-                v-if="projectName && existingChat.length > 0"
-                color="primary"
-                @click="generateNewSession"
-                unelevated
-                class="q-ml-sm"
-              >
-              {{ $t('pages.IndexPreparation.generateNewSession')  }}
-
-              </q-btn>
-              <q-select
-                v-if="sessions.length && showExistingSessions"
-                :label="$t('pages.IndexPreparation.chooseSession')"
-                v-model="session"
-                :placeholder="$t('pages.IndexPreparation.chooseSession')"
-                class="col-12 col-md-3"
-                bg-color="white"
-                :options="sessions"
-                borderless
-              />
-              <q-btn
-                v-if="!showExistingSessions && sessions.length > 0"
-                color="primary"
-                @click="toggleShow"
-                unelevated
-              >
-                {{ $t('pages.IndexPreparation.showExistingSession') }}
-              </q-btn>
-            </div>
-          </div>
-        </div>
-
         <q-tab-panels v-model="panel" class="bg-transparent q-px-none q-py-none">
           <q-tab-panel class="q-px-none q-py-none" name="chat">
             <Chat />
@@ -112,7 +108,6 @@ const session = ref(serviceStore.selectedSession ? serviceStore.selectedSession 
 const sessions = computed(() => serviceStore.sessions);
 const showExistingSessions = computed(() => serviceStore.showExistingSessions);
 const existingChat = computed(() => serviceStore.chatHistory);
-
 
 const toggleShow = () => {
   serviceStore.showExistingSessions = !serviceStore.showExistingSessions;
