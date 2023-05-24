@@ -29,7 +29,7 @@ class ChatBot():
         self.graph_config =  None if graph == None else self.getGraphConfig(index_saved_path,project_name,chunk_size_limit)
         self.toolKit = self.getToolKit()
         self.agent = self.getAgent(self.toolKit) 
-        pre_promt =  f"You are a personal assistant for Synergies company, your job is to answer questions. First check graph index as reference."
+        pre_promt =  f"You are a personal assistant for Synergies company, your job is to answer questions. First check index as reference."
 #  Use only context index_{self.project_name}.json 
 #         act_prompt = """We have provided context information below. \n"
 # "---------------------\n"
