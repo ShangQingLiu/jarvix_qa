@@ -66,6 +66,12 @@ export const useAuthStore = defineStore("authStore", {
           } else {
             currentUser = this.user;
           }
+          let index = data.findIndex(
+            (user) =>
+              user.id === currentUser.id && user.email === currentUser.email
+          );
+          data.unshift(data.splice(index, 1)[0]);
+          console.log(index);
           if (currentUser.role == "Admin") {
             this.usersList = data;
           } else {

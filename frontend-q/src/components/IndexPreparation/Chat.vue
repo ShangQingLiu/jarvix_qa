@@ -28,11 +28,10 @@
           v-model="queryText"
           placeholder="Search"
           :input-style="{ color: '#878787' }"
-          :disable="projectName ? false : true"
         >
           <template v-slot:append>
             <q-icon v-if="!loading" name="/send.svg" />
-            <q-spinner v-else color="negative" size="2em" />
+            <q-spinner-oval v-if="loading" color="primary" size="2em" />
           </template>
         </q-input>
       </q-form>
@@ -56,40 +55,49 @@ const error = ref(null);
 const queryText = ref('');
 const scrollAreaRef = ref(null);
 const submitQuery = async () => {
-  try {
-    error.value = null;
-    loading.value = true;
-    store.addUserMessage(queryText.value);
-    await nextTick();
-    // Scrolling at the bottom of Question List
-    const scrollArea = scrollAreaRef.value;
-    const scrollTarget = scrollArea.getScrollTarget();
-    const duration = 300;
-    scrollAreaRef.value.setScrollPosition(
-      'vertical',
-      scrollTarget.scrollHeight,
-      duration
-    );
-    const res = await store.submitQuery({
-      query: queryText.value,
-      sessionFrom: 'ChatRoom',
-    });
-    await nextTick();
-    scrollAreaRef.value.setScrollPosition(
-      'vertical',
-      scrollTarget.scrollHeight,
-      duration
-    );
-  } catch (err) {
-    console.log(err);
-    error.value = err.response.status + ' - ' + err.response.statusText;
+  if (projectName.value) {
+    try {
+      error.value = null;
+      loading.value = true;
+      store.addUserMessage(queryText.value);
+      await nextTick();
+      // Scrolling at the bottom of Question List
+      const scrollArea = scrollAreaRef.value;
+      const scrollTarget = scrollArea.getScrollTarget();
+      const duration = 300;
+      scrollAreaRef.value.setScrollPosition(
+        'vertical',
+        scrollTarget.scrollHeight,
+        duration
+      );
+      const res = await store.submitQuery({
+        query: queryText.value,
+        sessionFrom: 'ChatRoom',
+      });
+      await nextTick();
+      scrollAreaRef.value.setScrollPosition(
+        'vertical',
+        scrollTarget.scrollHeight,
+        duration
+      );
+    } catch (err) {
+      console.log(err);
+      error.value = err.response.status + ' - ' + err.response.statusText;
+      $q.notify({
+        message: error.value ? error.value : 'Something Went Wrong',
+        position: 'top-right',
+        color: 'negative',
+      });
+    } finally {
+      loading.value = false;
+      queryText.value = '';
+    }
+  } else {
     $q.notify({
-      message: error.value ? error.value : 'Something Went Wrong',
+      message: 'Please select project to start the chat',
       position: 'top-right',
-      color: 'negative',
+      color: 'primary',
     });
-  } finally {
-    loading.value = false;
     queryText.value = '';
   }
 };

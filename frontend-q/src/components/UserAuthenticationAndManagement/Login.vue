@@ -82,15 +82,52 @@
 </template>
 <script setup>
 import { useAuthStore } from 'src/stores/auth';
+import { useProjectStore } from 'src/stores/project';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
+
 const username = ref('');
 const password = ref('');
 const router = useRouter();
+const $q = useQuasar();
 
 const loading = ref(false);
 const error = ref(null);
 const store = useAuthStore();
+const projectStore = useProjectStore();
+
+const fetchUserProjects = async (id) => {
+  try {
+    error.value = null;
+    loading.value = true;
+
+    const res = await projectStore.fetchUserProjects(id);
+    const indexedProjects = await projectStore.getIndexedProjects();
+    const filteredProjects = res.filter((project, index) => {
+      if (indexedProjects[index].message === 'Index exists') {
+        return project;
+      }
+    });
+    // If project exists
+    if (filteredProjects.length > 1) {
+      projectStore.selectedProject = filteredProjects[0];
+      router.push('/index-preparation');
+    } else {
+      router.push('/');
+      $q.notify({
+        message: 'Please create new project and upload the file to use the service.',
+        position: 'top-right',
+        color: 'primary',
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + ' - ' + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
 const loginUser = async () => {
   try {
     error.value = null;
@@ -100,7 +137,10 @@ const loginUser = async () => {
       password: password.value,
     });
     if (res) {
-      router.push('/user-authentication-and-management');
+      const user = await store.getLoggedInUserData();
+      if (user) {
+        await fetchUserProjects(user.id);
+      }
     }
   } catch (err) {
     console.log(err);
