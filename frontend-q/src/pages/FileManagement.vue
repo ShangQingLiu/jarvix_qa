@@ -28,7 +28,7 @@
                 {{ $t('pages.FileManagementPage.uploadFilesTitle') }}
               </div>
               <div class="text-h6 text-weight-bold text-dark">
-                {{ projectName }}
+                {{ projectName.name }}
               </div>
             </div>
             <div v-else class="flex justify-between">
