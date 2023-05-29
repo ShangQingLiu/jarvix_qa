@@ -47,7 +47,7 @@
                 class="text-capitalize"
                 text-color="white"
                 rounded
-                to="/user-authentication-and-management/login"
+                to="/auth/login"
                 v-if="Object.keys(store.user).length === 0"
               >
                 {{ $t(`MainLayout.loginBtn`) }}
@@ -244,7 +244,7 @@ export default defineComponent({
     function logout() {
       localStorage.removeItem('jarvixUser');
       store.user = {};
-      router.push('user-authentication-and-management/login');
+      router.push('/auth/login');
     }
     watch(locale, (val) => {
       val == 'en-US'

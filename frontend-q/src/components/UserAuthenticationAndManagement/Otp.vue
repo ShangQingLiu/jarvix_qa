@@ -48,7 +48,7 @@
       <div class="text-subtitle1 text-dark-page q-mt-md q-mb-xs">
         Didn’t receive the code
         <router-link
-          to="/user-authentication-and-management/forgot-password"
+          to="/auth/forgot-password"
           class="text-primary no-underline"
         >
           click to resend

@@ -42,7 +42,7 @@
           text-color="dark"
           square
           style="width: 200px"
-          to="/user-authentication-and-management/login"
+          to="/auth/login"
         >
           {{
             $t(

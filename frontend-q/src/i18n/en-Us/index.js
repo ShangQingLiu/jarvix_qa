@@ -39,8 +39,9 @@ export default {
       },
       Invite: {
         email: "Email",
-        inviteBtn: "Invite",
+        inviteBtn: "Send Invite",
         title: "Invite People",
+        addField: "+ add another field",
       },
     },
     UserAuthenticationAndManagement: {
@@ -219,5 +220,12 @@ export default {
       chineeseSimplified: "Chineese ( Simplified )",
       chineeseTraditional: "Chineese ( Traditional )",
     },
+    roles: {
+      user: "User",
+      admin: "Admin",
+    },
+  },
+  AuthLayout: {
+    welcomeText: "Welcome to our website which will help you.",
   },
 };

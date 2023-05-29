@@ -46,30 +46,7 @@ const routes = [
             meta: { requiresAuth: true },
             name: "UsersManagementPage",
           },
-          {
-            path: "login",
-            component: () =>
-              import("pages/UserAuthenticationAndManagement/LoginPage.vue"),
-            // only authenticated users can create posts
-            meta: { requiresAuth: false },
-            name: "login",
-          },
-          {
-            path: "register",
-            component: () =>
-              import("pages/UserAuthenticationAndManagement/RegisterPage.vue"),
-            // only authenticated users can create posts
-            meta: { requiresAuth: false },
-          },
-          {
-            path: "forgot-password",
-            component: () =>
-              import(
-                "pages/UserAuthenticationAndManagement/ForgotPasswordPage.vue"
-              ),
-            // only authenticated users can create posts
-            meta: { requiresAuth: false },
-          },
+
           {
             path: "otp-code",
             component: () =>
@@ -122,6 +99,36 @@ const routes = [
         // only authenticated users can create posts
         meta: { requiresAuth: true },
         name: "services",
+      },
+    ],
+  },
+  {
+    path: "/auth",
+    component: () => import("layouts/AuthLayout.vue"),
+    children: [
+      {
+        path: "login",
+        component: () =>
+          import("pages/UserAuthenticationAndManagement/LoginPage.vue"),
+        // only authenticated users can create posts
+        meta: { requiresAuth: false },
+        name: "login",
+      },
+      {
+        path: "register",
+        component: () =>
+          import("pages/UserAuthenticationAndManagement/RegisterPage.vue"),
+        // only authenticated users can create posts
+        meta: { requiresAuth: false },
+      },
+      {
+        path: "forgot-password",
+        component: () =>
+          import(
+            "pages/UserAuthenticationAndManagement/ForgotPasswordPage.vue"
+          ),
+        // only authenticated users can create posts
+        meta: { requiresAuth: false },
       },
     ],
   },

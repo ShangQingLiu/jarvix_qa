@@ -71,7 +71,7 @@
           )
         }}
         <router-link
-          to="/user-authentication-and-management/login"
+          to="/auth/login"
           class="text-primary no-underline"
         >
           {{
@@ -108,7 +108,7 @@ const registerUser = async () => {
     });
     console.log(res);
     if (res) {
-      router.push('/user-authentication-and-management/login');
+      router.push('/auth/login');
     }
   } catch (err) {
     console.log(err);

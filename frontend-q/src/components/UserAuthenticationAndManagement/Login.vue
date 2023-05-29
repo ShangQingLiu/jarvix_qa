@@ -54,7 +54,7 @@
           $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontAccountText')
         }}
         <router-link
-          to="/user-authentication-and-management/register"
+          to="/auth/register"
           class="text-primary no-underline"
         >
           {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.signupBtn') }}
@@ -67,7 +67,7 @@
           )
         }},
         <router-link
-          to="/user-authentication-and-management/forgot-password"
+          to="/auth/forgot-password"
           class="text-primary no-underline"
         >
           {{

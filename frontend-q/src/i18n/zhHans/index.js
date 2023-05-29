@@ -32,8 +32,9 @@ export default {
       },
       Invite: {
         email: "电子邮件",
-        inviteBtn: "邀请",
+        inviteBtn: "发送邀请",
         title: "邀请人员",
+        addField: "+ 添加另一个字段",
       },
     },
     UserAuthenticationAndManagement: {
@@ -211,5 +212,12 @@ export default {
       chineeseSimplified: "简体中文",
       chineeseTraditional: "繁体中文",
     },
+    roles: {
+      user: "用户",
+      admin: "管理员",
+    },
+  },
+  AuthLayout: {
+    welcomeText: "歡迎來到我們的網站，這將對您有所幫助。",
   },
 };

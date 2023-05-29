@@ -81,6 +81,8 @@ export const useProjectStore = defineStore("projectStore", {
             `project-management/${payload.projectId}/invite`,
             {
               email: payload.email,
+              role: payload.role,
+              language: payload.language,
             }
           );
           console.log(data);
@@ -90,6 +92,17 @@ export const useProjectStore = defineStore("projectStore", {
           reject(error);
         }
       });
+    },
+    invitePeople(payload) {
+      const invitations = payload.inviteContent.map((invite) => {
+        return this.sendProjectInvitation({
+          projectId: payload.projectId,
+          email: invite.email,
+          role: invite.role,
+          language: payload.language,
+        });
+      });
+      return Promise.all(invitations);
     },
     fetchUserProjects(userId) {
       return new Promise(async (resolve, reject) => {
