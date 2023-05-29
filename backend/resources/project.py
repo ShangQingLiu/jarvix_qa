@@ -30,6 +30,7 @@ get_project_model = project_ns.model('get project', {
 project_invite_model = project_ns.model('invite model', {
     'email': fields.String(required=True, description='New memeber email'),
     'role': fields.String(description='New memeber role'),
+    'language': fields.String(description='Invitation email language'),
 })
 
 # define a data model for the project input
@@ -106,6 +107,7 @@ class invite(Resource):
         data = request.get_json()
         recipient_email = data.get('email')
         role = data.get('role', 'User')
+        language = data.get('language', 'EN') #ZH-TW, ZH-CN
 
         project = Project.query.get(project_id)
         current_user_id = get_jwt_identity()
@@ -123,7 +125,13 @@ class invite(Resource):
 
         # send email
         msg = Message('Invitation to join project', recipients=[recipient_email])
-        msg.body = render_template('invitation_email.txt', invitation=invitation)
+        if language == "EN":
+            msg.body = render_template('template_EN.txt', invitation=invitation)
+        elif language == "ZH-TW":
+            msg.body = render_template('template_ZH-TW.txt', invitation=invitation)
+        elif language == "ZH-CN":
+            msg.body = render_template('template_ZH-CN.txt', invitation=invitation)
+            
         mail.send(msg)
 
         return {"message":"Successful send the invitation."}

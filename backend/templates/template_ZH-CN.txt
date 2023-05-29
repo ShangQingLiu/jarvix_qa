@@ -1,0 +1,8 @@
+Hi {{ invitation.recipient_email }},
+
+You have been invited to join the project "{{ invitation.project.name }}" by {{ invitation.sender.username }}. To accept the invitation, please click on the following link:
+
+{{ url_for('project management_accept_invitation', invitation_id=invitation.id,  _external=True) }}
+
+Best regards,
+Jarvix Team
