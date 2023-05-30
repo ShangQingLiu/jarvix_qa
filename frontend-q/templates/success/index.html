@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+  <title>Invite Successful</title>
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="./assets/logo.svg" alt="">
+    </div>
+    <h1>
+      Joined Successfully
+      Project 2
+    </h1>
+    <h3>
+      Here some details about project
+    </h3>
+    <p>
+      Name : Project 2
+    </p>
+    <p>
+      Description : summery of project 2
+    </p>
+    <p>
+      Created at : 2023-05-23 / 12:58
+    </p>
+    <h3>
+      Your Username and Password
+    </h3>
+    <form action="">
+
+      <div class="input-block">
+        <label>
+          UserName
+        </label>
+        <div class="copy-link">
+          <!-- Value should be dynamic -->
+          <input type="text" class="copy-link-input" value="Shangching" readonly>
+          <button type="button" class="copy-link-button">
+            <img src="./assets/copy.svg" alt="">
+          </button>
+        </div>
+      </div>
+      <div class="input-block">
+        <label>
+          Password
+        </label>
+        <div class="copy-link">
+          <!-- Value should be dynamic -->
+          <input type="text" class="copy-link-input" value="Hisosupreme" readonly>
+          <button type="button" class="copy-link-button">
+            <img src="./assets/copy.svg" alt="">
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+
+    document.querySelectorAll(".copy-link").forEach((copyLinkParent) => {
+      const inputField = copyLinkParent.querySelector(".copy-link-input");
+      const copyButton = copyLinkParent.querySelector(".copy-link-button");
+      const text = inputField.value;
+
+      inputField.addEventListener("focus", () => inputField.select());
+
+      copyButton.addEventListener("click", () => {
+        inputField.select();
+        navigator.clipboard.writeText(text);
+
+        inputField.value = "Copied!";
+        setTimeout(() => (inputField.value = text), 2000);
+      });
+    });
+
+  </script>
+</body>
+
+</html>
