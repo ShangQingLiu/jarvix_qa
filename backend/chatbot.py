@@ -96,7 +96,8 @@ class ChatBot():
         return response 
 
     def get_query_configs(self):
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo"))
+        max_tokens = os.getenv("MAX_TOKENS", 512) 
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo",max_tokens=max_tokens))
         decompose_transform = DecomposeQueryTransform(
             llm_predictor, verbose=True
         )

@@ -74,6 +74,12 @@ def admin_required(fn):
 
     return wrapper
 
+def get_resource_as_string(name, charset='utf-8'):
+    with current_app.open_resource(name) as f:
+        return f.read().decode(charset)
+
+# current_app.jinja_env.globals['get_resource_as_string'] = get_resource_as_string
+
 # Admin
 @project_ns.route('/')
 class create_project(Resource): 

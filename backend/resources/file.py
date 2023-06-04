@@ -55,7 +55,7 @@ class UploadFile(Resource):
             if file.filename == '':
                 return {'error': 'No file selected'}, 400
             upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
-            # print(file_extension)
+            print(file_extension)
             if file_extension[1:].lower() == 'm4a':
                 upload_folder = os.path.join(upload_folder, 'audio')
             elif file_extension[1:].lower() == 'mp3':
