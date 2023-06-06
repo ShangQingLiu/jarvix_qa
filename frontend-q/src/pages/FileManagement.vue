@@ -107,7 +107,7 @@
                 {{ success }}
               </div>
             </div>
-            <q-btn
+            <!-- <q-btn
               unelevated
               color="bg-accent"
               class="full-width bg-accent"
@@ -115,24 +115,40 @@
               @click="loadLocalFiles"
               v-if="!uploadingFiles"
             >
-              <q-icon name="add" color="dark"></q-icon>
-            </q-btn>
-            <input
-              accept=".docx,.pdf,.html,.mp3,.m4a,.xlsx"
-              @change="uploadFiles"
+
+            </q-btn> -->
+            <p>Drag or Click to upload files</p>
+            <q-file
+              v-model="files"
               multiple
+              append
+              accept=".docx,.pdf,.html,.mp3,.m4a,.xlsx"
               type="file"
-              ref="filesRef"
-              style="display: none"
-            />
+              class="q-my-md full-width bg-accent file-input"
+              style="height: 200px"
+              use-chips
+              placeholder="Drag or Click to upload the files"
+            >
+              <template #default>
+                <q-icon
+                  v-if="!files"
+                  name="add"
+                  color="dark"
+                  size="24"
+                  class="add-btn"
+                ></q-icon>
+              </template>
+            </q-file>
+
             <q-btn
               color="primary"
               unelevated
-              class="text-capitalize q-mt-lg"
+              class="text-capitalize q-mt-lg upload-nt"
               text-color="white"
-              style="width: 120px"
-              v-if="!uploadingFiles"
+              style="width: 140px"
+              v-if="!uploadingFiles && files"
               @click="loadLocalFiles"
+              icon="cloud_upload"
             >
               {{ $t('pages.FileManagementPage.uploadBtn') }}
             </q-btn>
@@ -167,23 +183,17 @@ const projectName = ref(store.selectedProject ? store.selectedProject : '');
 const projectFiles = computed(() => store.projectFiles);
 // const projectList = ref([]);
 const userProjects = ref([]);
+const files = ref(null);
 
-const loadLocalFiles = () => {
-  filesRef.value.click();
+const loadLocalFiles = async () => {
+  // filesRef.value.click();
+  await uploadFiles();
 };
 const fetchUserProjects = async () => {
   try {
     uploadingError.value = null;
     uploadingFiles.value = true;
     const res = await store.fetchUserProjects(authStore.user.id);
-    // const indexedProjects = await store.getIndexedProjects();
-    // console.log(indexedProjects);
-    // const filteredProjects = res.filter((project, index) => {
-    //   if (indexedProjects[index].message === 'Index exists') {
-    //     return project;
-    //   }
-    // });
-    console.log(res);
     userProjects.value = res;
   } catch (err) {
     console.log(err);
@@ -192,15 +202,23 @@ const fetchUserProjects = async () => {
     uploadingFiles.value = false;
   }
 };
+const getUrl = (files) => {
+  console.log(files);
+  return `https://api.so-supreme.sis.ai/api/file/upload?project_name=${projectName.value}`;
+};
+const finish = async () => {
+  await listProjectFiles();
+  console.log('Finshed');
+};
+const user = JSON.parse(localStorage.getItem('jarvixUser'));
+const token = user.access_token;
+
 const uploadFiles = async (e) => {
   try {
     loading.value = true;
-    // uploadedFiles.value = [];
     const formData = new FormData();
-    let res;
-    console.log(e.target.files);
-    for (var i = 0; i < e.target.files.length; i++) {
-      let file = e.target.files[i];
+    for (var i = 0; i < files.value.length; i++) {
+      let file = files.value[i];
       formData.append('files', file);
       res = await api.post(`file/upload?project_name=${projectName.value}`, formData, {
         headers: {
@@ -208,13 +226,21 @@ const uploadFiles = async (e) => {
         },
       });
     }
-    await listProjectFiles();
   } catch (err) {
     error.value = err;
   } finally {
     loading.value = false;
+    files.value = null;
+    await listProjectFiles();
   }
 };
+// watch(files, (newFiles) => {
+//   console.log('Here');
+//   if (newFiles) {
+//     // uploadFiles();
+//     console.log('Here 2');
+//   }
+// });
 const deleteProjectFile = async (file) => {
   try {
     error.value = null;
@@ -315,4 +341,4 @@ onMounted(async () => {
   // await fetchProjects();
 });
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss"></style>

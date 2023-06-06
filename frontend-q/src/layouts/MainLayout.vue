@@ -244,6 +244,7 @@ export default defineComponent({
     function logout() {
       localStorage.removeItem('jarvixUser');
       store.user = {};
+      serviceStore.chatHistory = []
       router.push('/auth/login');
     }
     watch(locale, (val) => {

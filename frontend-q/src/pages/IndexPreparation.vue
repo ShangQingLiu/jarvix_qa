@@ -128,7 +128,9 @@ const listProjectFiles = async () => {
 };
 watch(projectName, (projectValue) => {
   if (projectValue) {
+    serviceStore.chatHistory = []
     store.selectedProject = projectValue;
+    store.chatHistory = []
     listProjectFiles();
     getSessions();
   }
