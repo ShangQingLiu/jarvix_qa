@@ -16,6 +16,9 @@ from llama_index.indices.composability import ComposableGraph
 from llama_index.retrievers import VectorIndexRetriever
 from llama_index import ResponseSynthesizer
 from llama_index.query_engine import RetrieverQueryEngine
+from llama_index.prompts.prompts import (
+    QuestionAnswerPrompt
+)
 import os
 
 
@@ -71,6 +74,7 @@ class ChatBot():
         try:
             if self.using_FAISS:
                 response = self.agent.query(agent_prompt)
+                # response = self.agent.chat(agent_prompt)
             else:
                 response = self.agent.run(input=agent_prompt).strip()
         except ValueError as e:
@@ -86,6 +90,7 @@ class ChatBot():
         try:
             if self.using_FAISS:
                 response = self.agent.query(agent_prompt)
+                # response = self.agent.chat(agent_prompt)
             else:
                 response = self.agent.run(input=agent_prompt).strip()
         except ValueError as e:
@@ -183,9 +188,35 @@ class ChatBot():
             vector_store = FaissVectorStore.from_persist_dir(index_save_path)
             storage_context = StorageContext.from_defaults(vector_store=vector_store, persist_dir=index_save_path)
             vector_index = load_index_from_storage(storage_context=storage_context)
+            # agent = vector_index.as_chat_engine()
             vector_retriever = VectorIndexRetriever(index=vector_index, similarity_top_k=3)
-            # define response synthesizer
-            response_synthesizer = ResponseSynthesizer.from_args()
+            # configure response synthesizer
+
+            # set number of output tokens
+            chunk_size_limit = os.getenv("MAX_TOKENS", 512) 
+            llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=chunk_size_limit))
+            # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
+            service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
+
+            qa_promtm_tmpl = (
+                "Context information is below. \n"
+                "---------------------\n"
+                "{context_str}"
+                "\n---------------------\n"
+                "If the Context information is empty, than try to answer the question: {query_str}."
+                "If the Context information in not empty, given the context information and not prior knowledge, "
+                "answer the question: {query_str}\n"
+            )
+            prompt = QuestionAnswerPrompt(qa_promtm_tmpl)
+            response_synthesizer = ResponseSynthesizer.from_args(
+                service_context=service_context,
+                response_mode='compact',
+                # response_mode='no_text',
+                text_qa_template=prompt
+                # node_postprocessors=[
+                #     SimilarityPostprocessor(similarity_cutoff=0.2)
+                # ]
+            )
             # vector query engine
             agent = RetrieverQueryEngine(
                 retriever=vector_retriever,

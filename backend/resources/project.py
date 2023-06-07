@@ -6,6 +6,7 @@ from flask_mail import Message
 from functools import wraps
 from models import db, Project, User, Invitation
 from globals import mail
+from datetime import datetime
 import os
 
 project_ns = Namespace('project management', description='project management')
@@ -132,7 +133,9 @@ class invite(Resource):
         # send email
         msg = Message('Invitation to join project', recipients=[recipient_email])
         if language == "EN":
-            msg.body = render_template('template_EN.txt', invitation=invitation)
+            username = invitation.recipient_email.split("@")[0]
+            msg.body = render_template('template_EN.txt', invitation=invitation, username=username)
+            msg.html = render_template('email_template.html', invitation=invitation, username=username)
         elif language == "ZH-TW":
             msg.body = render_template('template_ZH-TW.txt', invitation=invitation)
         elif language == "ZH-CN":
@@ -147,6 +150,8 @@ class accept_invitation(Resource):
     def get(self, invitation_id):
         '''Process the invitation acceptance and render the project join successful page'''
         invitation = Invitation.query.get(invitation_id)
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
         if invitation:
             if not invitation.accepted:
                 # Mark the invitation as accepted
@@ -176,7 +181,8 @@ class accept_invitation(Resource):
                 project.members.append(user)
                 db.session.commit()
                 print(new_user_details)
-                return make_response(render_template('join_project.html', invitation=invitation, project=project, new_user_details=new_user_details), 200, {'Content-Type': 'text/html'})
+
+                return make_response(render_template('join_project_new.html', invitation=invitation, project=project, new_user_details=new_user_details, current_date_time=dt_string), 200, {'Content-Type': 'text/html'})
             else:
                 user = User.query.filter_by(email=invitation.recipient_email).first()
                 project = invitation.project
@@ -189,7 +195,7 @@ class accept_invitation(Resource):
                     new_user_details = {
                         'username': user.username,
                     }
-                return make_response(render_template('join_project.html', invitation=invitation, project=project, new_user_details=new_user_details), 200, {'Content-Type': 'text/html'})
+                return make_response(render_template('join_project_new.html', invitation=invitation, project=project, new_user_details=new_user_details, current_date_time=dt_string), 200, {'Content-Type': 'text/html'})
         else:
             return make_response("Invalid invitation ID", 404)
 

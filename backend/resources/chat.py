@@ -6,6 +6,7 @@ from globals import global_chatbots, project_session, chat_history
 from chatbot import ChatBot
 from models import Project, User
 import os
+import json
 import requests
 
 
@@ -102,19 +103,21 @@ def translate(text,language:str): # language: ZH, EN
     result = ""
 
     if text != "":
-        url = "https://api.deepl.com/v2/translate"
-        headers = {
-            "Authorization": f"DeepL-Auth-Key {os.environ.get('DEEP_L_KEY')}"
-        }
-        data = {
-            "text": f"{text}",
-            "target_lang": f"{language}"
-        }
+        try:
+            url = "https://api.deepl.com/v2/translate"
+            headers = {
+                "Authorization": f"DeepL-Auth-Key {os.environ.get('DEEP_L_KEY')}"
+            }
+            data = {
+                "text": f"{text}",
+                "target_lang": f"{language}"
+            }
 
-        text = requests.post(url, headers=headers, data=data)
-        # print(response.json())
-
-        result = text.json()["translations"][0]["text"]
+            text = requests.post(url, headers=headers, data=data)
+            # print(response.json())
+            result = text.json()["translations"][0]["text"]
+        except: 
+            result = text
     else:
         result =  text
     return result
@@ -228,8 +231,10 @@ class Query(Resource):
         response = chatbot.run(query)
         # Translate
         result = translate(response, language)
-        
-        record = {"query":query_origin, "response":result} 
+        try: 
+            record = {"query":query_origin, "response":result} 
+        except:
+            record = {"query":query_origin, "response":""} 
 
         # Record 
         if session_id not in chat_history.keys():

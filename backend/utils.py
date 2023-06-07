@@ -7,7 +7,8 @@ from flask import current_app
 
 from llama_index import download_loader, GPTVectorStoreIndex,\
     ServiceContext, GPTListIndex, LLMPredictor, SimpleDirectoryReader,\
-        GPTVectorStoreIndex, StorageContext, load_index_from_storage
+         StorageContext, load_index_from_storage
+
 from llama_index.vector_stores.faiss import FaissVectorStore
 from pathlib import Path
 
@@ -30,8 +31,8 @@ def check_dir_exists(dir_path):
         os.makedirs(dir_path)
 
 def get_files_for_project(project_name):
-    # Assuming your uploaded files are stored in a folder named after the project_name
     print(current_app.config['UPLOAD_FOLDER'])
+    print(project_name)
     project_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
 
     f = []
@@ -74,7 +75,10 @@ class IndexUtils():
                 # print(upload_files)
                 if len(upload_files) == 0:
                     return "Nothing need to index" 
-                documents = SimpleDirectoryReader(input_files=upload_files).load_data()
+               
+                
+                loader = SimpleDirectoryReader(input_files=upload_files)
+                documents = loader.load_data()
                 vector_store = FaissVectorStore(faiss_index=self.faiss_index)
                 storage_context = StorageContext.from_defaults(vector_store=vector_store)
                 index = GPTVectorStoreIndex.from_documents(documents, storage_context=storage_context)
@@ -108,7 +112,7 @@ class IndexUtils():
                 DocxReader = download_loader("DocxReader")
                 reader = DocxReader()
             elif data_type == DataType.PDF:
-                PDFReader = download_loader("PDFReader")
+                PDFReader = download_loader("PyMuPDFReader")
                 reader = PDFReader()
             elif data_type == DataType.AUDIO:
                 StringIterableReader = download_loader("StringIterableReader")
@@ -122,15 +126,16 @@ class IndexUtils():
             
 
             unsaved_doc_set = {}
-            saved_doc_path = [] 
+            saved_vector_path_dirs = [] 
+            saved_vector_keys = []
             for file_path_str in file_pathes:
                 file_name = os.path.basename(file_path_str)
                 # check if index already exists
                 index_name = "index_" + file_name
-                index_path = os.path.join(self.root_path,index_name)
+                saved_vector_keys.append(index_name)
                 index_path = os.path.join(self.project_name,index_path)
                 if os.path.exists(index_path):
-                    saved_doc_path.append(index_path)
+                    saved_vector_path_dirs.append(index_path)
                     continue 
 
                 if data_type == DataType.AUDIO:
@@ -157,39 +162,39 @@ class IndexUtils():
 
             index_set = {} 
             index_set.update(self.saveIndexer(1024, unsaved_doc_set))
-            graph = self.buildGraphIndexer(index_set)
-            index_set.update(self.loadIndexer(saved_doc_path))
+            index_set.update(self.loadIndexer(zip(saved_vector_path_dirs, saved_vector_keys)))
 
             return index_set
     
     def saveIndexer(self, chunk_size_limit, doc_set):
         index_set = {}
         openai.api_key = os.environ.get("OPENAI_API_KEY")
-        service_context = ServiceContext.from_defaults(chunk_size_limit=chunk_size_limit)
+        max_tokens = os.getenv("MAX_TOKENS", 512) 
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
+        service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor, chunk_size_limit=chunk_size_limit)
         for key in doc_set.keys():
             cur_index = GPTVectorStoreIndex.from_documents(doc_set[key], service_context=service_context)
             index_set[key] = cur_index
             save_path = os.path.join(self.root_path,self.project_name)
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
-            save_path = os.path.join(save_path,f'index_{key}.json')
-            
-
-            cur_index.save_to_disk(save_path=save_path)
+            # save_path = os.path.join(save_path,f'index_{key}.json')
+            cur_index.set_index_id('index_{key}')
+            cur_index.storage_context.persist(save_path=save_path)
         return index_set
 
-    def loadIndexer(self, pathes:list):
+    def loadIndexer(self, pathes:tuple): #[(dir, key)]
         index_set = {}
         max_tokens = os.getenv("MAX_TOKENS", 512) 
         llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
         # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
 
         for path in pathes:
-            cur_index = GPTVectorStoreIndex.load_from_disk(Path(path),llm_predictor=llm_predictor)
-            file_name = os.path.basename(path)
-            index_set[file_name] = cur_index
+            cur_index = load_index_from_storage(Path(path[0]),index_id=(path[1]))
+            index_set[path[1]] = cur_index
 
         return index_set
+    # Deprecate
     def buildGraphIndexer(self, indexers):
         # check if graph exists
         file_name = f"graph_{self.project_name}.json"
@@ -197,13 +202,13 @@ class IndexUtils():
         graph_path = os.path.join(graph_path,file_name) 
 
         # set number of output tokens
-        max_tokens = os.getenv("MAX_TOKENS", 512) 
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
+        chunk_size_limit = os.getenv("MAX_TOKENS", 512) 
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo", max_tokens=chunk_size_limit))
         # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
-        service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor)
+        service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
 
         if os.path.exists(graph_path):
-            service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor)
+            service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
             graph = ComposableGraph.load_from_disk(Path(graph_path),ServiceContext=service_context)
 
             return graph

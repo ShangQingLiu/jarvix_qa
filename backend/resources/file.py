@@ -43,7 +43,9 @@ class UploadFile(Resource):
     @file_ns.expect(upload_parser)
     @jwt_required() 
     def post(self): 
+        print(request.files)
         files = request.files.getlist('files')
+        print(files)
         for file in files:
 
             # Get the file's MIME type
