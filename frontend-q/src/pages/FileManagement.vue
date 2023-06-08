@@ -147,7 +147,7 @@
               text-color="white"
               style="width: 140px"
               v-if="!uploadingFiles && files"
-              @click="loadLocalFiles"
+              @click="uploadFiles"
               icon="cloud_upload"
             >
               {{ $t('pages.FileManagementPage.uploadBtn') }}
@@ -187,6 +187,7 @@ const files = ref(null);
 
 const loadLocalFiles = async () => {
   // filesRef.value.click();
+  console.log(files.value.length);
   await uploadFiles();
 };
 const fetchUserProjects = async () => {
@@ -202,45 +203,28 @@ const fetchUserProjects = async () => {
     uploadingFiles.value = false;
   }
 };
-const getUrl = (files) => {
-  console.log(files);
-  return `https://api.so-supreme.sis.ai/api/file/upload?project_name=${projectName.value}`;
-};
-const finish = async () => {
-  await listProjectFiles();
-  console.log('Finshed');
-};
-const user = JSON.parse(localStorage.getItem('jarvixUser'));
-const token = user.access_token;
-
 const uploadFiles = async (e) => {
-  try {
-    loading.value = true;
-    const formData = new FormData();
-    for (var i = 0; i < files.value.length; i++) {
-      let file = files.value[i];
-      formData.append('files', file);
-      res = await api.post(`file/upload?project_name=${projectName.value}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-    }
-  } catch (err) {
-    error.value = err;
-  } finally {
-    loading.value = false;
-    files.value = null;
-    await listProjectFiles();
+  loading.value = true;
+  const formData = new FormData();
+  for (var i = 0; i < files.value.length; i++) {
+    let file = files.value[i];
+    formData.append('files', file);
   }
+  api
+    .post(`file/upload?project_name=${projectName.value}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    .then(function () {
+      loading.value = false;
+      listProjectFiles();
+    })
+    .catch(function () {
+      error.value = err;
+    });
 };
-// watch(files, (newFiles) => {
-//   console.log('Here');
-//   if (newFiles) {
-//     // uploadFiles();
-//     console.log('Here 2');
-//   }
-// });
+
 const deleteProjectFile = async (file) => {
   try {
     error.value = null;

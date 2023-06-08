@@ -71,9 +71,13 @@ export default defineComponent({
     const serviceStore = useServiceStore();
     const { locale } = useI18n({ useScope: 'global' });
     watch(locale, (val) => {
-      val == 'en-US'
-        ? (serviceStore.currentLanguage = 'EN')
-        : (serviceStore.currentLanguage = 'ZH');
+      if (val == 'en-US') {
+        serviceStore.currentLanguage = 'EN';
+      } else if (val == 'zhHans') {
+        serviceStore.currentLanguage = 'ZH_CN';
+      } else {
+        serviceStore.currentLanguage = 'ZH_TW';
+      }
     });
     const localeOptions = ref([
       { value: 'en-US', label: 'english' },

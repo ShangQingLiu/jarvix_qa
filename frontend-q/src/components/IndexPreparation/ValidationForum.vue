@@ -47,7 +47,7 @@
           </div>
           <q-separator class="q-my-lg" />
           <div v-if="loading" class="q-py-lg flex justify-center">
-           <q-spinner-oval color="primary" size="3rem" />
+            <q-spinner-oval color="primary" size="3rem" />
           </div>
           <q-scroll-area class="bg-accent q-pa-lg" style="height: 600px">
             <div v-for="(question, i) in questionsList" :key="i" class="q-mb-md">
@@ -138,6 +138,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { useServiceStore } from 'src/stores/service';
+import { useQuasar } from 'quasar';
 import { useRoute } from 'vue-router';
 const columns = [
   {
@@ -186,6 +187,7 @@ const columns = [
 //     is_correct: false,
 //   },
 // ];
+const $q = useQuasar();
 const store = useServiceStore();
 const loading = ref(false);
 const error = ref(null);
@@ -211,10 +213,17 @@ const submitQuestionsList = async () => {
 };
 // Getting Questions List
 const previewQuestionsList = async () => {
-  console.log(queryText.value);
-  questionsList.value = queryText.value.split('.');
-  questionsList.value.pop();
-  store.validationQuestions = questionsList.value;
+  if (queryText.value.includes('.')) {
+    questionsList.value = queryText.value.split('.');
+    questionsList.value.pop();
+    store.validationQuestions = questionsList.value;
+  } else{
+    $q.notify({
+      message: 'Questions Formate is wrong',
+      position: 'top-right',
+      color: 'negative',
+    });
+  }
 };
 </script>
 

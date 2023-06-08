@@ -201,6 +201,7 @@ import EssentialLink from 'components/EssentialLink.vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from 'src/stores/auth';
 import { useServiceStore } from 'src/stores/service';
+import { useProjectStore } from 'src/stores/project';
 
 import { useI18n } from 'vue-i18n';
 // Title here are translation files keys
@@ -239,18 +240,25 @@ export default defineComponent({
     const router = useRouter();
     const store = useAuthStore();
     const serviceStore = useServiceStore();
+    const projectStore = useProjectStore();
+
     const { locale } = useI18n({ useScope: 'global' });
 
     function logout() {
       localStorage.removeItem('jarvixUser');
+      localStorage.setItem('currentSelectedProject', projectStore.selectedProject);
       store.user = {};
-      serviceStore.chatHistory = []
+      serviceStore.chatHistory = [];
       router.push('/auth/login');
     }
     watch(locale, (val) => {
-      val == 'en-US'
-        ? (serviceStore.currentLanguage = 'EN')
-        : (serviceStore.currentLanguage = 'ZH');
+      if (val == 'en-US') {
+        serviceStore.currentLanguage = 'EN';
+      } else if (val == 'zhHans') {
+        serviceStore.currentLanguage = 'ZH_CN';
+      } else {
+        serviceStore.currentLanguage = 'ZH_TW';
+      }
     });
     const localeOptions = ref([
       { value: 'en-US', label: 'english' },

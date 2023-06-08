@@ -7,7 +7,7 @@ import {
 } from "vue-router";
 import routes from "./routes";
 import { isUserLoggedIn } from "./utils";
-// import { useProjectStore } from "src/stores/project";
+import { useProjectStore } from "src/stores/project";
 
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -24,9 +24,15 @@ export default route(function (/* { store, ssrContext } */) {
   Router.beforeEach(async (to, from, next) => {
     const isLoggedIn = await isUserLoggedIn();
     console.log(isLoggedIn);
-    // const store = useProjectStore();
+    const projectStore = useProjectStore();
     // If not loggedIn and also not going to login page redirect user to login page
-    if (to.meta.requiresAuth && !isLoggedIn) next({ name: "login" });
+    if (to.meta.requiresAuth && !isLoggedIn) {
+      localStorage.setItem(
+        "currentSelectedProject",
+        projectStore.selectedProject
+      );
+      next({ name: "login" });
+    }
     // if (to.name === "services" && !store.selectedProject)
     //   next({ name: "fileManagement" });
     // If loggedIn and also going to login page redirect user to home page

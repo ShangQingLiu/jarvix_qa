@@ -53,10 +53,7 @@
         {{
           $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontAccountText')
         }}
-        <router-link
-          to="/auth/register"
-          class="text-primary no-underline"
-        >
+        <router-link to="/auth/register" class="text-primary no-underline">
           {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.signupBtn') }}
         </router-link>
       </div>
@@ -66,10 +63,7 @@
             'pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontRememberText'
           )
         }},
-        <router-link
-          to="/auth/forgot-password"
-          class="text-primary no-underline"
-        >
+        <router-link to="/auth/forgot-password" class="text-primary no-underline">
           {{
             $t(
               'pages.UserAuthenticationAndManagement.LoginPage.Login.form.forgotPasswordBtn'
@@ -111,7 +105,10 @@ const fetchUserProjects = async (id) => {
     });
     // If project exists
     if (filteredProjects.length > 1) {
-      projectStore.selectedProject = filteredProjects[0];
+      const savedProject = localStorage.getItem('currentSelectedProject');
+      savedProject
+        ? (projectStore.selectedProject = savedProject)
+        : (projectStore.selectedProject = filteredProjects[0]);
       router.push('/index-preparation');
     } else {
       router.push('/');
