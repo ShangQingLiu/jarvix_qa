@@ -13,17 +13,22 @@ from llama_index import  LLMPredictor,ServiceContext, load_index_from_storage, S
 from llama_index.indices.query.query_transform.base import DecomposeQueryTransform
 from llama_index.langchain_helpers.agents import  LlamaToolkit, create_llama_chat_agent,IndexToolConfig
 from llama_index.indices.composability import ComposableGraph
-from llama_index.retrievers import VectorIndexRetriever
+from llama_index.retrievers import VectorIndexRetriever, VectorIndexAutoRetriever
 from llama_index import ResponseSynthesizer
 from llama_index.query_engine import RetrieverQueryEngine
 from llama_index.prompts.prompts import (
     QuestionAnswerPrompt
 )
+from llama_index.vector_stores.types import MetadataInfo, VectorStoreInfo
+from llama_index.vector_stores.types import ExactMatchFilter, MetadataFilters
 import os
+from opencc import OpenCC
+import constant_prompt 
 
 
 class ChatBot():
-    def __init__(self,index_set,graph,project_name,chunk_size_limit=512,index_saved_path="index_data") -> None:
+    def __init__(self,index_set,graph,project_name,chunk_size_limit=512,index_saved_path="index_data",
+                 language="EN") -> None:
         self.using_FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
         self.index_root_path = current_app.config["INDEX_SAVE_PATH"]
         self.project_name = project_name
@@ -31,7 +36,8 @@ class ChatBot():
         self.index_configs = self.getIndexConfigs(index_set)
         self.graph_config =  None if graph == None else self.getGraphConfig(index_saved_path,project_name,chunk_size_limit)
         self.toolKit = self.getToolKit()
-        self.agent = self.getAgent(self.toolKit) 
+        self.language = language
+        self.agent, self.agent_no_text, self.agent_generation = self.getAgent(self.toolKit) 
         pre_promt =  f"You are a personal assistant for Synergies company, your job is to answer questions. First check index as reference."
 #  Use only context index_{self.project_name}.json 
 #         act_prompt = """We have provided context information below. \n"
@@ -73,7 +79,19 @@ class ChatBot():
         agent_prompt = self.prompt.format(query=query)
         try:
             if self.using_FAISS:
-                response = self.agent.query(agent_prompt)
+                pre_response = self.agent_no_text.query(agent_prompt)
+                print("pre_response:",pre_response.response)
+                if pre_response.response == "None":
+                    max_tokens = os.getenv("MAX_TOKENS", 512) 
+                    llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
+                    response = llm_predictor.predict(query) 
+                else:
+                    response = self.agent.query(agent_prompt)
+                if self.language == "ZH":
+                    cc = OpenCC('s2tw')
+                    response = cc.convert(response.response)
+                else:
+                    response = response.response
                 # response = self.agent.chat(agent_prompt)
             else:
                 response = self.agent.run(input=agent_prompt).strip()
@@ -189,29 +207,47 @@ class ChatBot():
             storage_context = StorageContext.from_defaults(vector_store=vector_store, persist_dir=index_save_path)
             vector_index = load_index_from_storage(storage_context=storage_context)
             # agent = vector_index.as_chat_engine()
-            vector_retriever = VectorIndexRetriever(index=vector_index, similarity_top_k=3)
+
+            vector_retriever = VectorIndexRetriever(index=vector_index,
+            similarity_top_k=3,
+            vector_store_query_mode="default",
+            filters=[
+                ExactMatchFilter(key='company', value='IKEA TW'),
+                ExactMatchFilter(key='company', value='IKEA'),
+                ExactMatchFilter(key='company', value='中揚光'),
+                ExactMatchFilter(key='company', value='優派'),
+                ExactMatchFilter(key='company', value='光寶'),
+                ExactMatchFilter(key='company', value='和泰移勭'),
+                ExactMatchFilter(key='company', value='國巨'),
+                ExactMatchFilter(key='company', value='慧榮'),
+                ExactMatchFilter(key='company', value='文曄'),
+                ExactMatchFilter(key='company', value='正大會計'),
+                ExactMatchFilter(key='company', value='運達'),
+                ExactMatchFilter(key='company', value='高通'),
+            ],
+            alpha=None,
+            doc_ids=None,)
             # configure response synthesizer
 
             # set number of output tokens
-            chunk_size_limit = os.getenv("MAX_TOKENS", 512) 
-            llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=chunk_size_limit))
+            chunk_size_limit = os.getenv("MAX_TOKENS", 250) 
+            predict_size_limit = os.getenv("PREDICT_SIZE_LIMIT", 512) 
+            llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=predict_size_limit))
             # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
             service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
 
-            qa_promtm_tmpl = (
-                "Context information is below. \n"
-                "---------------------\n"
-                "{context_str}"
-                "\n---------------------\n"
+            print("prompt language:",self.language)
+            if self.language == "EN":
+                prompt = QuestionAnswerPrompt(constant_prompt.qa_promt_tmpl_en)
+            elif self.language == "ZH_TW":
+                prompt = QuestionAnswerPrompt(constant_prompt.qa_promt_tmpl_zh)
+            elif self.language == "ZH_CN":
+                prompt = QuestionAnswerPrompt(constant_prompt.qa_promt_tmpl_cn)
+            elif self.language == "ZH":
+                prompt = QuestionAnswerPrompt(constant_prompt.qa_promt_tmpl_zh)
+            else:
+                print("language not support")
 
-                "Context information is below. \n"
-                "---------------------\n"
-                "{query_str}"
-                "\n---------------------\n"
-                "If the Context information is empty, than try to answer the question without consider context information."
-                "If the Context information in not empty, given the context information and not prior knowledge.\n"
-            )
-            prompt = QuestionAnswerPrompt(qa_promtm_tmpl)
             response_synthesizer = ResponseSynthesizer.from_args(
                 service_context=service_context,
                 response_mode='compact',
@@ -221,12 +257,36 @@ class ChatBot():
                 #     SimilarityPostprocessor(similarity_cutoff=0.2)
                 # ]
             )
+
+            response_synthesizer_no_text = ResponseSynthesizer.from_args(
+                service_context=service_context,
+                response_mode='no_text',
+                text_qa_template=prompt
+            )
+
+            response_synthesizer_generate = ResponseSynthesizer.from_args(
+                service_context=service_context,
+                response_mode='generation',
+                text_qa_template=prompt
+            )
+
             # vector query engine
             agent = RetrieverQueryEngine(
                 retriever=vector_retriever,
                 response_synthesizer=response_synthesizer,
             )
+
+            agent_no_text = RetrieverQueryEngine(
+                retriever=vector_retriever,
+                response_synthesizer=response_synthesizer_no_text,
+            )
+
+            agent_generate = RetrieverQueryEngine(
+                retriever=vector_retriever,
+                response_synthesizer=response_synthesizer_generate,
+            )
         else:
+            raise(NotImplementedError)
             memory = ConversationBufferMemory(memory_key="chat_history")
             llm=ChatOpenAI(temperature=0.2, max_tokens=512)
             agent = create_llama_chat_agent( toolkit,
@@ -235,4 +295,4 @@ class ChatBot():
                 verbose=True,
                 # max_iterations=10
             )
-        return agent
+        return agent, agent_no_text, agent_generate

@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from flask import Flask,request,jsonify, current_app
+from flask import Flask,request,jsonify, current_app, make_response
 from utils import IndexUtils, DataType
 from globals import global_chatbots, project_session, chat_history
 from chatbot import ChatBot
@@ -192,12 +192,14 @@ class Query(Resource):
         query = data.get('query')
         language = data.get('language')
         language = language if language is not None else "ZH"
+        print("language: ", language)
         query_origin = query
 
         if project_name is None or session_id is None or query is None: 
             return {'error': 'No project name in the request'}, 400
 
         # Prepare Index
+        print("prepare index")
         upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
         if session_id not in global_chatbots.keys():
             # Make sure the project directory exists
@@ -220,7 +222,8 @@ class Query(Resource):
                     index_set.update(indexUtils.dataLoader(file_pathes, data_type))
 
             # print("Index set: ", index_set)
-            chatbot = ChatBot(index_set,None,project_name=project_name)
+            print("Start to build chatbot")
+            chatbot = ChatBot(index_set,None,project_name=project_name, language=language)
             global_chatbots[session_id] = chatbot
             if project_name not in project_session.keys():
                 project_session[project_name] = [session_id]
@@ -229,12 +232,8 @@ class Query(Resource):
         # Find Answer
         chatbot = global_chatbots[session_id]
         response = chatbot.run(query)
-        # Translate
-        result = translate(response, language)
-        try: 
-            record = {"query":query_origin, "response":result} 
-        except:
-            record = {"query":query_origin, "response":""} 
+        record = {"query":query_origin, "response":response} 
+        print("record: ", record)
 
         # Record 
         if session_id not in chat_history.keys():
@@ -242,7 +241,7 @@ class Query(Resource):
         else:
             chat_history[session_id].append(record)
         
-        return result
+        return response
 
 @service_ns.route("/sessions/<string:project_name>")
 @service_ns.param('project_name', 'Project name')

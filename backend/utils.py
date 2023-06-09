@@ -10,6 +10,7 @@ from llama_index import download_loader, GPTVectorStoreIndex,\
          StorageContext, load_index_from_storage
 
 from llama_index.vector_stores.faiss import FaissVectorStore
+from llama_index.vector_stores import PineconeVectorStore
 from pathlib import Path
 
 from langchain.chat_models import ChatOpenAI
@@ -17,6 +18,7 @@ from llama_index.indices.composability import ComposableGraph
 from globals import upload_hashes
 
 import faiss
+import pinecone
 
 class DataType(Enum):
     AUDIO = 1
@@ -51,17 +53,20 @@ class IndexUtils():
 
     def save_loader(self, file_pathes: list, data_type: DataType, project_dir=None):
         _FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
+        USING_PINECONE = os.getenv("USING_PINECONE", 'False').lower() in ('true', '1', 't') 
         if _FAISS: 
             index_save_path = os.path.join(self.root_path,self.project_name)
             if not os.path.exists(index_save_path):
                 os.makedirs(index_save_path)
 
-            # load documents
+            # load documents pathes
             upload_files =[]
             print(self.upload_path)
             for r,d,f in os.walk(self.upload_path):
                 for file in f:
                     upload_files.append(os.path.join(r,file))
+            
+            
             print("Detecting is repeating index...")    
             # Upload Hash comparison
             if self.project_name in upload_hashes.keys() and \
@@ -75,7 +80,14 @@ class IndexUtils():
                 # print(upload_files)
                 if len(upload_files) == 0:
                     return "Nothing need to index" 
-               
+                
+                def filename_fn(filename):
+                    # if "ESG" in filename:
+                    #     company_name = filename.split("-")[0]
+                    #     return {'doc_id': filename, 'company_name': company_name}
+                    # else:
+                        return {'doc_id': filename }
+                # filename_fn = lambda filename: {'file_name': filename} 
                 
                 loader = SimpleDirectoryReader(input_files=upload_files)
                 documents = loader.load_data()
@@ -86,6 +98,28 @@ class IndexUtils():
                 # save index to disk
                 print("Successful store new index...")    
                 index.storage_context.persist(index_save_path)
+        elif USING_PINECONE:
+            # load documents pathes
+            upload_files =[]
+            print(self.upload_path)
+            for r,d,f in os.walk(self.upload_path):
+                for file in f:
+                    upload_files.append(os.path.join(r,file))
+
+            def filename_fn(filename):
+                # if "ESG" in filename:
+                #     company_name = filename.split("-")[0]
+                #     return {'doc_id': filename, 'company_name': company_name}
+                # else:
+                    return {'doc_id': filename }
+            # filename_fn = lambda filename: {'file_name': filename} 
+            
+            loader = SimpleDirectoryReader(input_files=upload_files)
+            documents = loader.load_data()
+            pinecone_index = pinecone.Index("quickstart-index")
+            vector_store = PineconeVectorStore(pinecone_index=pinecone_index, namespace='test')
+            storage_context = StorageContext.from_defaults(vector_store=vector_store)
+            index = GPTVectorStoreIndex.from_documents(documents, storage_context=storage_context)
         else:
             raise NotImplementedError
         
@@ -161,7 +195,8 @@ class IndexUtils():
                     unsaved_doc_set[file_name] = reader.load_data(Path(file_path_str))
 
             index_set = {} 
-            index_set.update(self.saveIndexer(1024, unsaved_doc_set))
+            chunk_size_limit = os.getenv("MAX_TOKENS", 250) 
+            index_set.update(self.saveIndexer(chunk_size_limit, unsaved_doc_set))
             index_set.update(self.loadIndexer(zip(saved_vector_path_dirs, saved_vector_keys)))
 
             return index_set
@@ -170,7 +205,7 @@ class IndexUtils():
         index_set = {}
         openai.api_key = os.environ.get("OPENAI_API_KEY")
         max_tokens = os.getenv("MAX_TOKENS", 512) 
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
         service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor, chunk_size_limit=chunk_size_limit)
         for key in doc_set.keys():
             cur_index = GPTVectorStoreIndex.from_documents(doc_set[key], service_context=service_context)
@@ -202,8 +237,9 @@ class IndexUtils():
         graph_path = os.path.join(graph_path,file_name) 
 
         # set number of output tokens
-        chunk_size_limit = os.getenv("MAX_TOKENS", 512) 
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo", max_tokens=chunk_size_limit))
+        chunk_size_limit = os.getenv("MAX_TOKENS", 250) 
+        predict_size_limit = os.getenv("PREDICT_SIZE_LIMIT", 512) 
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo", max_tokens=predict_size_limit))
         # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
         service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
 

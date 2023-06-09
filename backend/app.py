@@ -11,11 +11,22 @@ import os
 from config import Config
 from routes import configure_routes
 from globals import global_chatbots,mail
+import pinecone
 
 app = Flask(__name__)
 app.config.from_object(Config)
 # set OPEN_AI_KEY
 os.environ['OPENAI_API_KEY'] = os.environ.get('OPEN_API_KEY')
+
+# set up PINECONE
+# api_key = os.environ.get('PINECONE_API_KEY')
+# pinecone.init(api_key=api_key, environment="us-east-1-aws")
+# dimensions are for text-embedding-ada-002
+# try:
+#     pinecone.create_index("quickstart-index", dimension=1536, metric="euclidean", pod_type="p1")
+# except Exception:
+#     # most likely index already exists
+#     pass
 
 CORS(app)
 jwt = JWTManager(app)
