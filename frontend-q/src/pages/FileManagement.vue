@@ -219,6 +219,7 @@ const uploadFiles = async (e) => {
     .then(function () {
       loading.value = false;
       listProjectFiles();
+      files.value = null
     })
     .catch(function () {
       error.value = err;
@@ -264,25 +265,7 @@ watch(projectName, (projectValue) => {
     getSessions();
   }
 });
-// const fetchProjects = async () => {
-//   try {
-//     error.value = null;
-//     loading.value = true;
-//     const res = await store.fetchProjects();
-//     console.log(res);
-//     var projects = res.filter(function (o1) {
-//       return userProjects.value.some(function (o2) {
-//         return o1.name === o2.name; // return the ones with equal id
-//       });
-//     });
-//     projectList.value = projects;
-//   } catch (err) {
-//     console.log(err);
-//     error.value = err.response.status + ' - ' + err.response.statusText;
-//   } finally {
-//     loading.value = false;
-//   }
-// };
+
 const indexProject = async () => {
   try {
     error.value = null;
