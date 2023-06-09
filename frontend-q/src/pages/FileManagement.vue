@@ -322,6 +322,7 @@ const getSessions = async () => {
 };
 onMounted(async () => {
   await fetchUserProjects();
+  await listProjectFiles();
   // await fetchProjects();
 });
 </script>

@@ -106,7 +106,7 @@ const fetchUserProjects = async (id) => {
     // If project exists
     if (filteredProjects.length > 1) {
       const savedProject = localStorage.getItem('currentSelectedProject');
-      savedProject
+      savedProject && savedProject != 'null'
         ? (projectStore.selectedProject = savedProject)
         : (projectStore.selectedProject = filteredProjects[0]);
       router.push('/index-preparation');
