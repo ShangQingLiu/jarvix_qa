@@ -208,25 +208,7 @@ class ChatBot():
             vector_index = load_index_from_storage(storage_context=storage_context)
             # agent = vector_index.as_chat_engine()
 
-            vector_retriever = VectorIndexRetriever(index=vector_index,
-            similarity_top_k=3,
-            vector_store_query_mode="default",
-            filters=[
-                ExactMatchFilter(key='company', value='IKEA TW'),
-                ExactMatchFilter(key='company', value='IKEA'),
-                ExactMatchFilter(key='company', value='中揚光'),
-                ExactMatchFilter(key='company', value='優派'),
-                ExactMatchFilter(key='company', value='光寶'),
-                ExactMatchFilter(key='company', value='和泰移勭'),
-                ExactMatchFilter(key='company', value='國巨'),
-                ExactMatchFilter(key='company', value='慧榮'),
-                ExactMatchFilter(key='company', value='文曄'),
-                ExactMatchFilter(key='company', value='正大會計'),
-                ExactMatchFilter(key='company', value='運達'),
-                ExactMatchFilter(key='company', value='高通'),
-            ],
-            alpha=None,
-            doc_ids=None,)
+            vector_retriever = VectorIndexRetriever(index=vector_index, similarity_top_k=3)
             # configure response synthesizer
 
             # set number of output tokens
