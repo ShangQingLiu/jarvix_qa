@@ -1,35 +1,33 @@
 from flask import current_app
+
+from langchain import  PromptTemplate
 from langchain.agents import Tool
-from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.chat_models import ChatOpenAI
-from langchain.agents import initialize_agent
+from langchain.chains.conversation.memory import ConversationBufferMemory
 
-
-from langchain import OpenAI, PromptTemplate
-from langchain.agents.agent_types import AgentType
-
+from llama_index import  (LLMPredictor,ServiceContext, ResponseSynthesizer, StorageContext
+                          , load_index_from_storage)
 from llama_index.vector_stores.faiss import FaissVectorStore
-from llama_index import  LLMPredictor,ServiceContext, load_index_from_storage, StorageContext
 from llama_index.indices.query.query_transform.base import DecomposeQueryTransform
 from llama_index.langchain_helpers.agents import  LlamaToolkit, create_llama_chat_agent,IndexToolConfig
 from llama_index.indices.composability import ComposableGraph
-from llama_index.retrievers import VectorIndexRetriever, VectorIndexAutoRetriever
-from llama_index import ResponseSynthesizer
+from llama_index.retrievers import VectorIndexRetriever
 from llama_index.query_engine import RetrieverQueryEngine
 from llama_index.prompts.prompts import (
     QuestionAnswerPrompt
 )
-from llama_index.vector_stores.types import MetadataInfo, VectorStoreInfo
-from llama_index.vector_stores.types import ExactMatchFilter, MetadataFilters
+
 import os
 from opencc import OpenCC
 import constant_prompt 
+import logging
 
 
 class ChatBot():
     def __init__(self,index_set,graph,project_name,chunk_size_limit=512,index_saved_path="index_data",
                  language="EN") -> None:
         self.using_FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
+        self.using_PINECONE = os.getenv("USING_PINECONE", 'False').lower() in ('true', '1', 't') 
         self.index_root_path = current_app.config["INDEX_SAVE_PATH"]
         self.project_name = project_name
         self.query_configs = self.get_query_configs()
@@ -38,60 +36,53 @@ class ChatBot():
         self.toolKit = self.getToolKit()
         self.language = language
         self.agent, self.agent_no_text, self.agent_generation = self.getAgent(self.toolKit) 
-        pre_promt =  f"You are a personal assistant for Synergies company, your job is to answer questions. First check index as reference."
-#  Use only context index_{self.project_name}.json 
-#         act_prompt = """We have provided context information below. \n"
-# "---------------------\n"
-# "{context_str}"
-# "\n---------------------\n"
-# "Your job is to continue the conversation as a chatbot.\n"
-# "When asked a question, try to use the context provided to directly answer that question.\n"
-# "Given this information, please respond to or answer the question: {query}""" 
-        noact_prompt = """
-"Your job is to continue the conversation as a chatbot.\n"
-"When asked a question, try to use the context provided to directly answer that question.\n"
-"Given this information, please respond to or answer the question: {query}""" 
-    #     self.prompt = PromptTemplate(
-    #     template=pre_promt + """to provide answers.
-    #                 Do not provide any answers that deviate from your toolkit documents. If you don't know the answer, just say "Hmm, Im not sure."
-    #                 Don't try to make up an answer up.
-    #                 --------
-    #                Question: {query}
-    #               """,
-    #     input_variables=["query"],
-    # )
         self.prompt = PromptTemplate(
-        template=pre_promt + noact_prompt,
+        template=constant_prompt.pre_promt + constant_prompt.noact_prompt,
         input_variables=["query"],
-    )
-
-        yes_no_prompt = """
-"I want you to act as a simple AI which only answer by "Yes" or "No" to my questions."
-"Do no write explanations. If you can't answer by Yes or No, type"I can't answer","
-"but do not type anythins else.\n"
-"The questio is: {query}""" 
+        )
         self.yes_no_prompt = PromptTemplate(
-        template=yes_no_prompt,
+        template=constant_prompt.yes_no_prompt,
         input_variables=["query"],
-    )
+        )
+    def truncate_text(self, text: str, max_length: int) -> str:
+        """Truncate text to a maximum length."""
+        return text[: max_length - 3] + "..."
 
     def run(self,query)->str:
         agent_prompt = self.prompt.format(query=query)
         try:
             if self.using_FAISS:
-                pre_response = self.agent_no_text.query(agent_prompt)
-                print("pre_response:",pre_response.response)
-                if pre_response.response == "None":
-                    max_tokens = os.getenv("MAX_TOKENS", 512) 
-                    llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
-                    response = llm_predictor.predict(query) 
+                pre_response = self.agent_no_text.query(query)
+                # pre_response = self.agent.query(agent_prompt)
+                logging.info(pre_response.source_nodes)
+                logging.info(pre_response.get_formatted_sources())
+                logging.info(pre_response.response)
+                if pre_response.response is None:
+                    import openai
+
+                    completion = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                            {"role": "system", "content": "You are a helpful assistant."},
+                            {"role": "user", "content": f"{query}"},
+                        ]
+                    )
+
+                    response = completion.choices[0].message
+                    response = response.to_dict()['content']
                 else:
                     response = self.agent.query(agent_prompt)
-                if self.language == "ZH":
-                    cc = OpenCC('s2tw')
-                    response = cc.convert(response.response)
+                if pre_response.response is None:
+                    pass
                 else:
-                    response = response.response
+                    if pre_response.response is None:
+                        pass
+                    else:
+                        if self.language == "ZH":
+                            cc = OpenCC('s2tw')
+                            response = cc.convert(response.response)
+                        else:
+                            response = response.response
                 # response = self.agent.chat(agent_prompt)
             else:
                 response = self.agent.run(input=agent_prompt).strip()
@@ -202,6 +193,9 @@ class ChatBot():
         agent = None
         if self.using_FAISS:
             # load index from disk
+            ## List Index
+            ### TODO
+            ## vector Index
             index_save_path = os.path.join(self.index_root_path,self.project_name)
             vector_store = FaissVectorStore.from_persist_dir(index_save_path)
             storage_context = StorageContext.from_defaults(vector_store=vector_store, persist_dir=index_save_path)
@@ -267,6 +261,24 @@ class ChatBot():
                 retriever=vector_retriever,
                 response_synthesizer=response_synthesizer_generate,
             )
+        elif self.using_PINECONE:
+            # pinecone_index = pinecone.Index("quickstart-index")
+            # vector_store = PineconeVectorStore(pinecone_index=pinecone_index, namespace='test')
+            # storage_context = StorageContext.from_defaults(vector_store=vector_store)
+            # vector_store = PineconeVectorStore(pinecone_index=pinecone_index, namespace='test')
+            # storage_context = StorageContext.from_defaults(vector_store=vector_store)
+            # vector_store_info = VectorStoreInfo(
+            #     content_info='brief biography of celebrities',
+            #     metadata_info=[
+            #         MetadataInfo(
+            #             name='category', 
+            #             type='str', 
+            #             description='Category of the celebrity, one of [Sports, Entertainment, Business, Music]'),
+            #         MetadataInfo(name='country', type='str', description='Country of the celebrity, one of [United States, Barbados, Portugal]'),
+            #     ]
+            # )
+            # retriever = VectorIndexAutoRetriever(index, vector_store_info=vector_store_info)
+            pass
         else:
             raise(NotImplementedError)
             memory = ConversationBufferMemory(memory_key="chat_history")

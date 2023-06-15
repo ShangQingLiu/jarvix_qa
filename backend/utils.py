@@ -7,7 +7,7 @@ from flask import current_app
 
 from llama_index import download_loader, GPTVectorStoreIndex,\
     ServiceContext, GPTListIndex, LLMPredictor, SimpleDirectoryReader,\
-         StorageContext, load_index_from_storage
+         StorageContext, load_index_from_storage 
 
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores import PineconeVectorStore
@@ -91,35 +91,45 @@ class IndexUtils():
                 
                 loader = SimpleDirectoryReader(input_files=upload_files)
                 documents = loader.load_data()
+                ## Vector Index
                 vector_store = FaissVectorStore(faiss_index=self.faiss_index)
                 storage_context = StorageContext.from_defaults(vector_store=vector_store)
                 index = GPTVectorStoreIndex.from_documents(documents, storage_context=storage_context)
+
+                ## List Index
+                # TODO: fix this
+                # list_service_context = ServiceContext.from_defaults(chunk_size=1024)
+                # list_nodes = list_service_context.node_parser.get_nodes_from_documents(documents)
+                # list_storage_context = StorageContext.from_defaults()
+                # list_index = ListIndex(list_nodes, storage_context=list_storage_context)
+
 
                 # save index to disk
                 print("Successful store new index...")    
                 index.storage_context.persist(index_save_path)
         elif USING_PINECONE:
             # load documents pathes
-            upload_files =[]
-            print(self.upload_path)
-            for r,d,f in os.walk(self.upload_path):
-                for file in f:
-                    upload_files.append(os.path.join(r,file))
+            pass
+            # upload_files =[]
+            # print(self.upload_path)
+            # for r,d,f in os.walk(self.upload_path):
+            #     for file in f:
+            #         upload_files.append(os.path.join(r,file))
 
-            def filename_fn(filename):
-                # if "ESG" in filename:
-                #     company_name = filename.split("-")[0]
-                #     return {'doc_id': filename, 'company_name': company_name}
-                # else:
-                    return {'doc_id': filename }
-            # filename_fn = lambda filename: {'file_name': filename} 
+            # def filename_fn(filename):
+            #     # if "ESG" in filename:
+            #     #     company_name = filename.split("-")[0]
+            #     #     return {'doc_id': filename, 'company_name': company_name}
+            #     # else:
+            #         return {'doc_id': filename }
+            # # filename_fn = lambda filename: {'file_name': filename} 
             
-            loader = SimpleDirectoryReader(input_files=upload_files)
-            documents = loader.load_data()
-            pinecone_index = pinecone.Index("quickstart-index")
-            vector_store = PineconeVectorStore(pinecone_index=pinecone_index, namespace='test')
-            storage_context = StorageContext.from_defaults(vector_store=vector_store)
-            index = GPTVectorStoreIndex.from_documents(documents, storage_context=storage_context)
+            # loader = SimpleDirectoryReader(input_files=upload_files)
+            # documents = loader.load_data()
+            # pinecone_index = pinecone.Index("quickstart-index")
+            # vector_store = PineconeVectorStore(pinecone_index=pinecone_index, namespace='test')
+            # storage_context = StorageContext.from_defaults(vector_store=vector_store)
+            # index = GPTVectorStoreIndex.from_documents(documents, storage_context=storage_context)
         else:
             raise NotImplementedError
         
@@ -221,7 +231,7 @@ class IndexUtils():
     def loadIndexer(self, pathes:tuple): #[(dir, key)]
         index_set = {}
         max_tokens = os.getenv("MAX_TOKENS", 512) 
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
         # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
 
         for path in pathes:
@@ -239,7 +249,7 @@ class IndexUtils():
         # set number of output tokens
         chunk_size_limit = os.getenv("MAX_TOKENS", 250) 
         predict_size_limit = os.getenv("PREDICT_SIZE_LIMIT", 512) 
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-3.5-turbo", max_tokens=predict_size_limit))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=predict_size_limit))
         # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
         service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
 

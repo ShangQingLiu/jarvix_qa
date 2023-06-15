@@ -12,6 +12,8 @@ from config import Config
 from routes import configure_routes
 from globals import global_chatbots,mail
 import pinecone
+import logging
+logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.INFO)
 
 app = Flask(__name__)
 app.config.from_object(Config)
