@@ -210,5 +210,29 @@ export const useProjectStore = defineStore("projectStore", {
         }
       });
     },
+    ViewProjectFile(payload) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const { data } = await api.post(`file/download`, {
+            filename: payload.filename,
+            project_name: payload.project_name,
+          });
+          const downloadUrl = window.URL.createObjectURL(new Blob([data]));
+          this.downloadFile(downloadUrl);
+          resolve(downloadUrl);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    downloadFile(downloadUrl) {
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', 'file.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
   },
 });

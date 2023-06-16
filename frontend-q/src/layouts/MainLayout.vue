@@ -1,33 +1,9 @@
 <template>
   <div class="">
     <q-layout class="q-pa-md" view="lHh Lpr lFf">
-      <q-header class="bg-white md-bg-primary q-px-none q-px-md-sm q-py-lg q-py-md-sm">
+      <q-header class="md-bg-primary q-px-none q-px-md-sm q-py-lg q-py-md-sm">
         <q-toolbar>
           <div class="flex justify-between items-center full-width">
-            <q-select
-              v-model="locale"
-              :options="localeOptions"
-              outlined
-              text-color="dark"
-              emit-value
-              map-options
-              style="min-width: 160px"
-              dense
-              class="language-dropdown gt-sm"
-            >
-              <template v-slot:selected>
-                {{ $t(`MainLayout.languages.${selectedLabel(locale)}`) }}
-              </template>
-              <template v-slot:option="scope">
-                <q-item v-bind="scope.itemProps">
-                  <q-item-section>
-                    <q-item-label>
-                      {{ $t(`MainLayout.languages.${scope.opt.label}`) }}</q-item-label
-                    >
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
             <q-btn
               flat
               dense
@@ -40,7 +16,9 @@
             <div class="logo-container lt-md text-center">
               <img style="max-width: 150px" src="/static/logo.svg" />
             </div>
-            <div class="flex justify-end items-center">
+
+            <!-- Desktop -->
+            <div class="flex justify-between items-center full-width gt-sm">
               <q-btn
                 color="primary"
                 unelevated
@@ -52,57 +30,105 @@
               >
                 {{ $t(`MainLayout.loginBtn`) }}
               </q-btn>
-
-              <!-- Desktop -->
-              <div
-                v-if="Object.keys(store.user).length !== 0"
-                class="flex flex-center gt-sm"
-              >
-                <q-btn-dropdown no-caps dropdown-icon="expand_more" text-color="dark">
-                  <template v-slot:label>
-                    <div class="row items-center no-wrap">
-                      <div class="column">
-                        <q-avatar size="50px">
-                          <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
-                        </q-avatar>
-                      </div>
-                      <div class="q-mx-sm" />
-                      <div class="column">
-                        <q-item-label class="text-dark text-left text-weight-regular">
-                          {{ store.user.username }}
-                        </q-item-label>
-                        <q-item-label caption>{{ store.user.email }}</q-item-label>
-                      </div>
-                    </div>
-                  </template>
-
-                  <div class="row no-wrap q-pa-md">
-                    <div class="column">
-                      <q-item-section>
-                        <q-item-label class="text-dark text-weight-regular">
-                          {{ store.user.role }}
-                        </q-item-label>
-                      </q-item-section>
-                    </div>
-
-                    <q-separator vertical inset class="q-mx-lg" />
-                    <div class="column items-center">
-                      <q-btn
-                        color="primary"
-                        unelevated
-                        class="text-capitalize"
-                        text-color="white"
-                        rounded
-                        @click="logout"
-                        v-if="Object.keys(store.user).length !== 0"
-                      >
-                        {{ $t(`MainLayout.logoutBtn`) }}
-                      </q-btn>
-                    </div>
-                  </div>
-                </q-btn-dropdown>
+              <div class="flex">
+                <q-item
+                  class="q-mr-md"
+                  clickable
+                  to="/user-authentication-and-management"
+                >
+                  <q-item-section>
+                    <q-item-label class="text-dark2">{{
+                      $t(`MainLayout.links.UserAuthenticationAndManagement`)
+                    }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item class="q-mr-md" clickable to="/">
+                  <q-item-section>
+                    <q-item-label class="text-dark2">{{
+                      $t(`MainLayout.links.Index`)
+                    }}</q-item-label>
+                  </q-item-section>
+                </q-item>
               </div>
-              <!-- Mobile -->
+              <div class="flex items-center">
+                <div
+                  v-if="Object.keys(store.user).length !== 0"
+                  class="flex flex-center gt-sm"
+                >
+                  <q-btn-dropdown no-caps dropdown-icon="expand_more" text-color="white">
+                    <template v-slot:label>
+                      <div class="row items-center no-wrap">
+                        <div class="column">
+                          <q-avatar size="50px">
+                            <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+                          </q-avatar>
+                        </div>
+                        <div class="q-mx-sm" />
+                        <div class="column">
+                          <q-item-label class="text-white text-left text-weight-regular">
+                            {{ store.user.username }}
+                          </q-item-label>
+                          <q-item-label caption class="text-white">{{ store.user.email }}</q-item-label>
+                        </div>
+                      </div>
+                    </template>
+
+                    <div class="row no-wrap q-pa-md">
+                      <div class="column">
+                        <q-item-section>
+                          <q-item-label class="text-weight-regular">
+                            {{ store.user.role }}
+                          </q-item-label>
+                        </q-item-section>
+                      </div>
+
+                      <q-separator vertical inset class="q-mx-lg" />
+                      <div class="column items-center">
+                        <q-btn
+                          color="primary"
+                          unelevated
+                          class="text-capitalize"
+                          text-color="white"
+                          rounded
+                          @click="logout"
+                          v-if="Object.keys(store.user).length !== 0"
+                        >
+                          {{ $t(`MainLayout.logoutBtn`) }}
+                        </q-btn>
+                      </div>
+                    </div>
+                  </q-btn-dropdown>
+                </div>
+                <q-select
+                  v-model="locale"
+                  :options="localeOptions"
+                  outlined
+                  text-color="white"
+                  emit-value
+                  map-options
+                  style="min-width: 160px"
+                  dense
+                  class="language-dropdown white-language-dropdown gt-sm"
+                >
+                  <template v-slot:selected>
+                    {{ $t(`MainLayout.languages.${selectedLabel(locale)}`) }}
+                  </template>
+                  <template v-slot:option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label>
+                          {{
+                            $t(`MainLayout.languages.${scope.opt.label}`)
+                          }}</q-item-label
+                        >
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+            </div>
+            <!-- Mobile -->
+            <div class="flex justify-end items-center lt-md">
               <div
                 v-if="Object.keys(store.user).length !== 0"
                 class="flex flex-center lt-md"
@@ -119,11 +145,11 @@
                   <div class="row no-wrap q-pa-md">
                     <div class="column">
                       <q-item-section>
-                        <q-item-label class="text-dark text-weight-regular">
+                        <q-item-label class="text-weight-regular">
                           {{ store.user.username }}
                         </q-item-label>
-                        <q-item-label caption>{{ store.user.email }}</q-item-label>
-                        <q-item-label class="text-dark text-weight-regular">
+                        <q-item-label caption class="">{{ store.user.email }}</q-item-label>
+                        <q-item-label class="text-weight-regular">
                           {{ store.user.role }}
                         </q-item-label>
                       </q-item-section>
@@ -156,7 +182,31 @@
         <div class="logo-container q-my-xl text-center">
           <img style="max-width: 200px" src="/static/logo.svg" />
         </div>
-        <q-list class="">
+        <!-- Desktop -->
+        <q-list class="q-ml-lg gt-sm">
+          <!-- <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" /> -->
+          <q-item class="q-mb-md" clickable to="/file-management">
+            <q-item-section avatar>
+              <q-icon size="30px" name="img:/static/file-management.svg" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="text-dark2">{{
+                $t(`MainLayout.links.FileManagement`)
+              }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item class="q-mb-md" clickable to="/index-preparation">
+            <q-item-section avatar>
+              <q-icon size="30px" name="img:/static/index-preparation.svg" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="text-dark2">{{
+                $t(`MainLayout.links.Services`)
+              }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+        <q-list class="q-ml-lg lt-md">
           <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
         </q-list>
       </q-drawer>
@@ -173,6 +223,8 @@
             style="max-width: 160px"
             dense
             class="language-dropdown"
+            color="white"
+            icon-color="white"
           >
             <template v-slot:selected>
               {{ $t(`MainLayout.languages.${selectedLabel(locale)}`) }}
@@ -308,7 +360,7 @@ export default defineComponent({
   }
 }
 .language-dropdown {
-  border: 1px solid #878787;
+  border: 0.5px solid #878787;
   .q-field--auto-height.q-field--dense .q-field__control {
     height: 30px;
   }
@@ -324,8 +376,31 @@ export default defineComponent({
       color: #000 !important;
     }
   }
+  .q-select__dropdown-icon {
+    color: #000;
+  }
 }
+
+.white-language-dropdown {
+  border: 0.5px solid #fff;
+  .q-field__native {
+    color: #fff !important;
+    span {
+      color: #fff !important;
+    }
+  }
+  .q-select__dropdown-icon {
+    color: #fff;
+  }
+}
+
 .q-header .q-field__control {
   height: 30px;
+}
+.q-router-link--active {
+  border-bottom: 3px solid $primary;
+  .q-item__label {
+    color: #fff !important;
+  }
 }
 </style>

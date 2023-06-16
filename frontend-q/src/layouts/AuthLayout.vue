@@ -4,7 +4,7 @@
       <div class="row auth-wrapper items-center">
         <div class="col-12 gt-sm full-height col-md-5 bg-linear">
           <div
-            class="flex column auth-wrapper full-height justify-center items-center align-center"
+            class="flex column auth-wrapper relative-position full-height justify-center items-center align-center"
           >
             <div class="logo-container q-my-xl text-center">
               <img style="max-width: 200px" src="/static/logo.svg" />
@@ -12,6 +12,21 @@
             <p class="text-white">
               {{ $t(`AuthLayout.welcomeText`) }}
             </p>
+            <!-- Info -->
+            <q-btn color="white" class="info-btn" flat icon="help">
+              <q-menu>
+                <div style="max-width: 300px" class="row no-wrap q-pa-md">
+                  <div class="column">
+                    <p>
+                      BauMa is the system aims to become your private assistant to answer
+                      the question regards all your data, you can follow the pipeline 1.
+                      Create a project 2. Upload files you want to ask for 3. Click for
+                      training and wait until it finish 4. Enjoy the service Chatbot!
+                    </p>
+                  </div>
+                </div>
+              </q-menu>
+            </q-btn>
           </div>
         </div>
         <div class="col-12 col-md-7 full-height">
@@ -106,5 +121,10 @@ export default defineComponent({
 }
 .auth-wrapper {
   min-height: 100vh;
+}
+.info-btn{
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
 }
 </style>

@@ -6,6 +6,12 @@
 .bg-dark1 {
   background: $dark1;
 }
+.bg-dark2 {
+  background: $dark2;
+}
+.text-dark2 {
+  color: $dark2;
+}
 .no-underline {
   text-decoration: none;
 }
@@ -50,7 +56,9 @@
 tr:nth-child(even) {
   background-color: $accent;
 }
-
+.md-bg-primary {
+  background: linear-gradient(90deg, #005055 0%, #006464 99.99%) !important;
+}
 @media (max-width: 1024px) {
   .text-md-center {
     text-align: center;

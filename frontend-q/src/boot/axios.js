@@ -1,5 +1,7 @@
 import { boot } from "quasar/wrappers";
 import axios from "axios";
+import { useAuthStore } from "src/stores/auth";
+// import { isUserLoggedIn } from "src/router/utils";
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -8,10 +10,21 @@ import axios from "axios";
 // "export default () => {}" function below (which runs individually
 // for each client)
 const api = axios.create({ baseURL: "https://api.bauma.sis.ai/api/" });
+function isTokenExpired(userData) {
+  if (userData) {
+    const expiryTime = new Date(Date.now());
+    const expiresAt = new Date(userData.exp * 1000);
+
+    return expiresAt < expiryTime;
+  }
+  return true;
+}
 
 // ℹ️ Add request interceptor to send the authorization header on each subsequent request after login
-api.interceptors.request.use((config) => {
-  console.log(config.url);
+api.interceptors.request.use(async (config) => {
+  const store = useAuthStore();
+  // const isLoggedIn = await isUserLoggedIn();
+  // console.log("Is Loggged In", isLoggedIn);
   // Retrieve token from localStorage
   const user = JSON.parse(localStorage.getItem("jarvixUser"));
   // If token is found
@@ -23,11 +36,16 @@ api.interceptors.request.use((config) => {
     ) {
       config.headers.Authorization = user ? `${user.access_token}` : "";
     }
+    if (isTokenExpired(user) && !store.refreshToken) {
+      console.log("Refreshing Token");
+      store.refreshToken = true
+      store.refreshToken();
+    }
   }
   return config;
 });
 
-export default boot(({ app }) => {
+export default boot(({ app, store }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
   app.config.globalProperties.$axios = axios;
@@ -35,6 +53,7 @@ export default boot(({ app }) => {
   //       so you won't necessarily have to import axios in each vue file
 
   app.config.globalProperties.$api = api;
+  app.config.globalProperties.$pinia = store;
   // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
   //       so you can easily perform requests against your app's API
 });

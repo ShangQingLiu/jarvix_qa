@@ -5,7 +5,7 @@
     </q-item-section>
 
     <q-item-section>
-      <q-item-label class="text-white">{{
+      <q-item-label class="text-dark2">{{
         $t(`MainLayout.links.${title}`)
       }}</q-item-label>
     </q-item-section>
@@ -50,10 +50,5 @@ export default defineComponent({
   font-size: 19px;
   line-height: 28px;
 }
-.q-router-link--active {
-  background: linear-gradient(90deg, #138f8f 0%, #4dbcbc 99.99%);
-  .q-item__label {
-    color: $dark !important;
-  }
-}
+
 </style>

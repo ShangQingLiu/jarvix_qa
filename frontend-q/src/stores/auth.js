@@ -20,6 +20,7 @@ export const useAuthStore = defineStore("authStore", {
   state: () => ({
     user: {},
     usersList: [],
+    refreshToken: false,
   }),
   actions: {
     registerUser(form) {
@@ -137,5 +138,21 @@ export const useAuthStore = defineStore("authStore", {
         }
       });
     },
+    refreshToken() {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const { data } = await api.post("auth/refresh");
+          const parsedData = parseJwt(data.access_token);
+          localStorage.setItem(
+            "jarvixUser",
+            JSON.stringify({ ...data, ...parsedData })
+          );
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+
   },
 });

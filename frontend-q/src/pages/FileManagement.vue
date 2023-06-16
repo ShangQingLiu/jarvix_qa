@@ -57,15 +57,20 @@
                         {{ file.split('.')[1] }}
                       </div>
                     </div>
-                    <q-btn
-                      round
-                      color="negative"
-                      unelevated
-                      class="q-mx-xs"
-                      icon="delete"
-                      size="sm"
-                      @click="deleteProjectFile(file)"
-                    />
+                    <div class="flex">
+                      <div
+                        @click="ViewProjectFile(file)"
+                        class="flex q-pa-sm rounded-50 bg-dark q-mr-xs"
+                      >
+                        <q-icon size="16px" name="visibility" color="white" />
+                      </div>
+                      <div
+                        @click="deleteProjectFile(file)"
+                        class="flex q-pa-sm rounded-50 bg-negative"
+                      >
+                        <q-icon size="16px" name="delete" color="white" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -155,6 +160,14 @@
           </q-card-section>
         </q-card>
       </div>
+      <iframe
+        v-if="filetoShow"
+        :src="filetoShow"
+        width="700"
+        height="550"
+        allowfullscreen
+        webkitallowfullscreen
+      ></iframe>
     </div>
   </div>
 </template>
@@ -171,7 +184,7 @@ import { useQuasar } from 'quasar';
 const $q = useQuasar();
 const serviceStore = useServiceStore();
 const authStore = useAuthStore();
-
+const filetoShow = ref(null);
 const filesRef = ref(null);
 const store = useProjectStore();
 const loading = ref(false);
@@ -219,7 +232,7 @@ const uploadFiles = async (e) => {
     .then(function () {
       loading.value = false;
       listProjectFiles();
-      files.value = null
+      files.value = null;
     })
     .catch(function () {
       error.value = err;
@@ -235,6 +248,24 @@ const deleteProjectFile = async (file) => {
       project_name: projectName.value,
       filename: file,
     });
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + ' - ' + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+};
+const ViewProjectFile = async (file) => {
+  try {
+    error.value = null;
+    loading.value = true;
+    console.log('Delete Project');
+    const res = await store.ViewProjectFile({
+      project_name: projectName.value,
+      filename: file,
+    });
+    // filetoShow.value = res;
     console.log(res);
   } catch (err) {
     console.log(err);
@@ -309,4 +340,8 @@ onMounted(async () => {
   // await fetchProjects();
 });
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.rounded-50 {
+  border-radius: 50%;
+}
+</style>
