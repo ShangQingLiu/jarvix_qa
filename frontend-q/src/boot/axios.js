@@ -39,7 +39,8 @@ api.interceptors.request.use(async (config) => {
     if (isTokenExpired(user) && !store.refreshToken) {
       console.log("Refreshing Token");
       store.refreshToken = true
-      store.refreshToken();
+      await store.refreshToken();
+
     }
   }
   return config;

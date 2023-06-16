@@ -150,6 +150,8 @@ export const useAuthStore = defineStore("authStore", {
           resolve(data);
         } catch (error) {
           reject(error);
+        } finally{
+          this.refreshToken = false
         }
       });
     },
