@@ -59,8 +59,11 @@
                     <template v-slot:label>
                       <div class="row items-center no-wrap">
                         <div class="column">
-                          <q-avatar size="50px">
-                            <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+                          <q-avatar color="primary" size="40px">
+                            <img v-if="store.user.img" :src="store.user.img" />
+                            <template v-else>
+                              {{ store.user.username.charAt(0).toUpperCase() }}
+                            </template>
                           </q-avatar>
                         </div>
                         <div class="q-mx-sm" />
@@ -138,8 +141,11 @@
                 <q-btn-dropdown no-caps dropdown-icon="expand_more">
                   <template v-slot:label>
                     <div class="row items-center no-wrap">
-                      <q-avatar size="30px">
-                        <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+                      <q-avatar color="primary" size="30px">
+                        <img v-if="store.user.img" :src="store.user.img" />
+                        <template v-store.else>
+                          {{ user.username.charAt(0).toUpperCase() }}
+                        </template>
                       </q-avatar>
                     </div>
                   </template>
