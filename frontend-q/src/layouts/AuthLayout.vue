@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <q-layout view="hHh lpR fFf">
-      <div class="row auth-wrapper items-center">
+      <div class="row auth-wrapper relative-position items-center">
         <div class="col-12 gt-sm full-height col-md-5 bg-linear">
           <div
             class="flex column auth-wrapper relative-position full-height justify-center items-center align-center"
@@ -41,7 +41,7 @@
                 map-options
                 style="max-width: 160px"
                 dense
-                class="language-dropdown"
+                class="language-dropdown auth-layout-language-dropdown"
               >
                 <template v-slot:selected>
                   {{ $t(`MainLayout.languages.${selectedLabel(locale)}`) }}
@@ -122,9 +122,14 @@ export default defineComponent({
 .auth-wrapper {
   min-height: 100vh;
 }
-.info-btn{
+.info-btn {
   position: absolute;
   bottom: 20px;
   left: 20px;
+}
+.auth-layout-language-dropdown {
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 </style>

@@ -6,7 +6,7 @@
           <q-spinner-oval color="primary" size="3rem" />
         </div>
         <q-card v-else flat class="bg-white q-mb-lg" style="border-radius: 16px">
-          <q-card-section class="q-pa-lg">
+          <!-- <q-card-section class="q-pa-lg">
             <p class="text-h6 text-weight-bold">
               {{ $t('pages.FileManagementPage.title') }}
             </p>
@@ -21,7 +21,7 @@
               option-label="name"
               emit-value
             />
-          </q-card-section>
+          </q-card-section> -->
           <q-card-section class="q-pa-lg">
             <div v-if="projectName" class="flex justify-between">
               <div class="text-h6 text-weight-bold text-dark">
@@ -95,8 +95,26 @@
       <div v-if="projectName" class="col-12 col-md-3">
         <q-card flat class="bg-white q-mb-lg" style="border-radius: 10px">
           <q-card-section class="q-pa-md">
-            <div class="text-h6 text-weight-bold text-dark">
-              {{ $t('pages.FileManagementPage.uploadNewFileTitle') }}
+            <div class="flex items-center justify-between">
+              <div class="text-h6 text-weight-bold text-dark">
+                {{ $t('pages.FileManagementPage.uploadNewFileTitle') }}
+              </div>
+              <q-icon name="info" size="20px" color="dark-page">
+                <q-menu>
+                  <div
+                    style="max-width: 300px"
+                    class="row no-wrap q-pa-md bg-primary text-white"
+                  >
+                    <div class="column">
+                      <p>Upload these files:</p>
+                      <p>
+                        .pdf, .docx, .pptx, .jpg, .png, .jpeg, .mp3, .mp4, .m4a, .csv,
+                        .epub, .md, .mbox, .ipynb
+                      </p>
+                    </div>
+                  </div>
+                </q-menu>
+              </q-icon>
             </div>
             <q-separator class="q-my-lg" />
             <div v-if="uploadingFiles" class="q-py-lg flex justify-center">

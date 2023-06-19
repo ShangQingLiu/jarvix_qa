@@ -1,71 +1,43 @@
 <template>
   <div class="col-12">
-    <q-card flat class="bg-white q-mb-lg">
-      <q-card-section>
-        <div class="text-h6 text-weight-bold text-dark">
-          {{ $t('pages.IndexPage.Detail.ProjectUsers.title') }}
-        </div>
-        <q-separator class="q-my-lg" />
-        <div v-if="loading" class="q-py-lg flex justify-center">
-          <q-spinner-oval color="primary" size="3rem" />
-        </div>
-        <div v-if="error" class="q-py-sm flex justify-center">
-          <div class="text-h6 text-negative">
-            {{ error }}
-          </div>
-        </div>
-        <q-list>
-          <q-item
-            v-for="(user, i) in users.slice(0, numberOfUsersToShow)"
-            :key="i"
-            class="q-py-none q-px-none list-item q-mb-lg"
-          >
-            <q-item-section>
-              <q-item-label class="text-dark">
-                {{ user.username }} ({{ user.role }})
-              </q-item-label>
-              <q-item-label caption>
-                {{ user.email }}
-              </q-item-label>
-            </q-item-section>
-
-            <q-item-section side>
-              <q-btn
-                round
-                color="negative"
-                unelevated
-                class="q-mx-xs"
-                icon="delete"
-                @click="deleteProjectUser(user.id)"
-                size="sm"
-              />
-            </q-item-section>
-          </q-item>
-          <q-item v-if="users.length === 0">
-            <q-item-section>
-              {{ $t('pages.IndexPage.Detail.ProjectUsers.noFound') }}
-            </q-item-section>
-          </q-item>
-        </q-list>
-        <q-separator class="q-my-lg" />
-        <q-item-label
-          @click="numberOfUsersToShow = users.length"
-          v-if="users.length >= 10 && numberOfUsersToShow !== users.length"
-          header
-          class="text-primary cursor-pointer q-pl-none"
+    <div v-if="loading" class="q-py-lg flex justify-center">
+      <q-spinner-oval color="primary" size="3rem" />
+    </div>
+    <div v-if="error" class="q-py-sm flex justify-center">
+      <div class="text-h6 text-negative">
+        {{ error }}
+      </div>
+    </div>
+    <div class="q-py-lg q-gutter-sm">
+      <q-avatar
+        v-for="(user, i) in users.slice(0, numberOfUsersToShow)"
+        :key="i"
+        size="50px"
+        class="overlapping"
+        :style="`left: -${i * 20}px`"
+        color="primary"
+        text-color="white"
+      >
+        <img v-if="user.img" :src="user.img" />
+        <template v-else>
+          {{ user.username.charAt(0).toUpperCase() }}
+        </template>
+        <q-badge
+          @click="deleteProjectUser(user.id)"
+          style="min-height: 22px"
+          floating
+          color="negative"
         >
-          {{ $t('pages.IndexPage.Detail.ProjectUsers.viewAll') }}
-        </q-item-label>
-        <q-item-label
-          @click="numberOfUsersToShow = 10"
-          v-if="numberOfUsersToShow == users.length"
-          header
-          class="text-primary cursor-pointer q-pl-none"
-        >
-          {{ $t('pages.IndexPage.Detail.ProjectUsers.viewLess') }}
-        </q-item-label>
-      </q-card-section>
-    </q-card>
+          <q-icon name="close" size="10px"></q-icon>
+        </q-badge>
+        <q-tooltip anchor="bottom middle" self="top middle" :offset="[10, 10]">
+          <strong>
+            {{ user.username }}
+          </strong>
+          {{ user.role }}
+        </q-tooltip>
+      </q-avatar>
+    </div>
   </div>
 </template>
 
@@ -125,4 +97,20 @@ onMounted(async () => {
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.overlapping {
+  .q-badge {
+    border-radius: 50%;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+  &:hover {
+    .q-badge {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+</style>

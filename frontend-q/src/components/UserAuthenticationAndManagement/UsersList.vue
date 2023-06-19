@@ -53,7 +53,7 @@
                   color="primary"
                   unelevated
                   class="q-mx-xs"
-                  icon="edit"
+                  icon="edit_square"
                   v-if="store.user.id === user.id"
                   @click="
                     $router.push(`/user-authentication-and-management/edit/${user.id}`)

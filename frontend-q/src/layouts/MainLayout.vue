@@ -68,7 +68,9 @@
                           <q-item-label class="text-white text-left text-weight-regular">
                             {{ store.user.username }}
                           </q-item-label>
-                          <q-item-label caption class="text-white">{{ store.user.email }}</q-item-label>
+                          <q-item-label caption class="text-white">{{
+                            store.user.email
+                          }}</q-item-label>
                         </div>
                       </div>
                     </template>
@@ -148,7 +150,9 @@
                         <q-item-label class="text-weight-regular">
                           {{ store.user.username }}
                         </q-item-label>
-                        <q-item-label caption class="">{{ store.user.email }}</q-item-label>
+                        <q-item-label caption class="">{{
+                          store.user.email
+                        }}</q-item-label>
                         <q-item-label class="text-weight-regular">
                           {{ store.user.role }}
                         </q-item-label>
@@ -240,7 +244,61 @@
             </template>
           </q-select>
         </div>
-
+        <div class="row q-mb-md q-col-gutter-md items-center">
+          <div class="col-3">
+            <q-select
+              v-model="projectName"
+              :placeholder="$t('pages.FileManagementPage.projectName')"
+              class="q-mb-md"
+              bg-color="white"
+              borderless
+              :options="userProjects"
+              option-value="name"
+              option-label="name"
+              emit-value
+            />
+          </div>
+          <div class="col-9">
+            <q-stepper
+              v-model="step"
+              header-nav
+              alternative-labels
+              ref="stepper"
+              color="primary"
+              animated
+              flat
+            >
+              <q-step
+                :name="1"
+                title="Create Project"
+                icon="fiber_manual_record"
+                :done="step > 1"
+                @click="$router.push('/')"
+              />
+              <q-step
+                :name="2"
+                title="Upload Files"
+                icon="fiber_manual_record"
+                :done="step > 2"
+                @click="$router.push('/file-management')"
+              />
+              <q-step
+                :name="3"
+                title="ProjectView & Training"
+                icon="fiber_manual_record"
+                :done="step > 3"
+                @click="$router.push('/')"
+              />
+              <q-step
+                :name="4"
+                title="Service"
+                icon="fiber_manual_record"
+                :done="step > 4"
+                @click="$router.push('/index-preparation')"
+              />
+            </q-stepper>
+          </div>
+        </div>
         <router-view />
       </q-page-container>
     </q-layout>
@@ -248,9 +306,9 @@
 </template>
 
 <script>
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, ref, watch, computed, onMounted } from 'vue';
 import EssentialLink from 'components/EssentialLink.vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from 'src/stores/auth';
 import { useServiceStore } from 'src/stores/service';
 import { useProjectStore } from 'src/stores/project';
@@ -287,12 +345,21 @@ export default defineComponent({
   },
 
   setup() {
+    const step = ref(1);
     const leftDrawerOpen = ref(false);
     const search = ref('');
     const router = useRouter();
+    const route = useRoute();
+
     const store = useAuthStore();
     const serviceStore = useServiceStore();
     const projectStore = useProjectStore();
+    const loading = ref(false);
+    const error = ref(null);
+    const userProjects = computed(() => projectStore.userProjects);
+    const projectName = ref(
+      projectStore.selectedProject ? projectStore.selectedProject : ''
+    );
 
     const { locale } = useI18n({ useScope: 'global' });
 
@@ -321,7 +388,67 @@ export default defineComponent({
       const option = localeOptions.value.find((i) => i.value == item);
       return option.label;
     };
-
+    watch(projectName, async (projectValue) => {
+      if (projectValue) {
+        projectStore.selectedProject = projectValue;
+        projectStore.projectFiles = [];
+        await listProjectFiles();
+        await getSessions();
+      }
+    });
+    async function getSessions() {
+      try {
+        error.value = null;
+        loading.value = true;
+        if (projectStore.selectedProject) {
+          const res = await serviceStore.getSessions();
+        } else {
+          return;
+        }
+      } catch (err) {
+        console.log(err);
+        error.value = err.response.status + ' - ' + err.response.statusText;
+      } finally {
+        loading.value = false;
+      }
+    }
+    async function listProjectFiles() {
+      try {
+        error.value = null;
+        loading.value = true;
+        const res = await projectStore.listProjectFiles({
+          project_name: projectName.value,
+        });
+      } catch (err) {
+        console.log(err);
+        error.value = err.response.status + ' - ' + err.response.statusText;
+      } finally {
+        loading.value = false;
+      }
+    }
+    watch(route, (newVal) => {
+      if (newVal.path == '/') {
+        step.value = 1;
+      } else if (newVal.path == '/file-management') {
+        step.value = 2;
+      } else if (newVal.params.id && newVal.name == 'SingleProject') {
+        step.value = 3;
+        console.log('Here');
+      } else if (newVal.path == '/index-preparation') {
+        step.value = 4;
+      }
+    });
+    onMounted(() => {
+      if (route.path == '/') {
+        step.value = 1;
+      } else if (route.path == '/file-management') {
+        step.value = 2;
+      } else if (route.params.id && route.name == 'SingleProject') {
+        step.value = 3;
+      } else if (route.path == '/index-preparation') {
+        step.value = 4;
+      }
+    });
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
@@ -334,6 +461,11 @@ export default defineComponent({
       locale,
       localeOptions,
       selectedLabel,
+      projectName,
+      getSessions,
+      listProjectFiles,
+      userProjects,
+      step,
     };
   },
 });
@@ -402,5 +534,8 @@ export default defineComponent({
   .q-item__label {
     color: #fff !important;
   }
+}
+.q-stepper__step-inner {
+  padding: 0px !important;
 }
 </style>

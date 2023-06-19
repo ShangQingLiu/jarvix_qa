@@ -15,7 +15,9 @@
           <p class="text-dark-page">
             {{ currentProject && currentProject.description }}
           </p>
-          <q-separator class="q-my-lg" />
+
+          <ProjectUsers v-if="authStore.user.role == 'Admin'" />
+
           <div class="row q-gutter-md">
             <q-btn
               color="primary"
@@ -61,7 +63,6 @@
         </q-card-section>
       </q-card>
     </div>
-    <ProjectUsers v-if="authStore.user.role == 'Admin'" />
   </div>
 </template>
 

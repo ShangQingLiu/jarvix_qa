@@ -18,6 +18,7 @@ const routes = [
             component: () => import("pages/IndexPage/Detail.vue"),
             // only authenticated users can create posts
             meta: { requiresAuth: true },
+            name: 'SingleProject'
           },
           {
             path: "/edit/:id",

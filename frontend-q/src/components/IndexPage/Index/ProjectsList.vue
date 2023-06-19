@@ -41,7 +41,7 @@
                   color="primary"
                   unelevated
                   class="q-mx-xs"
-                  icon="edit"
+                  icon="edit_square"
                   @click="$router.push(`/edit/${project.id}`)"
                   size="sm"
                   v-if="authStore.user.role == 'Admin'"
