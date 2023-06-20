@@ -143,8 +143,8 @@
                     <div class="row items-center no-wrap">
                       <q-avatar color="primary" size="30px">
                         <img v-if="store.user.img" :src="store.user.img" />
-                        <template v-store.else>
-                          {{ user.username.charAt(0).toUpperCase() }}
+                        <template v-else>
+                          {{ store.user.username.charAt(0).toUpperCase() }}
                         </template>
                       </q-avatar>
                     </div>
@@ -251,7 +251,7 @@
           </q-select>
         </div>
         <div class="row q-mb-md q-col-gutter-md items-center">
-          <div class="col-3">
+          <div class="col-12 col-sm-4 col-md-3">
             <q-select
               v-model="projectName"
               :placeholder="$t('pages.FileManagementPage.projectName')"
@@ -264,7 +264,7 @@
               emit-value
             />
           </div>
-          <div class="col-9">
+          <div class="col-12 col-sm-8 col-md-9">
             <q-stepper
               v-model="step"
               header-nav
@@ -543,5 +543,23 @@ export default defineComponent({
 }
 .q-stepper__step-inner {
   padding: 0px !important;
+}
+
+@media (max-width: 960px) {
+  .q-stepper__header {
+    flex-wrap: nowrap;
+  }
+  .q-stepper__header--alternative-labels .q-stepper__tab {
+    padding: 10px;
+    min-height: auto;
+  }
+  .q-stepper__title {
+    font-size: 10px;
+  }
+}
+@media(max-width: 380px){
+  .q-stepper__title {
+    font-size: 8px;
+  }
 }
 </style>

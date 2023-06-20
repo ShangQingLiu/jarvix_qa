@@ -210,7 +210,9 @@ const error = ref(null);
 const uploadingFiles = ref(false);
 const uploadingError = ref(null);
 const success = ref(null);
-const projectName = ref(store.selectedProject ? store.selectedProject : '');
+// const projectName = ref(store.selectedProject ? store.selectedProject : '');
+const projectName = computed(() => store.selectedProject);
+
 const projectFiles = computed(() => store.projectFiles);
 // const projectList = ref([]);
 const userProjects = ref([]);
@@ -242,7 +244,7 @@ const uploadFiles = async (e) => {
     formData.append('files', file);
   }
   api
-    .post(`file/upload?project_name=${projectName.value}`, formData, {
+    .post(`file/upload?project_name=${store.selectedProject}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -263,7 +265,7 @@ const deleteProjectFile = async (file) => {
     loading.value = true;
     console.log('Delete Project');
     const res = await store.deleteProjectFile({
-      project_name: projectName.value,
+      project_name: store.selectedProject,
       filename: file,
     });
     console.log(res);
@@ -278,13 +280,12 @@ const ViewProjectFile = async (file) => {
   try {
     error.value = null;
     loading.value = true;
-    console.log('Delete Project');
+    console.log('View Project File');
     const res = await store.ViewProjectFile({
-      project_name: projectName.value,
+      project_name: store.selectedProject,
       filename: file,
     });
-    // filetoShow.value = res;
-    console.log(res);
+
   } catch (err) {
     console.log(err);
     error.value = err.response.status + ' - ' + err.response.statusText;
@@ -297,7 +298,7 @@ const listProjectFiles = async () => {
     error.value = null;
     loading.value = true;
     const res = await store.listProjectFiles({
-      project_name: projectName.value,
+      project_name: store.selectedProject,
     });
   } catch (err) {
     console.log(err);
@@ -320,7 +321,7 @@ const indexProject = async () => {
     error.value = null;
     loading.value = true;
     const res = await store.indexProject({
-      project_name: projectName.value,
+      project_name: store.selectedProject,
     });
     if (res) {
       $q.notify({
