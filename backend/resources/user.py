@@ -5,6 +5,7 @@ from models import db, User
 import uuid
 from flask_mail import Message
 from globals import mail
+import logging
 
 # Create a namespace for the users endpoint
 user_ns = Namespace('user management', description='user management')
@@ -78,7 +79,7 @@ class UserResource(Resource):
     def put(self, user_id):
         '''Update a user given its identifier'''
         data = request.get_json()
-        print(data)
+        logging.info(data)
         user = User.query.get(user_id)
         if not user:
             current_app.api.abort(404)

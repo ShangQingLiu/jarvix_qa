@@ -6,8 +6,8 @@ from globals import global_chatbots, project_session, chat_history
 from chatbot import ChatBot
 from models import Project, User
 import os
-import json
 import requests
+import logging
 
 
 
@@ -192,14 +192,14 @@ class Query(Resource):
         query = data.get('query')
         language = data.get('language')
         language = language if language is not None else "ZH"
-        print("language: ", language)
+        logging.info("language: ", language)
         query_origin = query
 
         if project_name is None or session_id is None or query is None: 
             return {'error': 'No project name in the request'}, 400
 
         # Prepare Index
-        print("prepare index")
+        logging.info("prepare index")
         upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
         if session_id not in global_chatbots.keys():
             # Make sure the project directory exists
@@ -222,7 +222,7 @@ class Query(Resource):
                     index_set.update(indexUtils.dataLoader(file_pathes, data_type))
 
             # print("Index set: ", index_set)
-            print("Start to build chatbot")
+            logging.info("Start to build chatbot")
             chatbot = ChatBot(index_set,None,project_name=project_name, language=language)
             global_chatbots[session_id] = chatbot
             if project_name not in project_session.keys():
@@ -233,7 +233,7 @@ class Query(Resource):
         chatbot = global_chatbots[session_id]
         response = chatbot.run(query)
         record = {"query":query_origin, "response":response} 
-        print("record: ", record)
+        logging.debug("record: ", record)
 
         # Record 
         if session_id not in chat_history.keys():

@@ -20,6 +20,8 @@ from globals import upload_hashes
 import faiss
 import pinecone
 
+import logging
+
 class DataType(Enum):
     AUDIO = 1
     DOCX = 2
@@ -105,7 +107,7 @@ class IndexUtils():
 
 
                 # save index to disk
-                print("Successful store new index...")    
+                logging.info("Successful store new index...")    
                 index.storage_context.persist(index_save_path)
         elif USING_PINECONE:
             # load documents pathes

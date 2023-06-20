@@ -21,6 +21,7 @@ import os
 from opencc import OpenCC
 import constant_prompt 
 import logging
+import openai
 
 
 class ChatBot():
@@ -52,38 +53,46 @@ class ChatBot():
         agent_prompt = self.prompt.format(query=query)
         try:
             if self.using_FAISS:
+                # Refine
+                logging.info("Start to query")
+                response = self.agent.query(agent_prompt)
+                if self.language == "ZH_TW":
+                    cc = OpenCC('s2tw')
+                    response = cc.convert(response.response)
+                else:
+                    response = response.response
+
+                # # Old code
                 pre_response = self.agent_no_text.query(query)
                 # pre_response = self.agent.query(agent_prompt)
                 logging.info(pre_response.source_nodes)
                 logging.info(pre_response.get_formatted_sources())
                 logging.info(pre_response.response)
-                if pre_response.response is None:
-                    import openai
+                # if pre_response.response is None:
 
-                    completion = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                            {"role": "system", "content": "You are a helpful assistant."},
-                            {"role": "user", "content": f"{query}"},
-                        ]
-                    )
+                #     completion = openai.ChatCompletion.create(
+                #     model="gpt-3.5-turbo",
+                #     messages=[
+                #             {"role": "system", "content": "You are a helpful assistant."},
+                #             {"role": "user", "content": f"{query}"},
+                #         ]
+                #     )
 
-                    response = completion.choices[0].message
-                    response = response.to_dict()['content']
-                else:
-                    response = self.agent.query(agent_prompt)
-                if pre_response.response is None:
-                    pass
-                else:
-                    if pre_response.response is None:
-                        pass
-                    else:
-                        if self.language == "ZH":
-                            cc = OpenCC('s2tw')
-                            response = cc.convert(response.response)
-                        else:
-                            response = response.response
-                # response = self.agent.chat(agent_prompt)
+                #     response = completion.choices[0].message
+                #     response = response.to_dict()['content']
+                # else:
+                #     response = self.agent.query(agent_prompt)
+                # if pre_response.response is None:
+                #     pass
+                # else:
+                #     if pre_response.response is None:
+                #         pass
+                #     else:
+                #         if self.language == "ZH":
+                #             cc = OpenCC('s2tw')
+                #             response = cc.convert(response.response)
+                #         else:
+                #             response = response.response
             else:
                 response = self.agent.run(input=agent_prompt).strip()
         except ValueError as e:
@@ -175,7 +184,7 @@ class ChatBot():
     def getGraphConfig(self,index_saved_path,project_name,chunk_size_limit):
         service_context = ServiceContext.from_defaults(chunk_size_limit=chunk_size_limit)
         graph_path = os.path.join(os.getcwd(),f'{index_saved_path}/{project_name}/graph_{project_name}.json')
-        print(graph_path)
+        # print(graph_path)
         self.graph = ComposableGraph.load_from_disk( graph_path, 
             service_context=service_context,
         )
@@ -212,7 +221,7 @@ class ChatBot():
             # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
             service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
 
-            print("prompt language:",self.language)
+            logging.info("prompt language:",self.language)
             if self.language == "EN":
                 prompt = QuestionAnswerPrompt(constant_prompt.qa_promt_tmpl_en)
             elif self.language == "ZH_TW":
@@ -222,11 +231,12 @@ class ChatBot():
             elif self.language == "ZH":
                 prompt = QuestionAnswerPrompt(constant_prompt.qa_promt_tmpl_zh)
             else:
-                print("language not support")
+                logging.info("language not support")
 
             response_synthesizer = ResponseSynthesizer.from_args(
                 service_context=service_context,
-                response_mode='compact',
+                response_mode='refine',
+                # refine_template=prompt,
                 # response_mode='no_text',
                 text_qa_template=prompt
                 # node_postprocessors=[

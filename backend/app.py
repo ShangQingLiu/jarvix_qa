@@ -13,7 +13,20 @@ from routes import configure_routes
 from globals import global_chatbots,mail
 import pinecone
 import logging
-logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.INFO)
+import time
+
+def example_request_handler(name, level=logging.INFO):
+    logging.basicConfig(
+        level=level,
+        force = True,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        encoding='utf-8',
+        handlers=[
+            logging.FileHandler(f"{name}.log"),
+            logging.StreamHandler()])
+
+example_request_handler("execute", level=logging.INFO)
+# example_request_handler("debug", level=logging.DEBUG)
 
 app = Flask(__name__)
 app.config.from_object(Config)

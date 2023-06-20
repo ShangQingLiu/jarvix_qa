@@ -6,7 +6,9 @@ import os
 import mimetypes
 from utils import check_dir_exists, IndexUtils, get_files_for_project
 from werkzeug.datastructures import FileStorage
+from flask import send_from_directory
 
+import logging
 
 file_ns = Namespace('file',description="File management")
 
@@ -22,6 +24,38 @@ delete_file = file_ns.model('delete file', {
     'filename': fields.String(required=True, description='Focus File Name'),
     'project_name': fields.String(required=True, description='Focus Project Name'),
 })
+
+show_file = file_ns.model('show file', {
+    'filename': fields.String(required=True, description='Focus File Name'),
+    'project_name': fields.String(required=True, description='Focus Project Name'),
+})
+def get_sub_dir(filename):
+    if filename.endswith(".pdf"):
+        return "pdf"
+    elif filename.endswith(".docx"):
+        return "docx"
+    elif filename.endswith(".html"):
+        return "html"
+    elif filename.endswith(".mp3") or filename.endswith(".m4a"):
+        return "audio"
+    else:
+        # get the file's MIME type
+        content_type = mimetypes.guess_type(filename)[0]
+        return content_type.split("/")[1]
+
+    
+
+@file_ns.route('/download')
+class downloadFile(Resource):
+    @file_ns.expect(show_file)
+    @jwt_required() 
+    def post(self):
+        data = request.get_json()
+        project_name = data.get("project_name")
+        filename = data.get("filename")
+        project_path = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
+        download_path = os.path.join(project_path, get_sub_dir(filename))
+        return send_from_directory(download_path, filename, as_attachment=False)
 
 
 @file_ns.route("/list_files")
@@ -77,18 +111,18 @@ class prepare_index(Resource):
     def post(self):
         data = request.get_json()
         
-        print("Preparing index...")
+        logging.info("Preparing index...")
         project_name = data.get("project_name")
         project_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
 
         # Make sure the project directory exists
         check_dir_exists(project_dir)
 
-        print("Loading indexUtils...")
+        logging.info("Loading indexUtils...")
         indexUtils = IndexUtils(current_app.config["INDEX_SAVE_PATH"], project_name)
 
         # Read all files in the project directory
-        print("Reading files...")
+        logging.info("Reading files...")
         index_set = {}
         _FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
         if _FAISS:
@@ -100,10 +134,10 @@ class prepare_index(Resource):
                     check_dir_exists(docx_path)
                     doc_pathes = os.listdir(docx_path)
                     doc_pathes = [os.path.join(docx_path, doc_path) for doc_path in doc_pathes]
-                    print("doc_pathes number: ", len(doc_pathes))
+                    logging.info("doc_pathes number: ", len(doc_pathes))
                     if len(doc_pathes) == 0:
                         continue
-                    print("Loading data...DOCX")
+                    logging.info("Loading data...DOCX")
                     index_set.update(indexUtils.dataLoader(doc_pathes, data_type))
                 elif data_type == DataType.PDF:
                     pdf_path = os.path.join(project_dir, "pdf")
@@ -134,7 +168,7 @@ class prepare_index(Resource):
                     check_dir_exists(xlsx_path)
                     xlsx_pathes = os.listdir(xlsx_path)
                     xlsx_pathes = [os.path.join(xlsx_path, xlsx_e) for xlsx_e in xlsx_pathes]
-                    print(f"xlsx_pathes", xlsx_pathes)
+                    logging.info(f"xlsx_pathes", xlsx_pathes)
                     if len(xlsx_pathes) == 0:
                         continue
                     index_set.update(indexUtils.dataLoader(xlsx_pathes, data_type))

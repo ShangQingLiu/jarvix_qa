@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from flask import current_app
 from models import db, User
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 
 auth_ns = Namespace('auth', description='Authentication related operations')
 
@@ -33,3 +33,15 @@ class Login(Resource):
 
         # Invalid credentials
         return {'message': 'Invalid username or password'}, 401
+
+@auth_ns.route('/refresh')
+class RefreshToken(Resource):
+    @jwt_required()
+    def post(self):
+        # Get the current user identity
+        current_user = get_jwt_identity()
+        
+        # Generate a new access token using the identity of the currently authenticated user
+        new_token = create_refresh_token(identity=current_user)
+
+        return {'access_token': 'Bearer ' + new_token}, 200

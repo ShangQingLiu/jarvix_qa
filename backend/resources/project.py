@@ -7,6 +7,8 @@ from functools import wraps
 from models import db, Project, User, Invitation
 from globals import mail
 from datetime import datetime
+
+import logging
 import os
 
 project_ns = Namespace('project management', description='project management')
@@ -162,7 +164,7 @@ class accept_invitation(Resource):
                 new_user_details = None
                 if not user:
                     # Create new user
-                    print("Create New User")
+                    logging.info("Create New User")
                     username = invitation.recipient_email.split('@')[0]
                     password = "HiSoSupreme"  # Generate default password
                     user = User(username=username, email=invitation.recipient_email, password=password, role=invitation.role)
@@ -180,7 +182,7 @@ class accept_invitation(Resource):
                 project = invitation.project
                 project.members.append(user)
                 db.session.commit()
-                print(new_user_details)
+                logging.info(new_user_details)
 
                 return make_response(render_template('join_project_new.html', invitation=invitation, project=project, new_user_details=new_user_details, current_date_time=dt_string), 200, {'Content-Type': 'text/html'})
             else:
