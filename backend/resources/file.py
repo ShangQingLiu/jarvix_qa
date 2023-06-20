@@ -1,12 +1,11 @@
 from flask_restx import Namespace, Resource, fields, reqparse
 from flask_jwt_extended import jwt_required
 from utils import IndexUtils, DataType
-from flask import request,jsonify, current_app
+from flask import request,jsonify, current_app, abort, send_file
 import os
 import mimetypes
 from utils import check_dir_exists, IndexUtils, get_files_for_project
 from werkzeug.datastructures import FileStorage
-from flask import send_from_directory
 
 import logging
 
@@ -55,7 +54,12 @@ class downloadFile(Resource):
         filename = data.get("filename")
         project_path = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
         download_path = os.path.join(project_path, get_sub_dir(filename))
-        return send_from_directory(download_path, filename, as_attachment=False)
+        file_path = os.path.join(download_path, filename)
+        logging.info(f"download path: {file_path}")
+        try:
+            return send_file(file_path,mimetype=get_sub_dir(filename), as_attachment=True)
+        except FileNotFoundError:
+            abort(404)
 
 
 @file_ns.route("/list_files")
