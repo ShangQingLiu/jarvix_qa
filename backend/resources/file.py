@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource, fields, reqparse
 from flask_jwt_extended import jwt_required
 from utils import IndexUtils, DataType
-from flask import request,jsonify, current_app, abort, send_file
+from flask import request,jsonify, current_app, abort, send_file, send_from_directory, make_response, redirect
 import os
 import mimetypes
 from utils import check_dir_exists, IndexUtils, get_files_for_project
@@ -39,8 +39,23 @@ def get_sub_dir(filename):
         return "audio"
     else:
         # get the file's MIME type
-        content_type = mimetypes.guess_type(filename)[0]
-        return content_type.split("/")[1]
+        return os.path.splitext(filename)[1][1:]
+
+def download_pdf(file_path, filename):
+    file_content = None
+    with open(file_path, 'rb') as static_file:
+        file_content = static_file.read()
+
+    response = make_response(file_content, 200)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = \
+        'inline; filename=%s.pdf' % 'yourfilename'
+
+    # return send_file(file_path, mimetype='application/'+get_sub_dir(filename),
+    #                  download_name=filename, as_attachment=True)
+    # return redirect(file_path)
+
+    # return response
 
     
 
@@ -56,8 +71,17 @@ class downloadFile(Resource):
         download_path = os.path.join(project_path, get_sub_dir(filename))
         file_path = os.path.join(download_path, filename)
         logging.info(f"download path: {file_path}")
+        ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        logging.info(f"ROOT path: {ROOT_DIR}")
+        server_path = os.path.relpath(download_path,ROOT_DIR)
+        logging.info(f"Relative path: {server_path}")
+
         try:
-            return send_file(file_path,mimetype=get_sub_dir(filename), as_attachment=True)
+            logging.info("send file")
+            logging.info(mimetypes.guess_type(filename)[0])
+            logging.info(filename)
+            # return send_file(file_path,mimetype=mimetypes.guess_type(filename)[0], download_name=filename)
+            return send_from_directory(server_path,filename,as_attachment=True)
         except FileNotFoundError:
             abort(404)
 

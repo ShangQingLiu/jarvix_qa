@@ -23,12 +23,12 @@ def example_request_handler(name, level=logging.INFO):
         encoding='utf-8',
         handlers=[
             logging.FileHandler(f"{name}.log"),
-            logging.StreamHandler()])
+            logging.StreamHandler()])   
 
 example_request_handler("execute", level=logging.INFO)
 # example_request_handler("debug", level=logging.DEBUG)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='/home/ubuntu/jarvix_qa/backend/mount_storage/uploads',)
 app.config.from_object(Config)
 # set OPEN_AI_KEY
 os.environ['OPENAI_API_KEY'] = os.environ.get('OPEN_API_KEY')

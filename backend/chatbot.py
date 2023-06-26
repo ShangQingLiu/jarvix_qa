@@ -221,7 +221,7 @@ class ChatBot():
             # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
             service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
 
-            logging.info("prompt language:",self.language)
+            print("prompt language:",self.language)
             if self.language == "EN":
                 prompt = QuestionAnswerPrompt(constant_prompt.qa_promt_tmpl_en)
             elif self.language == "ZH_TW":

@@ -191,8 +191,7 @@ class Query(Resource):
         session_id = data.get('session_id')
         query = data.get('query')
         language = data.get('language')
-        language = language if language is not None else "ZH"
-        logging.info("language: ", language)
+        language = language if language is not None else "ZH_TW"
         query_origin = query
 
         if project_name is None or session_id is None or query is None: 
@@ -223,6 +222,7 @@ class Query(Resource):
 
             # print("Index set: ", index_set)
             logging.info("Start to build chatbot")
+            logging.info("language: ", language)
             chatbot = ChatBot(index_set,None,project_name=project_name, language=language)
             global_chatbots[session_id] = chatbot
             if project_name not in project_session.keys():

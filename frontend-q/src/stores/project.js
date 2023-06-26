@@ -217,7 +217,8 @@ export const useProjectStore = defineStore("projectStore", {
             filename: payload.filename,
             project_name: payload.project_name,
           });
-          const downloadUrl = window.URL.createObjectURL(new Blob([data]));
+          const type = 'application/pdf';
+          const downloadUrl = window.URL.createObjectURL(new Blob([data]), {type:type});
           this.downloadFile(downloadUrl);
           resolve(downloadUrl);
         } catch (error) {

@@ -69,46 +69,49 @@ class IndexUtils():
                     upload_files.append(os.path.join(r,file))
             
             
-            print("Detecting is repeating index...")    
+            print("Detecting if index exist...")    
             # Upload Hash comparison
-            if self.project_name in upload_hashes.keys() and \
-                upload_hashes[self.project_name] == hash(tuple(upload_files)):
-                # Already has good index
+            if True:
                 pass
             else:
-                # DEBUG
-                # Regenerate index
-                upload_hashes[self.project_name] = hash(tuple(upload_files))
-                # print(upload_files)
-                if len(upload_files) == 0:
-                    return "Nothing need to index" 
-                
-                def filename_fn(filename):
-                    # if "ESG" in filename:
-                    #     company_name = filename.split("-")[0]
-                    #     return {'doc_id': filename, 'company_name': company_name}
-                    # else:
-                        return {'doc_id': filename }
-                # filename_fn = lambda filename: {'file_name': filename} 
-                
-                loader = SimpleDirectoryReader(input_files=upload_files)
-                documents = loader.load_data()
-                ## Vector Index
-                vector_store = FaissVectorStore(faiss_index=self.faiss_index)
-                storage_context = StorageContext.from_defaults(vector_store=vector_store)
-                index = GPTVectorStoreIndex.from_documents(documents, storage_context=storage_context)
+                if self.project_name in upload_hashes.keys() and \
+                    upload_hashes[self.project_name] == hash(tuple(upload_files)):
+                    # Already has good index
+                    pass
+                else:
+                    # DEBUG
+                    # Regenerate index
+                    upload_hashes[self.project_name] = hash(tuple(upload_files))
+                    # print(upload_files)
+                    if len(upload_files) == 0:
+                        return "Nothing need to index" 
+                    
+                    def filename_fn(filename):
+                        # if "ESG" in filename:
+                        #     company_name = filename.split("-")[0]
+                        #     return {'doc_id': filename, 'company_name': company_name}
+                        # else:
+                            return {'doc_id': filename }
+                    # filename_fn = lambda filename: {'file_name': filename} 
+                    
+                    loader = SimpleDirectoryReader(input_files=upload_files)
+                    documents = loader.load_data()
+                    ## Vector Index
+                    vector_store = FaissVectorStore(faiss_index=self.faiss_index)
+                    storage_context = StorageContext.from_defaults(vector_store=vector_store)
+                    index = GPTVectorStoreIndex.from_documents(documents, storage_context=storage_context)
 
-                ## List Index
-                # TODO: fix this
-                # list_service_context = ServiceContext.from_defaults(chunk_size=1024)
-                # list_nodes = list_service_context.node_parser.get_nodes_from_documents(documents)
-                # list_storage_context = StorageContext.from_defaults()
-                # list_index = ListIndex(list_nodes, storage_context=list_storage_context)
+                    ## List Index
+                    # TODO: fix this
+                    # list_service_context = ServiceContext.from_defaults(chunk_size=1024)
+                    # list_nodes = list_service_context.node_parser.get_nodes_from_documents(documents)
+                    # list_storage_context = StorageContext.from_defaults()
+                    # list_index = ListIndex(list_nodes, storage_context=list_storage_context)
 
 
-                # save index to disk
-                logging.info("Successful store new index...")    
-                index.storage_context.persist(index_save_path)
+                    # save index to disk
+                    logging.info("Successful store new index...")    
+                    index.storage_context.persist(index_save_path)
         elif USING_PINECONE:
             # load documents pathes
             pass
