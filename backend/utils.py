@@ -71,7 +71,7 @@ class IndexUtils():
             
             print("Detecting if index exist...")    
             # Upload Hash comparison
-            if True:
+            if False:
                 pass
             else:
                 if self.project_name in upload_hashes.keys() and \
