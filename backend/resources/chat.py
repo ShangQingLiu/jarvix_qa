@@ -153,6 +153,7 @@ class ValidationForm(Resource):
 
         for line in form_lines:
             question, expect_answer = line.split(',')
+            # print(expect_answer)
 
             # Assuming the function get_query_answer(question) is available and returns the answer to a given question
             query_answer = get_query_answer(project_name,session_id,question)

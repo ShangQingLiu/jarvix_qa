@@ -50,7 +50,9 @@ class IndexUtils():
     def __init__(self, root_path, project_name="default"):
         self.root_path = root_path # index saved root path
         self.project_name = project_name # would later used as graph index name
-        self.faiss_index = faiss.IndexFlatL2(1536) # dimensions of text-ada-embedding-002
+        d = 1536 # dimensions of text-ada-embedding-002
+        index = faiss.IndexFlatL2(d)  # this remains the same
+        self.faiss_index = index 
         self.upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
 
     def save_loader(self, file_pathes: list, data_type: DataType, project_dir=None):
