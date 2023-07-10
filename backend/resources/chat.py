@@ -157,7 +157,7 @@ class ValidationForm(Resource):
 
             # Assuming the function get_query_answer(question) is available and returns the answer to a given question
             query_answer = get_query_answer(project_name,session_id,question)
-            is_correct = (expect_answer.lower() in query_answer.lower())
+            is_correct = (expect_answer.lower() in query_answer.response.lower())
 
             answer_list.append({
                 'question': question,
