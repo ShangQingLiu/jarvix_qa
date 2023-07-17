@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv("/home/ubuntu/jarvix_qa/backend/.env")
 import os
 
+from utils import read_all_faiss_indexes
 from config import Config
 from routes import configure_routes
 from globals import global_chatbots,mail
@@ -51,6 +52,10 @@ db.init_app(app)
 authorizations = {"Bearer": {"type": "apiKey", "in": "header", "name": "Authorization"}}
 api_security = {'Bearer': {'type': 'apiKey', 'name': 'Authorization', 'in': 'header'}}
 api = Api(app, version='1.0', title='Jarvix QA', authorizations=api_security, security=api_security)
+
+read_all_faiss_indexes(app.config["INDEX_SAVE_PATH"])
+
+
 # This is where the duck typing magic comes in
 jwt._set_error_handler_callbacks(api)
 @jwt.expired_token_loader

@@ -15,7 +15,7 @@ from pathlib import Path
 
 from langchain.chat_models import ChatOpenAI
 from llama_index.indices.composability import ComposableGraph
-from globals import upload_hashes
+from globals import upload_hashes, faiss_vectors
 
 import faiss
 import pinecone
@@ -40,6 +40,8 @@ def get_files_for_project(project_name):
     project_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
 
     f = []
+    if not os.path.exists(project_folder):
+        os.makedirs(project_folder)
     for data_fd in  os.listdir(project_folder):
         f.extend(os.listdir(os.path.join(project_folder,data_fd)))
 
@@ -76,11 +78,14 @@ class IndexUtils():
             if False:
                 pass
             else:
-                if self.project_name in upload_hashes.keys() and \
-                    upload_hashes[self.project_name] == hash(tuple(upload_files)):
+                if True:
+                # if self.project_name in upload_hashes.keys() and \
+                #     upload_hashes[self.project_name] == hash(tuple(upload_files)):
+                    logging.info("Index exist")
                     # Already has good index
                     pass
                 else:
+                    logging.info("Index not exist")
                     # DEBUG
                     # Regenerate index
                     upload_hashes[self.project_name] = hash(tuple(upload_files))
@@ -98,6 +103,8 @@ class IndexUtils():
                     
                     loader = SimpleDirectoryReader(input_files=upload_files)
                     documents = loader.load_data()
+                    ## Save documents
+                    ### TODO
                     ## Vector Index
                     vector_store = FaissVectorStore(faiss_index=self.faiss_index)
                     storage_context = StorageContext.from_defaults(vector_store=vector_store)
@@ -149,7 +156,12 @@ class IndexUtils():
             self.save_loader(file_pathes,data_type)
 
             # load index from disk
-            vector_store = FaissVectorStore.from_persist_dir(index_save_path)
+            vector_store = None
+            # TODO: index_save_path update need to be consider
+            if index_save_path in faiss_vectors.keys():
+                vector_store = faiss_vectors[index_save_path] 
+            else:
+                vector_store = FaissVectorStore.from_persist_dir(index_save_path)
             storage_context = StorageContext.from_defaults(vector_store=vector_store, persist_dir=index_save_path)
             index = load_index_from_storage(storage_context=storage_context)
 
@@ -222,7 +234,9 @@ class IndexUtils():
         index_set = {}
         openai.api_key = os.environ.get("OPENAI_API_KEY")
         max_tokens = os.getenv("MAX_TOKENS", 512) 
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-0613", max_tokens=max_tokens))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-4", max_tokens=max_tokens))
         service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor, chunk_size_limit=chunk_size_limit)
         for key in doc_set.keys():
             cur_index = GPTVectorStoreIndex.from_documents(doc_set[key], service_context=service_context)
@@ -238,7 +252,9 @@ class IndexUtils():
     def loadIndexer(self, pathes:tuple): #[(dir, key)]
         index_set = {}
         max_tokens = os.getenv("MAX_TOKENS", 512) 
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-0613", max_tokens=max_tokens))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=max_tokens))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-4", max_tokens=max_tokens))
         # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
 
         for path in pathes:
@@ -256,7 +272,9 @@ class IndexUtils():
         # set number of output tokens
         chunk_size_limit = os.getenv("MAX_TOKENS", 250) 
         predict_size_limit = os.getenv("PREDICT_SIZE_LIMIT", 512) 
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=predict_size_limit))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=predict_size_limit))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-0613", max_tokens=predict_size_limit))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-4", max_tokens=predict_size_limit))
         # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
         service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
 
@@ -282,3 +300,24 @@ class IndexUtils():
         graph.save_to_disk(graph_path)
 
         return graph
+
+def language_mapping(language):
+    mapping = {"ZH_TW": "traditional Chinese", "ZH_CN": "simplified Chinese", "EN": "English"}
+    if language in mapping.keys():
+        return mapping[language]
+    else:
+        return "traditional Chinese"
+
+def walk_through_files(path,file_prefix='index_'):
+    index_path = path 
+    for (dirpath, dirnames, filenames) in os.walk(index_path):
+      for filename in filenames:
+         if filename.startswith(file_prefix): 
+            yield os.path.join(dirpath)
+
+def read_all_faiss_indexes(path):
+    for file_path in walk_through_files(path):
+        print(file_path)
+        vector_store = FaissVectorStore.from_persist_dir(file_path)
+        faiss_vectors[file_path] = vector_store 
+        # faiss.read_index(file_path)

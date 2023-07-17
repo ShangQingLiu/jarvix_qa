@@ -19,14 +19,17 @@ from llama_index.prompts.prompts import (
 
 import os
 from opencc import OpenCC
+from utils import language_mapping
 import constant_prompt 
 import logging
 import openai
+import time
 
 
 class ChatBot():
     def __init__(self,index_set,graph,project_name,chunk_size_limit=512,index_saved_path="index_data",
                  language="EN") -> None:
+                 
         self.using_FAISS = os.getenv("USING_FAISS", 'False').lower() in ('true', '1', 't') 
         self.using_PINECONE = os.getenv("USING_PINECONE", 'False').lower() in ('true', '1', 't') 
         self.index_root_path = current_app.config["INDEX_SAVE_PATH"]
@@ -45,6 +48,7 @@ class ChatBot():
         template=constant_prompt.yes_no_prompt,
         input_variables=["query"],
         )
+
     def truncate_text(self, text: str, max_length: int) -> str:
         """Truncate text to a maximum length."""
         return text[: max_length - 3] + "..."
@@ -54,8 +58,10 @@ class ChatBot():
         try:
             if self.using_FAISS:
                 # Refine
-                logging.info("Start to query")
+                start_actual_query = time.time()
                 response = self.agent.query(agent_prompt)
+                end_actual_query = time.time()
+                logging.info(f"Actual query time: {end_actual_query - start_actual_query}")
                 if self.language == "ZH_TW":
                     cc = OpenCC('s2tw')
                     response = cc.convert(response.response)
@@ -63,11 +69,11 @@ class ChatBot():
                     response = response.response
 
                 # # Old code
-                pre_response = self.agent_no_text.query(query)
-                # pre_response = self.agent.query(agent_prompt)
-                logging.info(pre_response.source_nodes)
-                logging.info(pre_response.get_formatted_sources())
-                logging.info(pre_response.response)
+                # pre_response = self.agent_no_text.query(query)
+                # # pre_response = self.agent.query(agent_prompt)
+                # logging.info(pre_response.source_nodes)
+                # logging.info(pre_response.get_formatted_sources())
+                # logging.info(pre_response.response)
                 # if pre_response.response is None:
 
                 #     completion = openai.ChatCompletion.create(
@@ -120,7 +126,9 @@ class ChatBot():
 
     def get_query_configs(self):
         max_tokens = os.getenv("MAX_TOKENS", 512) 
-        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo",max_tokens=max_tokens))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo",max_tokens=max_tokens))
+        llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-0613",max_tokens=max_tokens))
+        # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-4",max_tokens=max_tokens))
         decompose_transform = DecomposeQueryTransform(
             llm_predictor, verbose=True
         )
@@ -217,7 +225,9 @@ class ChatBot():
             # set number of output tokens
             chunk_size_limit = os.getenv("MAX_TOKENS", 250) 
             predict_size_limit = os.getenv("PREDICT_SIZE_LIMIT", 512) 
-            llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=predict_size_limit))
+            # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=predict_size_limit))
+            llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-0613", max_tokens=predict_size_limit))
+            # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-4", max_tokens=predict_size_limit))
             # llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.2, model_name="gpt-4"))
             service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor,chunk_size_limit=chunk_size_limit)
 
@@ -300,3 +310,19 @@ class ChatBot():
                 # max_iterations=10
             )
         return agent, agent_no_text, agent_generate
+
+def run_chatgpt_agent(query, language):
+
+    lan_text = language_mapping(language)
+    logging.info("continuouse generating language: lan_text")
+    completion = openai.ChatCompletion.create(
+    model="gpt-4",
+    messages=[
+            {"role": "system", "content": f"You are a Synergies developed private assistant. Generate all the response in {lan_text}."},
+            {"role": "user", "content": f"{query}"},
+        ]
+    )
+
+    response = completion.choices[0].message
+    response = response.to_dict()['content']
+    return response

@@ -3,11 +3,14 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Flask,request,jsonify, current_app, make_response
 from utils import IndexUtils, DataType
 from globals import global_chatbots, project_session, chat_history
-from chatbot import ChatBot
+from chatbot import ChatBot, run_chatgpt_agent
 from models import Project, User
+from constant_prompt import continuous_prompt
 import os
 import requests
 import logging
+import json
+import time
 
 
 
@@ -181,11 +184,15 @@ class ValidationForm(Resource):
         return response
         
 
+
+
 @service_ns.route("/query")
 class Query(Resource):
     @service_ns.expect(query_model)
     @jwt_required()
     def post(self):
+
+        start_query = time.time()
         data = request.get_json()
 
         project_name = data.get('project_name')
@@ -199,8 +206,10 @@ class Query(Resource):
             return {'error': 'No project name in the request'}, 400
 
         # Prepare Index
+        start_prepare_index = time.time()
         logging.info("prepare index")
         upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], project_name)
+        # if False:
         if session_id not in global_chatbots.keys():
             # Make sure the project directory exists
             if not os.path.exists(upload_dir):
@@ -223,18 +232,41 @@ class Query(Resource):
 
             # print("Index set: ", index_set)
             logging.info("Start to build chatbot")
-            logging.info("language: ", language)
+            # logging.info("language: ", language)
             chatbot = ChatBot(index_set,None,project_name=project_name, language=language)
             global_chatbots[session_id] = chatbot
             if project_name not in project_session.keys():
                 project_session[project_name] = [session_id]
             else:
                 project_session[project_name].append(session_id)
-        # Find Answer
-        chatbot = global_chatbots[session_id]
-        response = chatbot.run(query)
-        record = {"query":query_origin, "response":response} 
-        logging.debug("record: ", record)
+        
+        record = None
+        end_prepare_index = time.time()
+        logging.info(f"query index prepare time: {end_prepare_index - start_prepare_index}")
+        # Judge if we want to only continuously finish the answer
+        if query == "繼續" or query == "继续" or query == "continue":
+            logging.info("Continouse generating")
+            continue_prompt = continuous_prompt
+            response = None
+
+            if session_id not in chat_history.keys():
+                response = run_chatgpt_agent(query, language)
+            else:
+                for _chat in chat_history[session_id]:
+                    continue_prompt += " " + json.dumps(_chat) + " "
+                response = run_chatgpt_agent(continue_prompt, language)
+                logging.info(f"Continouse generating prompt:{continue_prompt}")
+            record = {"query":query_origin, "response":response} 
+                 
+        else:
+            # Find Answer
+            chatbot = global_chatbots[session_id]
+            start_response = time.time()
+            response = chatbot.run(query)
+            end_response = time.time()
+            logging.info(f"response time:{end_response - start_response}")
+            record = {"query":query_origin, "response":response} 
+            logging.debug("record: ", record)
 
         # Record 
         if session_id not in chat_history.keys():
@@ -242,6 +274,8 @@ class Query(Resource):
         else:
             chat_history[session_id].append(record)
         
+        end_query = time.time() 
+        logging.info(f"Total query time:{end_query - start_query}")
         return response
 
 @service_ns.route("/sessions/<string:project_name>")
