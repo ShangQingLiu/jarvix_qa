@@ -1,8 +1,8 @@
 <template>
-  <div class="row">
+  <div class="row justify-center">
     <div class="col-12">
       <!-- BreadCrumbs -->
-      <q-breadcrumbs
+      <!-- <q-breadcrumbs
         separator-color="dark-page"
         class="text-dark q-mb-md"
         active-color="dark-page"
@@ -24,7 +24,7 @@
         />
 
         /></q-breadcrumbs
-      >
+      > -->
     </div>
     <div class="col-12 col-md-6">
       <!-- Register User -->

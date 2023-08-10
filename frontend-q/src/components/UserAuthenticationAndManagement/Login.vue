@@ -1,15 +1,13 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold text-dark q-mb-md">
+    <div class="text-h6 text-dark q-mb-md text-weight-light">
       {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.title') }}
     </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
       <q-spinner-oval color="primary" size="3rem" />
     </div>
-    <div v-if="error" class="q-py-sm flex justify-center">
-      <div class="text-h6 text-negative">
-        {{ error }}
-      </div>
+    <div v-if="error" class="q-py-sm flex">
+      <div class="text-body1 text-negative">! {{ error }}</div>
     </div>
     <q-form @submit.prevent="loginUser">
       <div class="row">
@@ -20,14 +18,14 @@
               $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.username')
             "
             class="q-mb-md"
-            borderless
-            bg-color="white"
+            outlined
+            bg-color="transparent"
             :input-style="{ padding: '0px 23px' }"
           />
 
           <q-input
-            borderless
-            bg-color="white"
+            outlined
+            bg-color="transparent"
             :input-style="{ padding: '0px 23px' }"
             v-model="password"
             :placeholder="
@@ -38,37 +36,32 @@
           />
         </div>
       </div>
-      <q-btn
-        color="primary"
-        unelevated
-        class="text-capitalize q-mt-xl md-block q-mx-auto q-mx-md-none"
-        text-color="white"
-        type="submit"
-        square
-        style="width: 200px"
-      >
-        {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.btn') }}
-      </q-btn>
-      <div class="text-subtitle1 text-dark-page q-mt-md q-mb-xs text-md-center">
-        {{
-          $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontAccountText')
-        }}
-        <router-link to="/auth/register" class="text-primary no-underline">
-          {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.signupBtn') }}
-        </router-link>
-      </div>
       <div class="text-subtitle1 text-dark-page text-md-center">
-        {{
-          $t(
-            'pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontRememberText'
-          )
-        }},
         <router-link to="/auth/forgot-password" class="text-primary no-underline">
           {{
             $t(
               'pages.UserAuthenticationAndManagement.LoginPage.Login.form.forgotPasswordBtn'
             )
           }}
+        </router-link>
+      </div>
+      <q-btn
+        color="primary"
+        unelevated
+        class="text-capitalize q-my-lg md-block q-mx-auto q-mx-md-none"
+        text-color="white"
+        type="submit"
+        style="width: 188px"
+        rounded
+      >
+        {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.btn') }}
+      </q-btn>
+      <div class="text-subtitle1 text-dark-page q-mb-xs text-md-center">
+        {{
+          $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.dontAccountText')
+        }}
+        <router-link to="/auth/register" class="text-primary no-underline">
+          {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.signupBtn') }}
         </router-link>
       </div>
     </q-form>

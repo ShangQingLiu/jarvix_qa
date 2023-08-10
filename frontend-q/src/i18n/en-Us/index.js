@@ -76,7 +76,7 @@ export default {
           title: "Forgot Password",
           form: {
             email: "Email",
-            btn: "Go back to login",
+            btn: "Back",
             btn2: "Send code",
           },
         },
@@ -100,7 +100,7 @@ export default {
             username: "User name",
             password: "Password",
             btn: "Login",
-            dontAccountText: "Don’t have a account?",
+            dontAccountText: "New to Bauma?/No account yet?",
             signupBtn: "Sign Up",
             forgotPasswordBtn: "Forget Password",
             dontRememberText: "If don’t remember password",
@@ -226,6 +226,6 @@ export default {
     },
   },
   AuthLayout: {
-    welcomeText: "Welcome to our website which will help you.",
+    welcomeText: "Personalized Knowledge, Tailored Conversation, Secured Privacy",
   },
 };

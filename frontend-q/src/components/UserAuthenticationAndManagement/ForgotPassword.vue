@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold text-dark q-mb-md">
+    <div class="text-h6 text-dark q-mb-md text-weight-light">
       {{
         $t(
           'pages.UserAuthenticationAndManagement.ForgotPasswordPage.ForgotPassword.title'
@@ -8,12 +8,10 @@
       }}
     </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
-     <q-spinner-oval color="primary" size="3rem" />
+      <q-spinner-oval color="primary" size="3rem" />
     </div>
-    <div v-if="error" class="q-py-sm flex justify-center">
-      <div class="text-h6 text-negative">
-        {{ error }}
-      </div>
+    <div v-if="error" class="q-py-sm flex">
+      <div class="text-body1 text-negative">! {{ error }}</div>
     </div>
     <q-form @submit.prevent="getCode">
       <div class="row">
@@ -25,23 +23,24 @@
                 'pages.UserAuthenticationAndManagement.ForgotPasswordPage.ForgotPassword.form.email'
               )
             "
-            class="q-mb-md"
-            borderless
             type="email"
-            bg-color="white"
+            class="q-mb-md"
+            outlined
+            bg-color="transparent"
             :input-style="{ padding: '0px 23px' }"
           />
         </div>
       </div>
 
-      <div class="row q-gutter-md q-mt-sm">
+      <div class="row ">
         <q-btn
-          color="white"
+          color="primary"
           unelevated
-          class="text-capitalize md-block q-mx-auto q-mx-md-none"
-          text-color="dark"
-          square
-          style="width: 200px"
+          class="text-capitalize q-my-sm md-block q-mx-auto q-mx-md-none"
+          text-color="white"
+          type="submit"
+          rounded
+          style="width: 200px; height: 50px"
           to="/auth/login"
         >
           {{
@@ -53,10 +52,10 @@
         <q-btn
           color="primary"
           unelevated
-          class="text-capitalize md-block q-mx-auto q-mx-md-none"
+          class="text-capitalize q-my-sm md-block q-mx-auto q-mx-md-none q-ml-md-md"
           text-color="white"
-          square
-          style="width: 200px"
+          rounded
+          style="width: 264px; height: 50px"
           type="submit"
         >
           {{

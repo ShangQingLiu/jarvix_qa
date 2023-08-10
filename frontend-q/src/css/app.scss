@@ -1,5 +1,9 @@
 // app global css in SCSS form
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100;200;300;400;500;700;800&display=swap");
 
+body {
+  font-family: "Noto Sans", sans-serif !important;
+}
 .text-dark-page {
   color: $dark-page;
 }
@@ -57,7 +61,7 @@ tr:nth-child(even) {
   background-color: $accent;
 }
 .md-bg-primary {
-  background: linear-gradient(90deg, #005055 0%, #006464 99.99%) !important;
+  background: #006464 !important;
 }
 @media (max-width: 1024px) {
   .text-md-center {
@@ -111,10 +115,9 @@ tr:nth-child(even) {
     transform: translate(-50%, -50%);
   }
 }
-.upload-nt{
-
-  .q-btn__content{
-    .q-icon{
+.upload-nt {
+  .q-btn__content {
+    .q-icon {
       margin-right: 10px;
     }
   }

@@ -2,18 +2,18 @@
   <div class="">
     <q-layout view="hHh lpR fFf">
       <div class="row auth-wrapper relative-position items-center">
-        <div class="col-12 gt-sm full-height col-md-5 bg-linear">
+        <div class="col-12 gt-sm full-height col-md-5 bg-primary">
           <div
             class="flex column auth-wrapper relative-position full-height justify-center items-center align-center"
           >
             <div class="logo-container q-my-xl text-center">
               <img style="max-width: 200px" src="/static/logo.svg" />
             </div>
-            <p class="text-white">
+            <p class="text-white welcome-text">
               {{ $t(`AuthLayout.welcomeText`) }}
             </p>
             <!-- Info -->
-            <q-btn color="white" class="info-btn" flat icon="help">
+            <!-- <q-btn color="white" class="info-btn" flat icon="help">
               <q-menu>
                 <div style="max-width: 300px" class="row no-wrap q-pa-md">
                   <div class="column">
@@ -26,7 +26,7 @@
                   </div>
                 </div>
               </q-menu>
-            </q-btn>
+            </q-btn> -->
           </div>
         </div>
         <div class="col-12 col-md-7 full-height">
@@ -131,5 +131,15 @@ export default defineComponent({
   position: absolute;
   top: 20px;
   right: 20px;
+}
+</style>
+<style lang="scss" scoped>
+.welcome-text {
+  font-size: 26px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  max-width: 480px;
+  text-align: right;
 }
 </style>

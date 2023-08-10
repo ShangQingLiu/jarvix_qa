@@ -1,15 +1,14 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold text-dark q-mb-md">
+    <div class="text-h6 text-dark q-mb-md text-weight-light">
       {{ $t('pages.UserAuthenticationAndManagement.RegisterPage.Register.title') }}
     </div>
     <div v-if="loading" class="q-py-lg flex justify-center">
-     <q-spinner-oval color="primary" size="3rem" />
+      <q-spinner-oval color="primary" size="3rem" />
     </div>
-    <div v-if="error" class="q-py-sm flex justify-center">
-      <div class="text-h6 text-negative">
-        {{ error }}
-      </div>
+
+    <div v-if="error" class="q-py-sm flex">
+      <div class="text-body1 text-negative">! {{ error }}</div>
     </div>
     <q-form @submit.prevent="registerUser">
       <div class="row">
@@ -22,8 +21,8 @@
               )
             "
             class="q-mb-md"
-            borderless
-            bg-color="white"
+            outlined
+            bg-color="transparent"
             :input-style="{ padding: '0px 23px' }"
           />
           <q-input
@@ -31,56 +30,53 @@
             :placeholder="
               $t('pages.UserAuthenticationAndManagement.RegisterPage.Register.form.email')
             "
-            class="q-mb-md"
-            borderless
             type="email"
-            bg-color="white"
+            class="q-mb-md"
+            outlined
+            bg-color="transparent"
             :input-style="{ padding: '0px 23px' }"
           />
 
           <q-input
-            borderless
-            bg-color="white"
-            :input-style="{ padding: '0px 23px' }"
             v-model="password"
             :placeholder="
               $t(
                 'pages.UserAuthenticationAndManagement.RegisterPage.Register.form.password'
               )
             "
-            class="q-mb-md"
             type="password"
+            class="q-mb-md"
+            outlined
+            bg-color="transparent"
+            :input-style="{ padding: '0px 23px' }"
           />
         </div>
       </div>
       <q-btn
+        style="width: 188px"
         color="primary"
         unelevated
-        class="text-capitalize q-mt-xl"
+        class="text-capitalize q-my-lg md-block q-mx-auto q-mx-md-none"
         text-color="white"
         type="submit"
-        square
-        style="width: 200px"
+        rounded
       >
         {{ $t('pages.UserAuthenticationAndManagement.RegisterPage.Register.form.btn') }}
       </q-btn>
-      <div class="text-subtitle1 text-dark-page q-mt-md q-mb-xs">
+      <!-- <div class="text-subtitle1 text-dark-page q-mt-md q-mb-xs">
         {{
           $t(
             'pages.UserAuthenticationAndManagement.RegisterPage.Register.form.alreadyBtn'
           )
         }}
-        <router-link
-          to="/auth/login"
-          class="text-primary no-underline"
-        >
+        <router-link to="/auth/login" class="text-primary no-underline">
           {{
             $t(
               'pages.UserAuthenticationAndManagement.RegisterPage.Register.form.loginBtn'
             )
           }}
         </router-link>
-      </div>
+      </div> -->
     </q-form>
   </div>
 </template>
