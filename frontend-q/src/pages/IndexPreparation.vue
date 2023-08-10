@@ -159,7 +159,7 @@ const generateNewSession = async () => {
   console.log(sessionFrom);
 
   serviceStore.sessionFrom = sessionFrom;
-  let sessionId = store.selectedProject + '-' + sessionFrom + '-' + guidGenerator();
+  let sessionId = guidGenerator();
   serviceStore.sessionId = sessionId;
   session.value = sessionId;
   serviceStore.chatHistory = [];

@@ -11,7 +11,7 @@
             size="6"
             :text="[message]"
             :sent="j === 0 ? true : false"
-            class="q-mb-md"
+            class="q-mb-md chat-message-content"
           />
         </div>
         <!-- <div v-if="!loading" class="flex flex-center q-py-lg">
@@ -114,4 +114,5 @@ const submitQuery = async () => {
 .chat-area {
   height: calc(100vh - 350px);
 }
+
 </style>

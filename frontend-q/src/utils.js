@@ -1,6 +1,13 @@
-export function guidGenerator() {
-  var S4 = function () {
-    return (((1 + Math.random()) * 0x1000) | 0).toString(16).substring(1);
-  };
-  return S4() + "-" + S4();
-}
+
+// function shuffle(o) {
+//   for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+//   return o;
+// };
+// const numbers = [...Array(1000).keys()]
+
+// export function guidGenerator() {
+//   var random = shuffle(numbers);
+//   console.log(random);
+//   return random;
+// }
+export const guidGenerator = () => parseInt(Date.now() * Math.random());

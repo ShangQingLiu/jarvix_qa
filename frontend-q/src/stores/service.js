@@ -23,10 +23,10 @@ export const useServiceStore = defineStore("ServiceStore", {
           if (store.selectedProject) {
             if (!this.sessionId) {
               this.sessionId =
-                store.selectedProject +
-                "-" +
-                this.sessionFrom +
-                "-" +
+                // store.selectedProject +
+                // "-" +
+                // this.sessionFrom +
+                // "-" +
                 guidGenerator();
             }
             const { data } = await api.post("service/query", {
@@ -73,12 +73,12 @@ export const useServiceStore = defineStore("ServiceStore", {
 
           this.sessions = [];
           // If there are no session then
-          this.sessionId =
-            store.selectedProject +
-            "-" +
-            this.sessionFrom +
-            "-" +
-            guidGenerator(this.sessionId);
+          // this.sessionId = guidGenerator()
+            // store.selectedProject +
+            // "-" +
+            // this.sessionFrom +
+            // "-" +
+            // guidGenerator(this.sessionId);
           this.sessions.push(this.sessionId);
           this.selectedSession = this.sessionId;
           reject(error);
@@ -88,15 +88,17 @@ export const useServiceStore = defineStore("ServiceStore", {
     getChatHistory() {
       return new Promise(async (resolve, reject) => {
         try {
+          const store = useProjectStore();
+
           if (this.selectedSession) {
             const { data } = await api.get(
-              `service/chat_history/${this.selectedSession}`
+              `service/chat_history/${store.selectedProject}/${this.selectedSession}`
             );
             this.chatHistory = data.chat_history;
             resolve(data);
           } else {
             const { data } = await api.get(
-              `service/chat_history/${this.sessionId}`
+              `service/chat_history/${store.selectedProject}/${this.sessionId}`
             );
             this.chatHistory = data.chat_history;
             resolve(data);
@@ -115,10 +117,10 @@ export const useServiceStore = defineStore("ServiceStore", {
           if (store.selectedProject) {
             if (!this.sessionId) {
               this.sessionId =
-                store.selectedProject +
-                "-" +
-                this.sessionFrom +
-                "-" +
+                // store.selectedProject +
+                // "-" +
+                // this.sessionFrom +
+                // "-" +
                 guidGenerator();
             }
             const { data } = await api.post("service/validation_form", {
