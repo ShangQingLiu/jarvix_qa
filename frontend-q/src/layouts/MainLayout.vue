@@ -4,19 +4,11 @@
       <q-header class="bg-white q-px-none q-px-md-sm q-py-lg q-py-md-sm">
         <q-toolbar>
           <div class="flex no-wrap items-center full-width">
-            <q-btn
-              flat
-              dense
-              round
-              icon="menu"
-              aria-label="Menu"
-              @click="toggleLeftDrawer"
-              class="lt-md"
-            />
-            <div class="logo-container lt-md text-center">
+            <div @click="$router.push('/')" class="logo-container lt-md text-center">
               <img style="max-width: 150px" src="/static/logo.svg" />
             </div>
             <div
+              @click="$router.push('/')"
               class="logo-container gt-sm q-my-lg text-center flex justify-center"
               style="flex: 0 0 350px"
             >
@@ -36,7 +28,7 @@
               >
                 {{ $t(`MainLayout.loginBtn`) }}
               </q-btn>
-              <div class="flex">
+              <!-- <div class="flex">
                 <q-item
                   class="q-mr-md"
                   clickable
@@ -55,6 +47,22 @@
                     }}</q-item-label>
                   </q-item-section>
                 </q-item>
+              </div> -->
+              <div class="flex items-center">
+                <p class="text-dark q-mb-none">Project Name:</p>
+                <q-select
+                  v-model="projectName"
+                  :placeholder="$t('pages.FileManagementPage.projectName')"
+                  class="language-dropdown q-ml-md"
+
+                  :options="userProjects"
+                  option-value="name"
+                  option-label="name"
+                  emit-value
+                  outlined
+                  dense
+                  style="min-width: 150px"
+                />
               </div>
               <div class="flex items-center">
                 <div
@@ -139,12 +147,12 @@
               </div>
             </div>
             <!-- Mobile -->
-            <div class="flex justify-end items-center lt-md">
+            <div class="flex justify-between items-center lt-md q-ml-auto">
               <div
                 v-if="Object.keys(store.user).length !== 0"
                 class="flex flex-center lt-md"
               >
-                <q-btn-dropdown no-caps dropdown-icon="expand_more">
+                <q-btn-dropdown no-caps dropdown-icon="expand_more" class="avatar-btn">
                   <template v-slot:label>
                     <div class="row items-center no-wrap">
                       <q-avatar color="primary" size="30px">
@@ -189,6 +197,16 @@
                   </div>
                 </q-btn-dropdown>
               </div>
+              <q-btn
+                flat
+                dense
+                round
+                icon="menu"
+                aria-label="Menu"
+                @click="toggleLeftDrawer"
+                class="lt-md"
+                color="dark"
+              />
             </div>
           </div>
         </q-toolbar>
@@ -196,13 +214,23 @@
 
       <q-drawer
         v-model="leftDrawerOpen"
-        class="left-sidebar q-py-xl flex column justify-betweeen"
+        class="left-sidebar q-py-xl flex column justify-betweeen no-wrap"
         show-if-above
         :width="350"
       >
         <!-- Desktop -->
-        <q-list class="q-ml-lg gt-sm">
+        <q-list class="q-mx-lg gt-sm">
           <!-- <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" /> -->
+          <q-item class="q-mb-md" clickable to="/user-authentication-and-management">
+            <q-item-section avatar>
+              <q-icon size="30px" name="img:/static/user-management.svg" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="text-white">{{
+                $t(`MainLayout.links.UserAuthenticationAndManagement`)
+              }}</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-item class="q-mb-md" clickable to="/file-management">
             <q-item-section avatar>
               <q-icon size="30px" name="img:/static/file-management.svg" />
@@ -224,12 +252,17 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <q-list class="q-ml-lg lt-md">
+        <q-list class="q-mx-lg lt-md">
           <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
         </q-list>
-        <img class="q-my-auto" src="/static/sidebar.png" alt="" />
+        <img
+          class="q-my-auto gt-sm q-mx-lg"
+          style="height: 200px; object-fit: contain; align-self: start"
+          src="/static/sidebar.png"
+          alt=""
+        />
         <q-btn
-          class="q-mx-md text-capitalize"
+          class="q-mx-md text-capitalize q-mt-auto"
           rounded
           padding="16px 20px"
           color="white"
@@ -242,7 +275,21 @@
 
       <q-page-container>
         <div class="cover">
-          <div class="flex justify-between items-center full-width lt-md q-mb-md">
+          <div class="flex items-center full-width lt-md q-mb-md">
+            <q-select
+              v-model="projectName"
+              :placeholder="$t('pages.FileManagementPage.projectName')"
+              class="language-dropdown q-mr-md"
+              :options="userProjects"
+              option-value="name"
+              option-label="name"
+              emit-value
+              outlined
+              color="white"
+              icon-color="white"
+              text-color="dark"
+              dense
+            />
             <q-select
               v-model="locale"
               :options="localeOptions"
@@ -271,7 +318,7 @@
             </q-select>
           </div>
           <div class="row q-mb-md q-col-gutter-md items-center">
-            <div class="col-12 col-sm-4 col-md-3">
+            <!-- <div class="col-12 col-sm-4 col-md-3">
               <q-select
                 v-model="projectName"
                 :placeholder="$t('pages.FileManagementPage.projectName')"
@@ -283,8 +330,8 @@
                 option-label="name"
                 emit-value
               />
-            </div>
-            <div class="col-12 col-sm-8 col-md-9">
+            </div> -->
+            <div class="col-12">
               <q-stepper
                 v-model="step"
                 alternative-labels
@@ -588,15 +635,25 @@ export default defineComponent({
   height: 30px;
 }
 .q-router-link--active {
+  background: #fff;
+  border-radius: 44px;
   border-bottom: 3px solid $primary;
   .q-item__label {
-    // color: #fff !important;
+    color: #005055 !important;
+  }
+  img {
+    filter: invert(23%) sepia(1%) saturate(7101%) hue-rotate(147deg) brightness(25%)
+      contrast(102%);
   }
 }
 .q-stepper__step-inner {
   padding: 0px !important;
 }
-
+.q-stepper__header--alternative-labels .q-stepper__tab {
+  padding-block: 16px;
+  padding-inline: 16px;
+  min-height: auto;
+}
 @media (max-width: 960px) {
   .q-stepper__header {
     flex-wrap: nowrap;
@@ -612,6 +669,11 @@ export default defineComponent({
 @media (max-width: 380px) {
   .q-stepper__title {
     font-size: 8px;
+  }
+}
+.avatar-btn {
+  .q-btn-dropdown__arrow {
+    display: none !important;
   }
 }
 </style>

@@ -7,7 +7,7 @@
         </div>
         <q-separator class="q-my-lg" />
         <div v-if="loading" class="q-py-lg flex justify-center">
-         <q-spinner-oval color="primary" size="3rem" />
+          <q-spinner-oval color="primary" size="3rem" />
         </div>
         <div v-if="error" class="q-py-sm flex justify-center">
           <div class="text-h6 text-negative">
@@ -53,7 +53,7 @@
                   class="q-mx-xs"
                   icon="delete"
                   v-if="authStore.user.role == 'Admin'"
-                  @click="deleteProject(project.id)"
+                  @click="deleteConfirmationModal(project.id)"
                   size="sm"
                 />
               </div>
@@ -84,6 +84,32 @@
         </q-item-label>
       </q-card-section>
     </q-card>
+    <q-dialog v-model="confirmDelete">
+      <q-card class="bg-primary text-white q-pa-xl">
+        <q-card-section style="margin-bottom: 50px">
+          <div class="text-h6 text-center q-mb-xl">Warning!</div>
+          <div class="text-h6 text-center">Do you really want to delete it?</div>
+        </q-card-section>
+
+        <q-card-actions align="center">
+          <q-btn
+            rounded
+            padding="12px 50px"
+            label="No"
+            class="bg-white text-dark"
+            v-close-popup
+          />
+          <q-btn
+            rounded
+            padding="12px 50px"
+            label="Yes"
+            class="bg-white text-dark"
+            v-close-popup
+            @click="deleteProject()"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -98,6 +124,8 @@ const loading = ref(false);
 const error = ref(null);
 const numberOfProjectsToShow = ref(10);
 const authStore = useAuthStore();
+const confirmDelete = ref(false);
+const projectId = ref(0);
 
 const fetchUserProjects = async () => {
   try {
@@ -112,12 +140,12 @@ const fetchUserProjects = async () => {
     loading.value = false;
   }
 };
-const deleteProject = async (id) => {
+const deleteProject = async () => {
   try {
     error.value = null;
     loading.value = true;
-    console.log(id);
-    const res = await store.deleteProject(id);
+    console.log(projectId.value);
+    const res = await store.deleteProject(projectId.value);
     console.log(res);
   } catch (err) {
     console.log(err);
@@ -126,7 +154,10 @@ const deleteProject = async (id) => {
     loading.value = false;
   }
 };
-
+const deleteConfirmationModal = (id) => {
+  confirmDelete.value = !confirmDelete.value;
+  projectId.value = id;
+};
 onMounted(async () => {
   // await fetchProjects();
   await fetchUserProjects();

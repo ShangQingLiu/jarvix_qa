@@ -2,7 +2,7 @@
   <div>
     <div class="text-h6 text-weight-bold text-dark q-mb-md">Edit Project</div>
     <div v-if="loading" class="q-py-lg flex justify-center">
-     <q-spinner-oval color="primary" size="3rem" />
+      <q-spinner-oval color="primary" size="3rem" />
     </div>
     <div v-if="error" class="q-py-sm flex justify-center">
       <div class="text-h6 text-negative">
@@ -11,8 +11,8 @@
     </div>
     <q-form @submit.prevent="editProject">
       <q-input
-        borderless
-        bg-color="white"
+        outlined
+        bg-color="transparent"
         v-model="projectDataLocal.name"
         :placeholder="$t('pages.IndexPage.Index.EditProject.form.projectName')"
         class="q-mb-md"
@@ -20,8 +20,8 @@
         required
       />
       <q-input
-        borderless
-        bg-color="white"
+        outlined
+        bg-color="transparent"
         v-model="projectDataLocal.description"
         :placeholder="$t('pages.IndexPage.Index.EditProject.form.description')"
         type="textarea"
@@ -35,6 +35,8 @@
         class="text-capitalize"
         text-color="white"
         type="submit"
+        rounded
+        padding="12px 24px"
       >
         {{ $t('pages.IndexPage.Index.EditProject.form.btn') }}
       </q-btn>
@@ -50,7 +52,7 @@ const router = useRouter();
 const loading = ref(false);
 const error = ref(null);
 const store = useProjectStore();
-const currentProject = store.projectsList.find(
+const currentProject = store.userProjects.find(
   (project) => project.id == route.params.id
 );
 console.log(currentProject);

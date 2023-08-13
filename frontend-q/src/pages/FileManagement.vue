@@ -79,7 +79,7 @@
             <div class="text-center q-py-lg" v-if="projectFiles.length === 0">
               {{ $t('pages.FileManagementPage.noFound') }}
             </div>
-            <q-btn
+            <!-- <q-btn
               v-if="projectName"
               unelevated
               color="primary"
@@ -88,7 +88,7 @@
               @click="indexProject"
             >
               {{ $t('pages.FileManagementPage.indexBtn') }}
-            </q-btn>
+            </q-btn> -->
           </q-card-section>
         </q-card>
       </div>
@@ -172,6 +172,8 @@
               v-if="!uploadingFiles && files"
               @click="uploadFiles"
               icon="cloud_upload"
+              rounded
+              padding="12px 20px"
             >
               {{ $t('pages.FileManagementPage.uploadBtn') }}
             </q-btn>

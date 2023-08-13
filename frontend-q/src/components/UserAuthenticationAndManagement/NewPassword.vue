@@ -15,8 +15,8 @@
       <div class="row">
         <div class="col-12">
           <q-input
-            borderless
-            bg-color="white"
+            outlined
+            bg-color="transparent"
             :input-style="{ padding: '0px 23px' }"
             v-model="password"
             :placeholder="
@@ -28,8 +28,8 @@
             type="password"
           />
           <q-input
-            borderless
-            bg-color="white"
+            outlined
+            bg-color="transparent"
             :input-style="{ padding: '0px 23px' }"
             v-model="confirmPassword"
             :placeholder="

@@ -25,6 +25,8 @@
               class="text-capitalize"
               text-color="white"
               @click="$router.push(`/invite/${$route.params.id}`)"
+              rounded
+              padding="10px 24px"
               v-if="authStore.user.role == 'Admin'"
             >
               {{ $t('pages.IndexPage.Detail.inviteBtn') }}
@@ -36,6 +38,8 @@
               text-color="white"
               @click="$router.push(`/edit/${$route.params.id}`)"
               v-if="authStore.user.role == 'Admin'"
+              rounded
+              padding="10px 24px"
             >
               {{ $t('pages.IndexPage.Detail.updateBtn') }}
             </q-btn>
@@ -46,6 +50,8 @@
               text-color="white"
               @click="indexProject"
               v-if="authStore.user.role == 'Admin' && projectFiles.length != 0"
+              rounded
+              padding="10px 24px"
             >
               {{ $t('pages.IndexPage.Detail.indexBtn') }}
             </q-btn>
@@ -56,6 +62,8 @@
               text-color="white"
               @click="deleteProject"
               v-if="authStore.user.role == 'Admin'"
+              rounded
+              padding="10px 24px"
             >
               {{ $t('pages.IndexPage.Detail.deleteBtn') }}
             </q-btn>

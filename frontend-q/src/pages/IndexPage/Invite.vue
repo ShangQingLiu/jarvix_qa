@@ -17,13 +17,12 @@
             </div>
             <q-form @submit.prevent="sendProjectInvitation">
               <div class="row">
-                <div class="col-12 col-md-8 q-mb-md">
+                <div class="col-12 col-md-9 q-mb-md">
                   <q-select
                     v-model="locale"
                     :options="localeOptions"
                     outlined
                     text-color="dark"
-                    bg-color="white"
                     emit-value
                     map-options
                     dense
@@ -58,24 +57,21 @@
                         :placeholder="$t('pages.IndexPage.Invite.email')"
                         class="q-mb-md"
                         type="email"
-                        borderless
-                        bg-color="white"
+                        outlined
                         :input-style="{ padding: '0px 23px' }"
                         dense
                         required
                       />
                     </div>
-                    <div class="col-4 col-md-2">
+                    <div class="col-3 col-md-2">
                       <q-select
                         v-model="content.role"
                         :options="content.roleOptions"
                         outlined
                         text-color="dark"
-                        bg-color="white"
                         emit-value
                         map-options
                         dense
-                        borderless
                       >
                         <template v-slot:selected>
                           {{
@@ -92,6 +88,9 @@
                           </q-item>
                         </template>
                       </q-select>
+                    </div>
+                    <div class="col-1 flex items-center" style="padding-top: 0px !important;">
+                      <q-btn @click="inviteContent.pop()" padding="4px" round color="black" icon="close" />
                     </div>
                   </div>
                 </div>

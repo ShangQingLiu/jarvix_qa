@@ -14,6 +14,7 @@ export const useServiceStore = defineStore("ServiceStore", {
     sessionFrom: "ChatRoom",
     validationQuestions: [],
     validationForumContent: null,
+    selectedFile: ''
   }),
   actions: {
     submitQuery(form) {

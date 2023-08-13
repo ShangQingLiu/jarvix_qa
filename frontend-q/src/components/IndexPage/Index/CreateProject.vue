@@ -10,19 +10,21 @@
             {{ error }}
           </div>
         </div>
+        <div class="text-h5 text-weight-bold q-mb-md">Create Project</div>
         <q-form @submit.prevent="createProject">
           <q-input
-            borderless
-            bg-color="white"
+            outlined
+            bg-color="transparent"
             v-model="projectName"
             :placeholder="$t('pages.IndexPage.Index.CreateProject.form.projectName')"
             class="q-mb-md"
             :input-style="{ padding: '0px 23px' }"
             required
+
           />
           <q-input
-            borderless
-            bg-color="white"
+            outlined
+            bg-color="transparent"
             v-model="description"
             :placeholder="$t('pages.IndexPage.Index.CreateProject.form.description')"
             type="textarea"
@@ -36,6 +38,8 @@
             class="text-capitalize"
             text-color="white"
             type="submit"
+            rounded
+            padding="12px 36px"
           >
             {{ $t('pages.IndexPage.Index.CreateProject.form.btn') }}
           </q-btn>

@@ -25,6 +25,8 @@
             <q-btn
               color="primary"
               unelevated
+              rounded
+              padding="12px 20px"
               class="text-dark text-capitalize"
               text-color="white"
               @click="previewQuestionsList"
@@ -63,6 +65,8 @@
             <q-btn
               color="primary"
               unelevated
+              rounded
+              padding="12px 20px"
               class="text-dark text-capitalize"
               text-color="white"
               @click="submitQuestionsList"
@@ -72,6 +76,8 @@
             <q-btn
               color="primary"
               unelevated
+              rounded
+              padding="12px 20px"
               class="text-dark text-capitalize q-ml-xl"
               text-color="white"
               type="submit"

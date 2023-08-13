@@ -5,7 +5,7 @@
     </q-item-section>
 
     <q-item-section>
-      <q-item-label class="text-dark2">{{
+      <q-item-label class="text-white">{{
         $t(`MainLayout.links.${title}`)
       }}</q-item-label>
     </q-item-section>

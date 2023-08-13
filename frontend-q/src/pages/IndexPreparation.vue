@@ -1,31 +1,7 @@
 <template>
   <div>
-    <div class="row flex-wrap q-py-md q-col-gutter-sm">
-      <div class="col-6 col-md-4">
-        <q-btn
-          :color="panel === 'chat' ? 'primary' : 'white'"
-          :text-color="panel === 'chat' ? 'white' : 'dark-page'"
-          unelevated
-          style="height: 55px"
-          icon="img:/static/chat.svg"
-          :label="$t('pages.IndexPreparation.chatBtn')"
-          @click="panel = 'chat'"
-          class="full-width"
-        />
-      </div>
-      <div class="col-6 col-md-4">
-        <q-btn
-          :color="panel === 'validation-forum' ? 'primary' : 'white'"
-          :text-color="panel === 'validation-forum' ? 'white' : 'dark-page'"
-          unelevated
-          style="height: 55px"
-          icon="img:/static/questions.svg"
-          :label="$t('pages.IndexPreparation.validationForum')"
-          @click="panel = 'validation-forum'"
-          class="full-width"
-        />
-      </div>
-      <div class="col-6 col-md-4">
+    <!-- <div class="row flex-wrap q-py-md q-col-gutter-sm"> -->
+    <!-- <div class="col-6 col-md-4">
         <q-select
           :label="$t('pages.IndexPreparation.chooseProject')"
           v-model="projectName"
@@ -39,13 +15,13 @@
           borderless
           class="full-width"
         />
-      </div>
-      <div v-if="projectName && existingChat.length > 0" class="col-6 col-md-4">
+      </div> -->
+    <!-- <div v-if="projectName && existingChat.length > 0" class="col-6 col-md-4">
         <q-btn color="primary" @click="generateNewSession" unelevated class="full-width">
           {{ $t('pages.IndexPreparation.generateNewSession') }}
         </q-btn>
-      </div>
-      <div v-if="sessions.length && showExistingSessions" class="col-6 col-md-4">
+      </div> -->
+    <!-- <div v-if="sessions.length && showExistingSessions" class="col-6 col-md-4">
         <q-select
           :label="$t('pages.IndexPreparation.chooseSession')"
           v-model="session"
@@ -56,21 +32,93 @@
           borderless
           class="full-width"
         />
-      </div>
+      </div> -->
 
-      <div v-if="!showExistingSessions && sessions.length > 0" class="col-6 col-md-4">
+    <!-- <div v-if="!showExistingSessions && sessions.length > 0" class="col-6 col-md-4">
         <q-btn color="primary" @click="toggleShow" unelevated class="full-width">
           {{ $t('pages.IndexPreparation.showExistingSession') }}
         </q-btn>
+      </div> -->
+    <!-- </div> -->
+    <div class="row">
+      <div class="col-12 q-mb-md">
+        <q-tabs
+          indicator-color="transparent"
+          v-model="panel"
+          inline-label
+          class="bg-transparent"
+          align="left"
+        >
+          <q-tab class="custom-tab" name="chat" label="Chat Room" />
+          <q-tab class="custom-tab" name="validation-forum" label="Validation Form" />
+        </q-tabs>
+      </div>
+      <div class="col-12 q-mb-md">
+        <q-tabs
+          indicator-color="transparent"
+          v-model="serviceStore.selectedFile"
+          inline-label
+          class="bg-transparent"
+          align="left"
+        >
+          <q-tab
+            v-for="(file, i) in projectFiles"
+            class="custom-tab"
+            :name="file"
+            :label="file"
+            :key="i"
+          />
+
+        </q-tabs>
       </div>
     </div>
+
     <div class="row">
       <div class="col-12">
         <q-tab-panels v-model="panel" class="bg-transparent q-px-none q-py-none">
           <q-tab-panel class="q-px-none q-py-none" name="chat">
-            <Chat />
+            <div class="chat-wrapper bg-white q-py-md q-pl-md">
+              <div class="row q-col-gutter-md">
+                <div class="col-12 col-md-3">
+                  <q-btn
+                    color="dark"
+                    text-color="dark"
+                    rounded
+                    unelevated
+                    icon="add"
+                    outline
+                    :label="$t('pages.IndexPreparation.generateNewSession')"
+                    @click="generateNewSession"
+                    class="q-mb-md"
+                  />
+                  <div class="text-dark-page q-mb-lg">Existing Sessions</div>
+                  <div class="sessions-list">
+                    <div
+                      class="text-subtitle2 q-mb-md"
+                      v-for="session in sessions"
+                      :key="session"
+                      @click="serviceStore.selectedSession = session"
+                      :class="[
+                        serviceStore.selectedSession === session
+                          ? 'text-dark'
+                          : 'text-dark-page',
+                      ]"
+                      style="cursor: pointer;"
+                    >
+                      {{ session }}
+                    </div>
+                  </div>
+                  <!-- {{ sessions }} -->
+                </div>
+                <div class="col-12 col-md-9">
+                  <div class="q-px-md border-left">
+                    <Chat />
+                  </div>
+                </div>
+              </div>
+            </div>
           </q-tab-panel>
-
+<!-- 90 + 98 + 128 -->
           <!-- <q-tab-panel class="q-px-none" name="questions">
             <Questions />
           </q-tab-panel> -->
@@ -99,7 +147,9 @@ const $q = useQuasar();
 const serviceStore = useServiceStore();
 const store = useProjectStore();
 const panel = ref('chat');
-const projectName = ref(store.selectedProject ? store.selectedProject : '');
+// const projectName = ref(store.selectedProject ? store.selectedProject : '');
+const projectName = computed(() => store.selectedProject);
+
 const loading = ref(false);
 const error = ref(null);
 const projects = ref([]);
@@ -108,6 +158,7 @@ const session = ref(serviceStore.selectedSession ? serviceStore.selectedSession 
 const sessions = computed(() => serviceStore.sessions);
 const showExistingSessions = computed(() => serviceStore.showExistingSessions);
 const existingChat = computed(() => serviceStore.chatHistory);
+const projectFiles = computed(() => store.projectFiles);
 
 const toggleShow = () => {
   serviceStore.showExistingSessions = !serviceStore.showExistingSessions;
@@ -128,9 +179,9 @@ const listProjectFiles = async () => {
 };
 watch(projectName, (projectValue) => {
   if (projectValue) {
-    serviceStore.chatHistory = []
+    serviceStore.chatHistory = [];
     store.selectedProject = projectValue;
-    store.chatHistory = []
+    store.chatHistory = [];
     listProjectFiles();
     getSessions();
   }
@@ -214,11 +265,13 @@ const getChatHistory = async () => {
     loading.value = false;
   }
 };
+
 onMounted(async () => {
   await fetchUserProjects();
   if (serviceStore.selectedSession) {
     await getChatHistory();
   }
+  await listProjectFiles();
 });
 </script>
 <style lang="scss" scoped>
@@ -233,5 +286,27 @@ onMounted(async () => {
     top: 10px;
     right: 10px;
   }
+}
+.q-tab.custom-tab {
+  border: 1px solid #878787;
+  border-radius: 100px;
+  margin-right: 10px;
+}
+.custom-tab.q-tab--active {
+  background: $primary;
+  color: #fff;
+  border: 1px solid $primary;
+}
+.chat-wrapper {
+  border-radius: 20px;
+}
+.border-left {
+  border-left: 1px solid #000;
+}
+</style>
+
+<style lang="scss">
+.q-tab-panels .scroll {
+  overflow: hidden !important;
 }
 </style>

@@ -210,7 +210,7 @@ export default {
     logoutBtn: "Logout",
     links: {
       UserAuthenticationAndManagement:
-        "User Authentication and User Management",
+        "Users",
       Index: "Project Management",
       FileManagement: "File Management",
       Services: "Services",

@@ -1,6 +1,6 @@
 <template>
-  <div class="q-py-lg">
-    <div class="chat-wrapper">
+
+    <div>
       <q-scroll-area ref="scrollAreaRef" class="chat-area">
         <div v-for="(chat, i) in chatHistory" :key="i">
           <q-chat-message
@@ -8,7 +8,7 @@
             :key="j"
             :bg-color="j === 0 ? 'info' : 'white'"
             text-color="dark-page"
-            size="6"
+            size="9"
             :text="[message]"
             :sent="j === 0 ? true : false"
             class="q-mb-md chat-message-content"
@@ -22,21 +22,36 @@
       <q-form @submit.prevent="submitQuery">
         <q-input
           rounded
-          bg-color="white"
+          bg-color="transparent"
           standout="bg-white text-dark"
           class="elevation-0 q-mr-md full-width"
           v-model="queryText"
-          placeholder="Search"
+          placeholder="Type your question here..."
           :input-style="{ color: '#878787' }"
+          outlined
+          color="dark1"
         >
           <template v-slot:append>
-            <q-icon v-if="!loading" name="/send.svg" />
-            <q-spinner-oval v-if="loading" color="primary" size="2em" />
+            <div class="flex items-center append-content">
+              <q-spinner-oval
+                v-if="loading"
+                color="dark-page"
+                class="q-pr-md"
+                size="2em"
+              />
+              <!-- <q-icon  /> -->
+              <img
+                v-if="!loading"
+                src="/static/send.svg"
+                class="q-pl-md border-left"
+                alt=""
+              />
+            </div>
           </template>
         </q-input>
       </q-form>
     </div>
-  </div>
+
 </template>
 
 <script setup>
@@ -112,7 +127,9 @@ const submitQuery = async () => {
   }
 }
 .chat-area {
-  height: calc(100vh - 350px);
+  height: calc(100vh - 450px);
 }
-
+.append-content .border-left {
+  border-left: 1px solid $dark-page;
+}
 </style>
