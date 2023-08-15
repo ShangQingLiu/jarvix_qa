@@ -1,6 +1,14 @@
 <template>
   <div>
     <q-scroll-area ref="scrollAreaRef" class="chat-area overflow-y-auto">
+      <!-- <div>
+        {{
+          formatMessage(
+            `Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatem culpa laborum quisquam illum quod corrupti! `,
+            true
+          )
+        }}
+      </div> -->
       <div v-for="(chat, i) in chatHistory" :key="i">
         <q-chat-message
           v-for="(message, j) in Object.values(chat)"
@@ -13,16 +21,21 @@
           class="q-mb-md chat-message-content"
           :class="{ 'last-message': chatHistory.length - 1 === i && j === 1 }"
         />
-        <!-- <q-chat-message
-          :bg-color="'response'"
-          text-color="dark-page"
-          size="9"
-          :text="[message]"
-          :sent="false"
-          class="q-mb-md chat-message-content"
-          v-else
-        /> -->
       </div>
+      <!-- <div
+          v-for="(message, j) in Object.values(chat)"
+          :key="j"
+          :bg-color="j === 0 ? 'user-chat' : 'response'"
+          text-color="dark-page"
+
+          :sent="j === 0 ? true : false"
+          class="q-mb-md chat-message-content col-9 dark-page"
+          :class="{ 'last-message': chatHistory.length - 1 === i && j === 1, 'bg-user-chat': j === 0, 'bg-response': j === 1, 'items-end': j === 0, }"
+
+        >
+        {{ formatMessage(message, chatHistory.length - 1 === i && j === 1 ? true : false) }}
+        </div> -->
+
       <!-- <div v-if="!loading" class="flex flex-center q-py-lg">
          <q-spinner-oval color="primary" size="3rem" />
         </div> -->
@@ -118,6 +131,28 @@ const submitQuery = async () => {
     });
     queryText.value = '';
   }
+};
+const formatMessage = (text, iterate) => {
+  let str = text.split(' ');
+  if (iterate) {
+    const interval = setInterval(() => {
+      let returnedText = str[0];
+      console.log(returnedText);
+      str = str.slice(1);
+      if (!str.length) {
+        clearInterval(interval);
+      }
+      return returnedText;
+    }, 1000);
+    // console.log(iterate);
+    // return text;
+  }
+
+  // else {
+  //   return text;
+  // }
+  // console.log(iterate);
+  // return text;
 };
 </script>
 

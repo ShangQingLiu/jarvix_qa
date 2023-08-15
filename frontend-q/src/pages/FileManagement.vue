@@ -106,7 +106,7 @@
                     class="row no-wrap q-pa-md bg-primary text-white"
                   >
                     <div class="column">
-                      <p>Upload these files:</p>
+                      <p>{{ $t('pages.FileManagementPage.theseFiles') }}</p>
                       <p>
                         .pdf, .docx, .pptx, .jpg, .png, .jpeg, .mp3, .mp4, .m4a, .csv,
                         .epub, .md, .mbox, .ipynb
@@ -140,7 +140,7 @@
             >
 
             </q-btn> -->
-            <p>Drag or Click to upload files</p>
+            <p>{{ $t('pages.FileManagementPage.theseFiles') }}</p>
             <q-file
               v-model="files"
               multiple
@@ -150,7 +150,7 @@
               class="q-my-md full-width bg-accent file-input"
               style="height: 200px"
               use-chips
-              placeholder="Drag or Click to upload the files"
+              :placeholder="$t('pages.FileManagementPage.dragFiles')"
             >
               <template #default>
                 <q-icon
@@ -287,7 +287,6 @@ const ViewProjectFile = async (file) => {
       project_name: store.selectedProject,
       filename: file,
     });
-
   } catch (err) {
     console.log(err);
     error.value = err.response.status + ' - ' + err.response.statusText;

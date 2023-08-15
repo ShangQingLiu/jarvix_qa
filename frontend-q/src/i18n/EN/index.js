@@ -167,6 +167,9 @@ export default {
       indexBtn: "Re-Training",
       uploadNewFileTitle: "Upload New File",
       uploadBtn: "Upload",
+      theseFiles: 'Upload these files:',
+      dragFiles: 'Drag or Click to upload files',
+
     },
     IndexPreparation: {
       chatBtn: "Chat Room",

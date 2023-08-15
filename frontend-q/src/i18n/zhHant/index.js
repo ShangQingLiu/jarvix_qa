@@ -160,6 +160,8 @@ export default {
       indexBtn: "重新訓練",
       uploadNewFileTitle: "上傳新檔案",
       uploadBtn: "上傳",
+      theseFiles: '上傳這些檔案：',
+dragFiles: '拖曳或點擊以上傳檔案'
     },
     IndexPreparation: {
       chatBtn: "聊天室",

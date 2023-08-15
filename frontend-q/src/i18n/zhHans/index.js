@@ -160,6 +160,8 @@ export default {
       indexBtn: "重新训练",
       uploadNewFileTitle: "上传新文件",
       uploadBtn: "上传",
+      theseFiles: '上传这些文件：',
+      dragFiles: '拖拽或点击上传文件',
     },
     IndexPreparation: {
       chatBtn: "聊天室",
