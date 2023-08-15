@@ -49,9 +49,9 @@
                 </q-item>
               </div> -->
               <div class="flex items-center">
-                <p class="text-dark q-mb-none">Project Name:</p>
+                <p class="text-dark q-mb-none">{{ $t('Extra.projectName') }}</p>
                 <q-select
-                  v-model="projectName"
+                v-model="projectStore.selectedProject"
                   :placeholder="$t('pages.FileManagementPage.projectName')"
                   class="language-dropdown q-ml-md"
                   :options="userProjects"
@@ -316,7 +316,7 @@
           color="white"
           outline
           icon="img:/static/logout.png"
-          label="Logout"
+          :label="$t('Extra.logout')"
           @click="logout"
         />
       </q-drawer>
@@ -325,7 +325,7 @@
         <div class="cover">
           <div class="flex items-center full-width lt-md q-mb-md">
             <q-select
-              v-model="projectName"
+              v-model="projectStore.selectedProject"
               :placeholder="$t('pages.FileManagementPage.projectName')"
               class="language-dropdown q-mr-md"
               :options="userProjects"
@@ -418,14 +418,14 @@
               /> -->
                 <q-step
                   :name="1"
-                  title="Create Project"
+                  :title="$t('Extra.createProject')"
                   icon="fiber_manual_record"
                   :done="step > 1"
                   @click="stepClicked"
                 />
                 <q-step
                   :name="2"
-                  title="Upload Files"
+                  :title="$t('Extra.uploadFile')"
                   icon="fiber_manual_record"
                   :done="step > 2"
                   @click="stepClicked"
@@ -439,7 +439,7 @@
                 /> -->
                 <q-step
                   :name="3"
-                  title="Service"
+                  :title="$t('Extra.service')"
                   icon="fiber_manual_record"
                   :done="step > 3"
                   @click="stepClicked"
@@ -506,9 +506,11 @@ export default defineComponent({
     const loading = ref(false);
     const error = ref(null);
     const userProjects = computed(() => projectStore.userProjects);
-    const projectName = ref(
-      projectStore.selectedProject ? projectStore.selectedProject : ''
-    );
+    const projectName = computed(() => projectStore.selectedProject);
+
+    // const projectName = ref(
+    //   projectStore.selectedProject ? projectStore.selectedProject : ''
+    // );
 
     const { locale } = useI18n({ useScope: 'global' });
 
@@ -619,6 +621,7 @@ export default defineComponent({
       userProjects,
       step,
       stepClicked,
+      projectStore
     };
   },
 });

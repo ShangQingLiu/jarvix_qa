@@ -222,4 +222,13 @@ export default {
   AuthLayout: {
     welcomeText: "歡迎來到我們的網站，這將對您有所幫助。",
   },
+  Extra:{
+    projectName: '项目名称:',
+    logout: '注销',
+    existingSession: '现有会话',
+    createProject: '创建项目',
+    uploadFile: '上传文件',
+    service: ' 服务',
+    chatPlaceholder: '在此处输入您的问题...'
+  }
 };

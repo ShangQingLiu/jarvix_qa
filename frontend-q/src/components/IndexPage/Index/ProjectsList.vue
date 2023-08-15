@@ -53,7 +53,7 @@
                   class="q-mx-xs"
                   icon="delete"
                   v-if="authStore.user.role == 'Admin'"
-                  @click="deleteConfirmationModal(project.id)"
+                  @click="deleteConfirmationModal(project.id, project.name)"
                   size="sm"
                 />
               </div>
@@ -126,6 +126,9 @@ const numberOfProjectsToShow = ref(10);
 const authStore = useAuthStore();
 const confirmDelete = ref(false);
 const projectId = ref(0);
+const projectName = ref(0);
+
+
 
 const fetchUserProjects = async () => {
   try {
@@ -145,7 +148,7 @@ const deleteProject = async () => {
     error.value = null;
     loading.value = true;
     console.log(projectId.value);
-    const res = await store.deleteProject(projectId.value);
+    const res = await store.deleteProject(projectId.value, projectName.value);
     console.log(res);
   } catch (err) {
     console.log(err);
@@ -154,9 +157,10 @@ const deleteProject = async () => {
     loading.value = false;
   }
 };
-const deleteConfirmationModal = (id) => {
+const deleteConfirmationModal = (id, name) => {
   confirmDelete.value = !confirmDelete.value;
   projectId.value = id;
+  projectName.value = name
 };
 onMounted(async () => {
   // await fetchProjects();

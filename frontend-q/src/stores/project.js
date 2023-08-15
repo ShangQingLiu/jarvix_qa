@@ -39,11 +39,16 @@ export const useProjectStore = defineStore("projectStore", {
         }
       });
     },
-    deleteProject(projectId) {
+    deleteProject(projectId, projectName) {
       return new Promise(async (resolve, reject) => {
         try {
           const { data } = await api.delete(`project-management/${projectId}`);
           console.log(data);
+
+          // If selectedProject is same project, the one we are deleting
+          if(this.userProjects.length && projectName == this.selectedProject){
+            this.selectedProject = this.userProjects[0].name
+          }
           this.userProjects = this.userProjects.filter(
             (project) => project.id != projectId
           );

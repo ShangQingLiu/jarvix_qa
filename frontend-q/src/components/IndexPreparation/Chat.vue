@@ -48,7 +48,7 @@
         standout="bg-white text-dark"
         class="elevation-0 q-mr-md full-width"
         v-model="queryText"
-        placeholder="Type your question here..."
+        :placeholder="$t('Extra.chatPlaceholder')"
         :input-style="{ color: '#878787' }"
         outlined
         color="dark1"

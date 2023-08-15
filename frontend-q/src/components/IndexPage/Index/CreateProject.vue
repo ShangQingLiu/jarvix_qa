@@ -3,7 +3,7 @@
     <q-card flat class="bg-transparent q-px-none q-mb-lg">
       <q-card-section class="q-px-none">
         <div v-if="loading" class="q-py-lg flex justify-center">
-         <q-spinner-oval color="primary" size="3rem" />
+          <q-spinner-oval color="primary" size="3rem" />
         </div>
         <div v-if="error" class="q-py-sm flex justify-center">
           <div class="text-h6 text-negative">
@@ -20,7 +20,6 @@
             class="q-mb-md"
             :input-style="{ padding: '0px 23px' }"
             required
-
           />
           <q-input
             outlined
@@ -67,6 +66,7 @@ const createProject = async () => {
     });
     console.log(res);
     if (res) {
+      store.selectedProject = projectName.value;
       projectName.value = '';
       description.value = '';
     }

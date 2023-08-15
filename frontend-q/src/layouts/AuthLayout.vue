@@ -7,8 +7,8 @@
             class="flex column auth-wrapper relative-position full-height justify-center items-center align-center"
           >
             <div
-              class="logo-container q-my-xl"
-              style="align-self: flex-end; padding-right: 60px"
+              class="logo-container q-my-xl flex justify-end"
+              style="width: 480px;"
             >
               <img style="max-width: 200px" src="/static/logo-white.png" />
             </div>

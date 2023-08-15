@@ -49,8 +49,8 @@
           class="bg-transparent"
           align="left"
         >
-          <q-tab class="custom-tab" name="chat" label="Chat Room" />
-          <q-tab class="custom-tab" name="validation-forum" label="Validation Form" />
+          <q-tab class="custom-tab" name="chat" :label="$t('pages.IndexPreparation.chatBtn')" />
+          <q-tab class="custom-tab" name="validation-forum" :label="$t('pages.IndexPreparation.validationForum')" />
         </q-tabs>
       </div>
       <div class="col-12 q-mb-md">
@@ -93,7 +93,7 @@
                     @click="generateNewSession"
                     class="q-mb-md"
                   />
-                  <div class="text-dark q-mb-lg">Existing Sessions</div>
+                  <div class="text-dark q-mb-lg">{{ $t('Extra.existingSession') }}</div>
                   <div class="sessions-list">
                     <div
                       class="text-subtitle2 q-mb-md"

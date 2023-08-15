@@ -222,4 +222,13 @@ dragFiles: '拖曳或點擊以上傳檔案'
   AuthLayout: {
     welcomeText: "欢迎访问我们的网站，将为您提供帮助。",
     },
+    Extra:{
+      projectName: '專案名稱：',
+      logout: '登出',
+      existingSession: '現有會話',
+      createProject: '建立專案',
+      uploadFile: '上傳檔案',
+      service: '服務',
+      chatPlaceholder: '在這裡輸入您的問題...'
+    }
 };

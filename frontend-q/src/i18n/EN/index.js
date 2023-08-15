@@ -207,6 +207,7 @@ export default {
         },
       },
     },
+
   },
   MainLayout: {
     loginBtn: "Login",
@@ -231,4 +232,13 @@ export default {
   AuthLayout: {
     welcomeText: "Personalized Knowledge, Tailored Conversation, Secured Privacy",
   },
+  Extra:{
+    projectName: 'Project Name:',
+    logout:'Logout',
+    existingSession: 'Existing Sessions',
+    createProject: 'Create Project',
+    uploadFile: 'Upload Files',
+    service: 'Service',
+    chatPlaceholder: 'Type your question here...'
+  }
 };
