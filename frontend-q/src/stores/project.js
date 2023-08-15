@@ -213,23 +213,27 @@ export const useProjectStore = defineStore("projectStore", {
     ViewProjectFile(payload) {
       return new Promise(async (resolve, reject) => {
         try {
+          console.log(payload);
+          const fileNameArray = payload.filename.split('.')
+          const extension = fileNameArray[fileNameArray.length - 1]
+          const fileName = fileNameArray[0]
           const { data } = await api.post(`file/download`, {
             filename: payload.filename,
             project_name: payload.project_name,
           });
-          const type = 'application/pdf';
+          const type = `application/${extension}`;
           const downloadUrl = window.URL.createObjectURL(new Blob([data]), {type:type});
-          this.downloadFile(downloadUrl);
+          this.downloadFile(downloadUrl, extension, fileName);
           resolve(downloadUrl);
         } catch (error) {
           reject(error);
         }
       });
     },
-    downloadFile(downloadUrl) {
+    downloadFile(downloadUrl, extention, name) {
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.setAttribute('download', 'file.pdf');
+      link.setAttribute('download', `${name}.${extention}`);
       document.body.appendChild(link);
       link.click();
       link.remove();

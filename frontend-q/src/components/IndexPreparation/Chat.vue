@@ -1,57 +1,60 @@
 <template>
-
-    <div>
-      <q-scroll-area ref="scrollAreaRef" class="chat-area">
-        <div v-for="(chat, i) in chatHistory" :key="i">
-          <q-chat-message
-            v-for="(message, j) in Object.values(chat)"
-            :key="j"
-            :bg-color="j === 0 ? 'info' : 'white'"
-            text-color="dark-page"
-            size="9"
-            :text="[message]"
-            :sent="j === 0 ? true : false"
-            class="q-mb-md chat-message-content"
-          />
-        </div>
-        <!-- <div v-if="!loading" class="flex flex-center q-py-lg">
+  <div>
+    <q-scroll-area ref="scrollAreaRef" class="chat-area overflow-y-auto">
+      <div v-for="(chat, i) in chatHistory" :key="i">
+        <q-chat-message
+          v-for="(message, j) in Object.values(chat)"
+          :key="j"
+          :bg-color="j === 0 ? 'user-chat' : 'response'"
+          text-color="dark-page"
+          size="9"
+          :text="[message]"
+          :sent="j === 0 ? true : false"
+          class="q-mb-md chat-message-content"
+          :class="{ 'last-message': chatHistory.length - 1 === i && j === 1 }"
+        />
+        <!-- <q-chat-message
+          :bg-color="'response'"
+          text-color="dark-page"
+          size="9"
+          :text="[message]"
+          :sent="false"
+          class="q-mb-md chat-message-content"
+          v-else
+        /> -->
+      </div>
+      <!-- <div v-if="!loading" class="flex flex-center q-py-lg">
          <q-spinner-oval color="primary" size="3rem" />
         </div> -->
-      </q-scroll-area>
+    </q-scroll-area>
 
-      <q-form @submit.prevent="submitQuery">
-        <q-input
-          rounded
-          bg-color="transparent"
-          standout="bg-white text-dark"
-          class="elevation-0 q-mr-md full-width"
-          v-model="queryText"
-          placeholder="Type your question here..."
-          :input-style="{ color: '#878787' }"
-          outlined
-          color="dark1"
-        >
-          <template v-slot:append>
-            <div class="flex items-center append-content">
-              <q-spinner-oval
-                v-if="loading"
-                color="dark-page"
-                class="q-pr-md"
-                size="2em"
-              />
-              <!-- <q-icon  /> -->
-              <img
-                v-if="!loading"
-                src="/static/send.svg"
-                class="q-pl-md border-left"
-                alt=""
-              />
-            </div>
-          </template>
-        </q-input>
-      </q-form>
-    </div>
-
+    <q-form @submit.prevent="submitQuery">
+      <q-input
+        rounded
+        bg-color="transparent"
+        standout="bg-white text-dark"
+        class="elevation-0 q-mr-md full-width"
+        v-model="queryText"
+        placeholder="Type your question here..."
+        :input-style="{ color: '#878787' }"
+        outlined
+        color="dark1"
+      >
+        <template v-slot:append>
+          <div class="flex items-center append-content">
+            <q-spinner-oval v-if="loading" color="dark-page" class="q-pr-md" size="2em" />
+            <!-- <q-icon  /> -->
+            <img
+              v-if="!loading"
+              src="/static/send.svg"
+              class="q-pl-md border-left"
+              alt=""
+            />
+          </div>
+        </template>
+      </q-input>
+    </q-form>
+  </div>
 </template>
 
 <script setup>

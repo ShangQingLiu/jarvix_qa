@@ -9,7 +9,7 @@ import { useAuthStore } from "src/stores/auth";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: "https://api.bauma.sis.ai/api/" });
+const api = axios.create({ baseURL: "http://192.168.66.145:2345/api/" });
 function isTokenExpired(userData) {
   if (userData) {
     const expiryTime = new Date(Date.now());

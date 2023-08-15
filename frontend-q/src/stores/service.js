@@ -14,7 +14,7 @@ export const useServiceStore = defineStore("ServiceStore", {
     sessionFrom: "ChatRoom",
     validationQuestions: [],
     validationForumContent: null,
-    selectedFile: ''
+    selectedFile: "",
   }),
   actions: {
     submitQuery(form) {
@@ -23,14 +23,9 @@ export const useServiceStore = defineStore("ServiceStore", {
           const store = useProjectStore();
           if (store.selectedProject) {
             if (!this.sessionId) {
-              this.sessionId =
-                // store.selectedProject +
-                // "-" +
-                // this.sessionFrom +
-                // "-" +
-                guidGenerator();
+              this.sessionId = guidGenerator();
             }
-            const { data } = await api.post("service/query", {
+            const { data } = await api.post("service/query/stream", {
               query: form.query,
               project_name: store.selectedProject,
               session_id: this.sessionId,
@@ -55,6 +50,8 @@ export const useServiceStore = defineStore("ServiceStore", {
       return new Promise(async (resolve, reject) => {
         const store = useProjectStore();
         try {
+          console.log(store.selectedProject);
+
           // If don't have any project nothing todo
           if (store.selectedProject) {
             const { data } = await api.get(
@@ -65,21 +62,21 @@ export const useServiceStore = defineStore("ServiceStore", {
             this.sessions = data.sessions;
             this.selectedSession = data.sessions[this.sessions.length - 1];
             this.sessionId = data.sessions[this.sessions.length - 1];
+
             resolve(data);
           } else {
             this.sessions = [];
             reject(new Error("Something Wrong"));
           }
         } catch (error) {
-
           this.sessions = [];
           // If there are no session then
           // this.sessionId = guidGenerator()
-            // store.selectedProject +
-            // "-" +
-            // this.sessionFrom +
-            // "-" +
-            // guidGenerator(this.sessionId);
+          // store.selectedProject +
+          // "-" +
+          // this.sessionFrom +
+          // "-" +
+          // guidGenerator(this.sessionId);
           this.sessions.push(this.sessionId);
           this.selectedSession = this.sessionId;
           reject(error);
@@ -106,7 +103,7 @@ export const useServiceStore = defineStore("ServiceStore", {
           }
           // this.chatHistory.push({ type: "bot-message", text: data });
         } catch (error) {
-          this.chatHistory = []
+          this.chatHistory = [];
           reject(error);
         }
       });

@@ -68,7 +68,6 @@
             :label="file"
             :key="i"
           />
-
         </q-tabs>
       </div>
     </div>
@@ -79,7 +78,10 @@
           <q-tab-panel class="q-px-none q-py-none" name="chat">
             <div class="chat-wrapper bg-white q-py-md q-pl-md">
               <div class="row q-col-gutter-md">
-                <div class="col-12 col-md-3">
+                <div
+                  class="col-12 col-md-3"
+                  style="height: calc(100vh - 377px); overflow-y: auto"
+                >
                   <q-btn
                     color="dark"
                     text-color="dark"
@@ -91,7 +93,7 @@
                     @click="generateNewSession"
                     class="q-mb-md"
                   />
-                  <div class="text-dark-page q-mb-lg">Existing Sessions</div>
+                  <div class="text-dark q-mb-lg">Existing Sessions</div>
                   <div class="sessions-list">
                     <div
                       class="text-subtitle2 q-mb-md"
@@ -103,7 +105,7 @@
                           ? 'text-dark'
                           : 'text-dark-page',
                       ]"
-                      style="cursor: pointer;"
+                      style="cursor: pointer"
                     >
                       {{ session }}
                     </div>
@@ -118,7 +120,7 @@
               </div>
             </div>
           </q-tab-panel>
-<!-- 90 + 98 + 128 -->
+          <!-- 90 + 98 + 128 -->
           <!-- <q-tab-panel class="q-px-none" name="questions">
             <Questions />
           </q-tab-panel> -->
@@ -223,13 +225,14 @@ const fetchUserProjects = async () => {
     loading.value = true;
 
     const res = await store.fetchUserProjects(authStore.user.id);
-    const indexedProjects = await store.getIndexedProjects();
-    const filteredProjects = res.filter((project, index) => {
-      if (indexedProjects[index].message === 'Index exists') {
-        return project;
-      }
-    });
-    projects.value = filteredProjects;
+    console.log(res);
+    // const indexedProjects = await store.getIndexedProjects();
+    // const filteredProjects = res.filter((project, index) => {
+    //   if (indexedProjects[index].message === 'Index exists') {
+    //     return project;
+    //   }
+    // });
+    projects.value = res;
   } catch (err) {
     console.log(err);
     error.value = err.response.status + ' - ' + err.response.statusText;
@@ -268,6 +271,7 @@ const getChatHistory = async () => {
 
 onMounted(async () => {
   await fetchUserProjects();
+  await getSessions();
   if (serviceStore.selectedSession) {
     await getChatHistory();
   }
@@ -307,6 +311,6 @@ onMounted(async () => {
 
 <style lang="scss">
 .q-tab-panels .scroll {
-  overflow: hidden !important;
+  // overflow: hidden !important;
 }
 </style>

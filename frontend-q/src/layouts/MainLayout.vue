@@ -54,7 +54,6 @@
                   v-model="projectName"
                   :placeholder="$t('pages.FileManagementPage.projectName')"
                   class="language-dropdown q-ml-md"
-
                   :options="userProjects"
                   option-value="name"
                   option-label="name"
@@ -114,6 +113,30 @@
                         >
                           {{ $t(`MainLayout.logoutBtn`) }}
                         </q-btn>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-12">
+                        <q-list>
+                          <q-item
+                            clickable
+                            to="/user-authentication-and-management"
+                            class="bg-info q-mb-sm dropdown-link"
+                          >
+                            <q-item-section>
+                              <q-item-label class="">{{
+                                $t(`MainLayout.links.UserAuthenticationAndManagement`)
+                              }}</q-item-label>
+                            </q-item-section>
+                          </q-item>
+                          <q-item clickable to="/" class="bg-info q-mb-sm dropdown-link">
+                            <q-item-section>
+                              <q-item-label class="">{{
+                                $t(`MainLayout.links.Index`)
+                              }}</q-item-label>
+                            </q-item-section>
+                          </q-item>
+                        </q-list>
                       </div>
                     </div>
                   </q-btn-dropdown>
@@ -195,6 +218,31 @@
                       </q-btn>
                     </div>
                   </div>
+
+                  <div class="row">
+                    <div class="col-12">
+                      <q-list>
+                        <q-item
+                          clickable
+                          to="/user-authentication-and-management"
+                          class="bg-info q-mb-sm dropdown-link"
+                        >
+                          <q-item-section>
+                            <q-item-label class="">{{
+                              $t(`MainLayout.links.UserAuthenticationAndManagement`)
+                            }}</q-item-label>
+                          </q-item-section>
+                        </q-item>
+                        <q-item clickable to="/" class="bg-info q-mb-sm dropdown-link">
+                          <q-item-section>
+                            <q-item-label class="">{{
+                              $t(`MainLayout.links.Index`)
+                            }}</q-item-label>
+                          </q-item-section>
+                        </q-item>
+                      </q-list>
+                    </div>
+                  </div>
                 </q-btn-dropdown>
               </div>
               <q-btn
@@ -221,7 +269,7 @@
         <!-- Desktop -->
         <q-list class="q-mx-lg gt-sm">
           <!-- <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" /> -->
-          <q-item class="q-mb-md" clickable to="/user-authentication-and-management">
+          <!-- <q-item class="q-mb-md" clickable to="/user-authentication-and-management">
             <q-item-section avatar>
               <q-icon size="30px" name="img:/static/user-management.svg" />
             </q-item-section>
@@ -230,7 +278,7 @@
                 $t(`MainLayout.links.UserAuthenticationAndManagement`)
               }}</q-item-label>
             </q-item-section>
-          </q-item>
+          </q-item> -->
           <q-item class="q-mb-md" clickable to="/file-management">
             <q-item-section avatar>
               <q-icon size="30px" name="img:/static/file-management.svg" />
@@ -382,18 +430,18 @@
                   :done="step > 2"
                   @click="stepClicked"
                 />
-                <q-step
+                <!-- <q-step
                   :name="3"
                   title="ProjectView & Training"
                   icon="fiber_manual_record"
                   :done="step > 3"
                   @click="stepClicked"
-                />
+                /> -->
                 <q-step
-                  :name="4"
+                  :name="3"
                   title="Service"
                   icon="fiber_manual_record"
-                  :done="step > 4"
+                  :done="step > 3"
                   @click="stepClicked"
                 />
               </q-stepper>
@@ -472,7 +520,7 @@ export default defineComponent({
       router.push('/auth/login');
     }
     watch(locale, (val) => {
-      if (val == 'en-US') {
+      if (val == 'EN') {
         serviceStore.currentLanguage = 'EN';
       } else if (val == 'zhHans') {
         serviceStore.currentLanguage = 'ZH_CN';
@@ -481,7 +529,7 @@ export default defineComponent({
       }
     });
     const localeOptions = ref([
-      { value: 'en-US', label: 'english' },
+      { value: 'EN', label: 'english' },
       { value: 'zhHans', label: 'chineeseSimplified' },
       { value: 'zhHant', label: 'chineeseTraditional' },
     ]);
@@ -645,6 +693,10 @@ export default defineComponent({
     filter: invert(23%) sepia(1%) saturate(7101%) hue-rotate(147deg) brightness(25%)
       contrast(102%);
   }
+}
+.q-router-link--active.dropdown-link{
+  border-radius: 0px;
+  // border-bottom: 0px;
 }
 .q-stepper__step-inner {
   padding: 0px !important;

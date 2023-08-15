@@ -90,18 +90,18 @@ const fetchUserProjects = async (id) => {
     loading.value = true;
 
     const res = await projectStore.fetchUserProjects(id);
-    const indexedProjects = await projectStore.getIndexedProjects();
-    const filteredProjects = res.filter((project, index) => {
-      if (indexedProjects[index].message === 'Index exists') {
-        return project;
-      }
-    });
+    // const indexedProjects = await projectStore.getIndexedProjects();
+    // const filteredProjects = res.filter((project, index) => {
+    //   if (indexedProjects[index].message === 'Index exists') {
+    //     return project;
+    //   }
+    // });
     // If project exists
-    if (filteredProjects.length > 1) {
+    if (res.length > 1) {
       const savedProject = localStorage.getItem('currentSelectedProject');
       savedProject && savedProject != 'null'
         ? (projectStore.selectedProject = savedProject)
-        : (projectStore.selectedProject = filteredProjects[0]);
+        : (projectStore.selectedProject = res[0].name);
       router.push('/index-preparation');
     } else {
       router.push('/');

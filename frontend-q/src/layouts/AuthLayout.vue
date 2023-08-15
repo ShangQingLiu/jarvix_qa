@@ -6,8 +6,11 @@
           <div
             class="flex column auth-wrapper relative-position full-height justify-center items-center align-center"
           >
-            <div class="logo-container q-my-xl text-center">
-              <img style="max-width: 200px" src="/static/logo.svg" />
+            <div
+              class="logo-container q-my-xl"
+              style="align-self: flex-end; padding-right: 60px"
+            >
+              <img style="max-width: 200px" src="/static/logo-white.png" />
             </div>
             <p class="text-white welcome-text">
               {{ $t(`AuthLayout.welcomeText`) }}
@@ -86,7 +89,7 @@ export default defineComponent({
     const serviceStore = useServiceStore();
     const { locale } = useI18n({ useScope: 'global' });
     watch(locale, (val) => {
-      if (val == 'en-US') {
+      if (val == 'EN') {
         serviceStore.currentLanguage = 'EN';
       } else if (val == 'zhHans') {
         serviceStore.currentLanguage = 'ZH_CN';
@@ -95,7 +98,7 @@ export default defineComponent({
       }
     });
     const localeOptions = ref([
-      { value: 'en-US', label: 'english' },
+      { value: 'EN', label: 'english' },
       { value: 'zhHans', label: 'chineeseSimplified' },
       { value: 'zhHant', label: 'chineeseTraditional' },
     ]);

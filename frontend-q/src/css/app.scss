@@ -19,6 +19,18 @@ body {
 .no-underline {
   text-decoration: none;
 }
+.bg-user-chat{
+  background: $user-chat;
+}
+.bg-response{
+  background: $response;
+}
+.text-user-chat{
+  color: $user-chat;
+}
+.text-response{
+  color: $response;
+}
 // declare a class which applies it
 
 .q-header {

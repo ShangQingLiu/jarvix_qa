@@ -43,7 +43,7 @@
             >
               {{ $t('pages.IndexPage.Detail.updateBtn') }}
             </q-btn>
-            <q-btn
+            <!-- <q-btn
               color="dark1"
               unelevated
               class="text-capitalize"
@@ -54,7 +54,7 @@
               padding="10px 24px"
             >
               {{ $t('pages.IndexPage.Detail.indexBtn') }}
-            </q-btn>
+            </q-btn> -->
             <q-btn
               color="negative"
               unelevated
