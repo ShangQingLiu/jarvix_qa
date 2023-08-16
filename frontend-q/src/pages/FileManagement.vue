@@ -39,7 +39,7 @@
             <q-separator class="q-my-lg" />
             <div v-if="projectName && !loading" class="row q-col-gutter-md">
               <div
-                v-for="(file, i) in projectFiles"
+                v-for="({ name: file }, i) in projectFiles"
                 :key="i"
                 class="col-12 col-sm-6 col-md-4"
               >

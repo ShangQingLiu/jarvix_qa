@@ -56,7 +56,19 @@
       <div class="col-12 q-mb-md">
         <q-tabs
           indicator-color="transparent"
-          v-model="serviceStore.selectedFile"
+          @update:model-value="(id) => {
+            if (panel === 'validation-forum') {
+              serviceStore.selectedFileIdList = [id]
+              return
+            }
+
+            const index = serviceStore.selectedFileIdList.indexOf(id);
+            if (index === -1) {
+              serviceStore.selectedFileIdList.push(id);
+            } else {
+              serviceStore.selectedFileIdList.splice(index, 1);
+            }
+          }"
           inline-label
           class="bg-transparent"
           align="left"
@@ -64,8 +76,11 @@
           <q-tab
             v-for="(file, i) in projectFiles"
             class="custom-tab"
-            :name="file"
-            :label="file"
+            :class="{
+              'q-tab--active': serviceStore.selectedFileIdList.includes(file.id),
+            }"
+            :name="file.id"
+            :label="file.name"
             :key="i"
           />
         </q-tabs>
@@ -202,6 +217,7 @@ watch(panel, (panelValue, OldValue) => {
     console.log(panelValue);
     let sessionFrom = panelValue === 'chat' ? 'ChatRoom' : 'ValidationForum';
     serviceStore.sessionFrom = sessionFrom;
+    serviceStore.selectedFileIdList = []
   }
 });
 serviceStore.$subscribe((mutation, state) => {

@@ -46,7 +46,7 @@ export const useProjectStore = defineStore("projectStore", {
           console.log(data);
 
           // If selectedProject is same project, the one we are deleting
-          if(this.userProjects.length && projectName == this.selectedProject){
+          if (this.userProjects.length && projectName == this.selectedProject) {
             this.selectedProject = this.userProjects[0].name
           }
           this.userProjects = this.userProjects.filter(
@@ -140,7 +140,8 @@ export const useProjectStore = defineStore("projectStore", {
           const { data } = await api.post(`file/list_files`, {
             project_name: payload.project_name,
           });
-          this.projectFiles = data.files;
+
+          this.projectFiles = data.files.map((name, i) => ({ name, id: data.fileIds[i] }));
           resolve(data);
         } catch (error) {
           reject(error);
@@ -229,7 +230,7 @@ export const useProjectStore = defineStore("projectStore", {
             responseType: 'blob'
           });
           const type = `application/${extension}`;
-          const downloadUrl = window.URL.createObjectURL(new Blob([data]), {type:type});
+          const downloadUrl = window.URL.createObjectURL(new Blob([data]), { type: type });
           this.downloadFile(downloadUrl, extension, fileName);
           resolve(downloadUrl);
         } catch (error) {

@@ -14,7 +14,7 @@ export const useServiceStore = defineStore("ServiceStore", {
     sessionFrom: "ChatRoom",
     validationQuestions: [],
     validationForumContent: null,
-    selectedFile: "",
+    selectedFileIdList: [],
   }),
   actions: {
     submitQuery(form, scrollToBottom) {
@@ -43,6 +43,7 @@ export const useServiceStore = defineStore("ServiceStore", {
                 project_name: store.selectedProject,
                 session_id: this.sessionId,
                 language: this.currentLanguage,
+                fileIdList: this.selectedFileIdList,
               }),
               responseType: 'stream',
             })
