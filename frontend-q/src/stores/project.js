@@ -225,6 +225,8 @@ export const useProjectStore = defineStore("projectStore", {
           const { data } = await api.post(`file/download`, {
             filename: payload.filename,
             project_name: payload.project_name,
+          }, {
+            responseType: 'blob'
           });
           const type = `application/${extension}`;
           const downloadUrl = window.URL.createObjectURL(new Blob([data]), {type:type});
