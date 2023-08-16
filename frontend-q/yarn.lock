@@ -843,6 +843,11 @@ depd@2.0.0:
   resolved "https://registry.npmjs.org/depd/-/depd-2.0.0.tgz"
   integrity sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==
 
+destr@^2.0.0:
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/destr/-/destr-2.0.1.tgz"
+  integrity sha512-M1Ob1zPSIvlARiJUkKqvAZ3VAqQY6Jcuth/pBKQ2b1dX/Qx0OnJ8Vux6J2H5PTMQeRzWrrbTu70VxBfv/OPDJA==
+
 destroy@1.2.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/destroy/-/destroy-1.2.0.tgz"
@@ -1586,6 +1591,11 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
+node-fetch-native@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/node-fetch-native/-/node-fetch-native-1.2.0.tgz"
+  integrity sha512-5IAMBTl9p6PaAjYCnMv5FmqIF6GcZnawAVnzaCG0rX2aYZJ4CxEkZNtVPuTRug7fL7wyM5BQYTlAzcyMPi6oTQ==
+
 node-releases@^2.0.8:
   version "2.0.10"
   resolved "https://registry.npmjs.org/node-releases/-/node-releases-2.0.10.tgz"
@@ -1605,6 +1615,15 @@ object-inspect@^1.9.0:
   version "1.12.3"
   resolved "https://registry.npmjs.org/object-inspect/-/object-inspect-1.12.3.tgz"
   integrity sha512-geUvdk7c+eizMNUDkRpW1wJwgfOiOeHbxBR/hLXK1aT6zmVSO0jsQcs7fj6MGw89jC/cjGfLcNOrtMYtGqm81g==
+
+ofetch@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/ofetch/-/ofetch-1.1.1.tgz"
+  integrity sha512-SSMoktrp9SNLi20BWfB/BnnKcL0RDigXThD/mZBeQxkIRv1xrd9183MtLdsqRYLYSqW0eTr5t8w8MqjNhvoOQQ==
+  dependencies:
+    destr "^2.0.0"
+    node-fetch-native "^1.2.0"
+    ufo "^1.1.2"
 
 on-finished@2.4.1:
   version "2.4.1"
@@ -2181,6 +2200,11 @@ type-is@~1.6.18:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.24"
+
+ufo@^1.1.2:
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/ufo/-/ufo-1.2.0.tgz"
+  integrity sha512-RsPyTbqORDNDxqAdQPQBpgqhWle1VcTSou/FraClYlHf6TZnQcGslpLcAphNR+sQW4q5lLWLbOsRlh9j24baQg==
 
 uglify-js@^3.5.1:
   version "3.17.4"
