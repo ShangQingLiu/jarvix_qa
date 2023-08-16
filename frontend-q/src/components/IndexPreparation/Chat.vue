@@ -85,32 +85,30 @@ const loading = ref(false);
 const error = ref(null);
 const queryText = ref('');
 const scrollAreaRef = ref(null);
+const scrollToBottom = async () => {
+  await nextTick()
+  // Scrolling at the bottom of Question List
+  const scrollArea = scrollAreaRef.value;
+  const scrollTarget = scrollArea.getScrollTarget();
+  const duration = 0;
+  scrollAreaRef.value.setScrollPosition(
+    'vertical',
+    scrollTarget.scrollHeight,
+    duration
+  );
+}
 const submitQuery = async () => {
   if (projectName.value) {
     try {
       error.value = null;
       loading.value = true;
-      store.addUserMessage(queryText.value);
-      await nextTick();
-      // Scrolling at the bottom of Question List
-      const scrollArea = scrollAreaRef.value;
-      const scrollTarget = scrollArea.getScrollTarget();
-      const duration = 300;
-      scrollAreaRef.value.setScrollPosition(
-        'vertical',
-        scrollTarget.scrollHeight,
-        duration
-      );
-      const res = await store.submitQuery({
-        query: queryText.value,
-        sessionFrom: 'ChatRoom',
-      });
-      await nextTick();
-      scrollAreaRef.value.setScrollPosition(
-        'vertical',
-        scrollTarget.scrollHeight,
-        duration
-      );
+      await store.submitQuery(
+        {
+          query: queryText.value,
+          sessionFrom: 'ChatRoom',
+        },
+        scrollToBottom,
+      )
     } catch (err) {
       console.log(err);
       error.value = err.response.status + ' - ' + err.response.statusText;

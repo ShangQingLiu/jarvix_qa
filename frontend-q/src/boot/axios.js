@@ -1,5 +1,6 @@
 import { boot } from "quasar/wrappers";
 import axios from "axios";
+import { ofetch } from 'ofetch';
 import { useAuthStore } from "src/stores/auth";
 // import { isUserLoggedIn } from "src/router/utils";
 
@@ -9,7 +10,8 @@ import { useAuthStore } from "src/stores/auth";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: "http://192.168.66.145:2345/api/" });
+const baseURL = "http://192.168.66.145:2345/api/";
+const api = axios.create({ baseURL });
 function isTokenExpired(userData) {
   if (userData) {
     const expiryTime = new Date(Date.now());
@@ -19,6 +21,8 @@ function isTokenExpired(userData) {
   }
   return true;
 }
+
+
 
 // ℹ️ Add request interceptor to send the authorization header on each subsequent request after login
 api.interceptors.request.use(async (config) => {
@@ -46,6 +50,29 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+const apiFetch = ofetch.create({
+  baseURL,
+  async onRequest(context) {
+    const store = useAuthStore();
+    const user = JSON.parse(localStorage.getItem("jarvixUser"));
+    // If token is found
+    if (user) {
+      context.options.headers = context.options.headers ?? {};
+      if (
+        context.request !== "auth/login" ||
+        context.request !== "user-management/forgot_password"
+      ) {
+        context.options.headers.Authorization = user ? `${user.access_token}` : "";
+      }
+      if (isTokenExpired(user) && !store.refreshToken) {
+        console.log("Refreshing Token");
+        store.refreshToken = true
+        await store.refreshToken();
+      }
+    }
+  },
+});
+
 export default boot(({ app, store }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
@@ -59,4 +86,4 @@ export default boot(({ app, store }) => {
   //       so you can easily perform requests against your app's API
 });
 
-export { api };
+export { api, apiFetch };

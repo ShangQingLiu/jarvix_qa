@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { api } from "src/boot/axios";
+import { api, apiFetch } from "src/boot/axios";
 import { useProjectStore } from "src/stores/project";
 import { guidGenerator } from "src/utils";
 
@@ -17,7 +17,7 @@ export const useServiceStore = defineStore("ServiceStore", {
     selectedFile: "",
   }),
   actions: {
-    submitQuery(form) {
+    submitQuery(form, scrollToBottom) {
       return new Promise(async (resolve, reject) => {
         try {
           const store = useProjectStore();
@@ -25,16 +25,57 @@ export const useServiceStore = defineStore("ServiceStore", {
             if (!this.sessionId) {
               this.sessionId = guidGenerator();
             }
-            const { data } = await api.post("service/query/stream", {
+
+            const index = this.chatHistory.length;
+            this.chatHistory.push({
               query: form.query,
-              project_name: store.selectedProject,
-              session_id: this.sessionId,
-              language: this.currentLanguage,
+              response: '...'
             });
+            const record = this.chatHistory[index];
+            await scrollToBottom?.()
+
+
+            const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+            await apiFetch("service/query/stream", {
+              method: 'POST',
+              body: JSON.stringify({
+                query: form.query,
+                project_name: store.selectedProject,
+                session_id: this.sessionId,
+                language: this.currentLanguage,
+              }),
+              responseType: 'stream',
+            })
+              .then((stream) => {
+                const reader = stream
+                  .pipeThrough(new TextDecoderStream())
+                  .getReader()
+
+                record.response = ''
+
+                const processText = async ({ done, value: rawValue }) => {
+                  if (done) {
+                    return;
+                  }
+                  const textList = rawValue.slice(5).split("\n\ndata:")
+
+                  for (const text of textList) {
+                    record.response += text
+                    await scrollToBottom?.()
+                    await delay(100)
+                  }
+
+                  // Call processText recursively on next chunk
+                  return reader.read().then(processText);
+                }
+
+                return reader.read().then(processText)
+              })
+
             this.selectedSession = this.sessionId;
-            await this.getSessions();
-            await this.getChatHistory();
-            resolve(data);
+            // await this.getSessions();
+            // await this.getChatHistory();
+            resolve(record.response);
           } else {
             reject(new Error("Something Wrong"));
           }
