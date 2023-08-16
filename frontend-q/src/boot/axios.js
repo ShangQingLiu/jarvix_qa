@@ -10,7 +10,12 @@ import { useAuthStore } from "src/stores/auth";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const baseURL = "http://192.168.66.145:2345/api/";
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+if (baseURL == null) {
+  throw new Error("VITE_API_BASE_URL is not defined");
+}
+
 const api = axios.create({ baseURL });
 function isTokenExpired(userData) {
   if (userData) {
