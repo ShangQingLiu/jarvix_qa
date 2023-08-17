@@ -283,7 +283,8 @@ const fetchUserProjects = async () => {
 };
 const uploadFiles = async (e) => {
   loading.value = true;
-  const maxAllowedSize = 0.1 * 1024 * 1024;
+  // File size should be 20MB
+  const maxAllowedSize = 20 * 1024 * 1024;
   const formData = new FormData();
   for (var i = 0; i < files.value.length; i++) {
     let file = files.value[i];
