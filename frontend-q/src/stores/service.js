@@ -168,6 +168,7 @@ export const useServiceStore = defineStore("ServiceStore", {
               project_name: store.selectedProject,
               // Same as Project Name to avoid conflicts
               session_id: this.sessionId,
+              fileIdList: this.selectedFileIdList,
             });
             this.selectedSession = this.sessionId;
             await this.getSessions();
