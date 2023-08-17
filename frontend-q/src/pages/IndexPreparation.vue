@@ -95,7 +95,7 @@
               <div class="row q-col-gutter-md">
                 <div
                   class="col-12 col-md-3"
-                  style="height: calc(100vh - 377px); overflow-y: auto"
+                  style="height: calc(100vh - 277px); overflow-y: auto"
                 >
                   <q-btn
                     color="dark"

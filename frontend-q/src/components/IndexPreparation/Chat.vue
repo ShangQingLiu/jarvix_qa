@@ -164,7 +164,7 @@ const formatMessage = (text, iterate) => {
   }
 }
 .chat-area {
-  height: calc(100vh - 450px);
+  height: calc(100vh - 350px);
 }
 .append-content .border-left {
   border-left: 1px solid $dark-page;

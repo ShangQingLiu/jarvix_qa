@@ -51,7 +51,7 @@
               <div class="flex items-center">
                 <p class="text-dark q-mb-none">{{ $t('Extra.projectName') }}</p>
                 <q-select
-                v-model="projectStore.selectedProject"
+                  v-model="projectStore.selectedProject"
                   :placeholder="$t('pages.FileManagementPage.projectName')"
                   class="language-dropdown q-ml-md"
                   :options="userProjects"
@@ -365,8 +365,8 @@
               </template>
             </q-select>
           </div>
-          <div class="row q-mb-md q-col-gutter-md items-center">
-            <!-- <div class="col-12 col-sm-4 col-md-3">
+          <!-- <div class="row q-mb-md q-col-gutter-md items-center"> -->
+          <!-- <div class="col-12 col-sm-4 col-md-3">
               <q-select
                 v-model="projectName"
                 :placeholder="$t('pages.FileManagementPage.projectName')"
@@ -379,7 +379,7 @@
                 emit-value
               />
             </div> -->
-            <div class="col-12">
+          <!-- <div class="col-12">
               <q-stepper
                 v-model="step"
                 alternative-labels
@@ -387,8 +387,8 @@
                 color="primary"
                 animated
                 flat
-              >
-                <!-- <q-step
+              > -->
+          <!-- <q-step
                 :name="1"
                 title="Create Project"
                 icon="fiber_manual_record"
@@ -416,7 +416,7 @@
                 :done="step > 4"
                 @click="$router.push('/index-preparation')"
               /> -->
-                <q-step
+          <!-- <q-step
                   :name="1"
                   :title="$t('Extra.createProject')"
                   icon="fiber_manual_record"
@@ -429,26 +429,26 @@
                   icon="fiber_manual_record"
                   :done="step > 2"
                   @click="stepClicked"
-                />
-                <!-- <q-step
+                /> -->
+          <!-- <q-step
                   :name="3"
                   title="ProjectView & Training"
                   icon="fiber_manual_record"
                   :done="step > 3"
                   @click="stepClicked"
                 /> -->
-                <q-step
+          <!-- <q-step
                   :name="3"
                   :title="$t('Extra.service')"
                   icon="fiber_manual_record"
                   :done="step > 3"
                   @click="stepClicked"
                 />
-              </q-stepper>
-            </div>
-          </div>
-          <router-view />
+              </q-stepper> -->
+          <!-- </div> -->
         </div>
+        <router-view />
+        <!-- </div> -->
       </q-page-container>
     </q-layout>
   </div>
@@ -577,29 +577,29 @@ export default defineComponent({
         loading.value = false;
       }
     }
-    watch(route, (newVal) => {
-      if (newVal.path == '/') {
-        step.value = 1;
-      } else if (newVal.path == '/file-management') {
-        step.value = 2;
-      } else if (newVal.params.id && newVal.name == 'SingleProject') {
-        step.value = 3;
-        console.log('Here');
-      } else if (newVal.path == '/index-preparation') {
-        step.value = 4;
-      }
-    });
-    onMounted(() => {
-      if (route.path == '/') {
-        step.value = 1;
-      } else if (route.path == '/file-management') {
-        step.value = 2;
-      } else if (route.params.id && route.name == 'SingleProject') {
-        step.value = 3;
-      } else if (route.path == '/index-preparation') {
-        step.value = 4;
-      }
-    });
+    // watch(route, (newVal) => {
+    //   if (newVal.path == '/') {
+    //     step.value = 1;
+    //   } else if (newVal.path == '/file-management') {
+    //     step.value = 2;
+    //   } else if (newVal.params.id && newVal.name == 'SingleProject') {
+    //     step.value = 3;
+    //     console.log('Here');
+    //   } else if (newVal.path == '/index-preparation') {
+    //     step.value = 4;
+    //   }
+    // });
+    // onMounted(() => {
+    //   if (route.path == '/') {
+    //     step.value = 1;
+    //   } else if (route.path == '/file-management') {
+    //     step.value = 2;
+    //   } else if (route.params.id && route.name == 'SingleProject') {
+    //     step.value = 3;
+    //   } else if (route.path == '/index-preparation') {
+    //     step.value = 4;
+    //   }
+    // });
     function stepClicked() {
       console.log('Clicked');
     }
@@ -621,7 +621,7 @@ export default defineComponent({
       userProjects,
       step,
       stepClicked,
-      projectStore
+      projectStore,
     };
   },
 });
@@ -697,7 +697,7 @@ export default defineComponent({
       contrast(102%);
   }
 }
-.q-router-link--active.dropdown-link{
+.q-router-link--active.dropdown-link {
   border-radius: 0px;
   // border-bottom: 0px;
 }
