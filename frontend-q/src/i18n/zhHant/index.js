@@ -229,6 +229,8 @@ dragFiles: '拖曳或點擊以上傳檔案'
       createProject: '建立專案',
       uploadFile: '上傳檔案',
       service: '服務',
-      chatPlaceholder: '在這裡輸入您的問題...'
+      chatPlaceholder: '在這裡輸入您的問題...',
+      fileTitle: '已超過限制',
+      fileCaption: '最大文件限制為20 MB',
     }
 };

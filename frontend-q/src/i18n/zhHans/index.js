@@ -229,6 +229,8 @@ export default {
     createProject: '创建项目',
     uploadFile: '上传文件',
     service: ' 服务',
-    chatPlaceholder: '在此处输入您的问题...'
+    chatPlaceholder: '在此处输入您的问题...',
+    fileTitle: '超过了限制',
+    fileCaption: '最大文件限制为20MB',
   }
 };

@@ -202,31 +202,31 @@
         webkitallowfullscreen
       ></iframe>
       <q-dialog v-model="confirmDelete">
-      <q-card class="bg-primary text-white q-pa-xl">
-        <q-card-section style="margin-bottom: 50px">
-          <div class="text-h6 text-center q-mb-xl">Warning!</div>
-          <div class="text-h6 text-center">Do you really want to delete it?</div>
-        </q-card-section>
+        <q-card class="bg-primary text-white q-pa-xl">
+          <q-card-section style="margin-bottom: 50px">
+            <div class="text-h6 text-center q-mb-xl">Warning!</div>
+            <div class="text-h6 text-center">Do you really want to delete it?</div>
+          </q-card-section>
 
-        <q-card-actions align="center">
-          <q-btn
-            rounded
-            padding="12px 50px"
-            label="No"
-            class="bg-white text-dark"
-            v-close-popup
-          />
-          <q-btn
-            rounded
-            padding="12px 50px"
-            label="Yes"
-            class="bg-white text-dark"
-            v-close-popup
-            @click="deleteProjectFile()"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+          <q-card-actions align="center">
+            <q-btn
+              rounded
+              padding="12px 50px"
+              label="No"
+              class="bg-white text-dark"
+              v-close-popup
+            />
+            <q-btn
+              rounded
+              padding="12px 50px"
+              label="Yes"
+              class="bg-white text-dark"
+              v-close-popup
+              @click="deleteProjectFile()"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
   </div>
 </template>
@@ -239,7 +239,9 @@ import { useAuthStore } from 'src/stores/auth';
 
 import { useServiceStore } from 'src/stores/service';
 import { useQuasar } from 'quasar';
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const $q = useQuasar();
 const serviceStore = useServiceStore();
 const authStore = useAuthStore();
@@ -261,7 +263,6 @@ const files = ref(null);
 const fileToDelete = ref(0);
 const confirmDelete = ref(false);
 
-
 const loadLocalFiles = async () => {
   // filesRef.value.click();
   console.log(files.value.length);
@@ -282,9 +283,21 @@ const fetchUserProjects = async () => {
 };
 const uploadFiles = async (e) => {
   loading.value = true;
+  const maxAllowedSize = 0.1 * 1024 * 1024;
   const formData = new FormData();
   for (var i = 0; i < files.value.length; i++) {
     let file = files.value[i];
+    if (file.size > maxAllowedSize) {
+      $q.notify({
+        message: `${file.name} ${t('Extra.fileTitle')}`,
+        caption: `${t('Extra.fileCaption')}`,
+        position: 'top-right',
+        color: 'negative',
+      });
+      loading.value = false;
+
+      return;
+    }
     formData.append('files', file);
   }
   api
@@ -401,7 +414,6 @@ const getSessions = async () => {
 const deleteConfirmationModal = (file) => {
   confirmDelete.value = !confirmDelete.value;
   fileToDelete.value = file;
-
 };
 onMounted(async () => {
   await fetchUserProjects();
