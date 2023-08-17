@@ -167,6 +167,7 @@ export const useServiceStore = defineStore("ServiceStore", {
               validation_form: form.query,
               project_name: store.selectedProject,
               // Same as Project Name to avoid conflicts
+              language: this.currentLanguage,
               session_id: this.sessionId,
               fileIdList: this.selectedFileIdList,
             });
