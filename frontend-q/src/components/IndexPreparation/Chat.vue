@@ -52,6 +52,7 @@
         :input-style="{ color: '#878787' }"
         outlined
         color="dark1"
+        :disable="loading"
       >
         <template v-slot:append>
           <div class="flex items-center append-content">
