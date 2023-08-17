@@ -262,7 +262,7 @@
 
       <q-drawer
         v-model="leftDrawerOpen"
-        class="left-sidebar q-py-xl flex column justify-betweeen no-wrap"
+        class="left-sidebar q-py-md flex column justify-betweeen no-wrap"
         show-if-above
         :width="350"
       >
@@ -304,8 +304,8 @@
           <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
         </q-list>
         <img
-          class="q-my-auto gt-sm q-mx-lg"
-          style="height: 200px; object-fit: contain; align-self: start"
+          class="q-my-auto gt-sm"
+          style=" align-self: start; width: 100%; max-height: 350px;"
           src="/static/sidebar.png"
           alt=""
         />
