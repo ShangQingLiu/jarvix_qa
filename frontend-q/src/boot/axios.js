@@ -10,7 +10,7 @@ import { useAuthStore } from "src/stores/auth";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+const baseURL = import.meta.env.VITE_API_BASE_URL || window.env.API_BASE_URL;
 
 if (baseURL == null) {
   throw new Error("VITE_API_BASE_URL is not defined");
