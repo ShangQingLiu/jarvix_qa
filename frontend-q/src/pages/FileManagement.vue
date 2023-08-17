@@ -78,7 +78,7 @@
                         <q-icon size="16px" name="visibility" color="white" />
                       </div>
                       <div
-                        @click="deleteProjectFile(file)"
+                        @click="deleteConfirmationModal(file)"
                         class="flex q-pa-sm rounded-50 bg-negative"
                       >
                         <q-icon size="16px" name="delete" color="white" />
@@ -201,6 +201,32 @@
         allowfullscreen
         webkitallowfullscreen
       ></iframe>
+      <q-dialog v-model="confirmDelete">
+      <q-card class="bg-primary text-white q-pa-xl">
+        <q-card-section style="margin-bottom: 50px">
+          <div class="text-h6 text-center q-mb-xl">Warning!</div>
+          <div class="text-h6 text-center">Do you really want to delete it?</div>
+        </q-card-section>
+
+        <q-card-actions align="center">
+          <q-btn
+            rounded
+            padding="12px 50px"
+            label="No"
+            class="bg-white text-dark"
+            v-close-popup
+          />
+          <q-btn
+            rounded
+            padding="12px 50px"
+            label="Yes"
+            class="bg-white text-dark"
+            v-close-popup
+            @click="deleteProjectFile()"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     </div>
   </div>
 </template>
@@ -232,6 +258,9 @@ const projectFiles = computed(() => store.projectFiles);
 // const projectList = ref([]);
 const userProjects = ref([]);
 const files = ref(null);
+const fileToDelete = ref(0);
+const confirmDelete = ref(false);
+
 
 const loadLocalFiles = async () => {
   // filesRef.value.click();
@@ -274,16 +303,17 @@ const uploadFiles = async (e) => {
     });
 };
 
-const deleteProjectFile = async (file) => {
+const deleteProjectFile = async () => {
   try {
     error.value = null;
     loading.value = true;
     console.log('Delete Project');
     const res = await store.deleteProjectFile({
       project_name: store.selectedProject,
-      filename: file,
+      filename: fileToDelete.value,
     });
     console.log(res);
+    await listProjectFiles();
   } catch (err) {
     console.log(err);
     error.value = err.response.status + ' - ' + err.response.statusText;
@@ -366,6 +396,12 @@ const getSessions = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const deleteConfirmationModal = (file) => {
+  confirmDelete.value = !confirmDelete.value;
+  fileToDelete.value = file;
+
 };
 onMounted(async () => {
   await fetchUserProjects();
