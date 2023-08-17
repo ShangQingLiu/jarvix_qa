@@ -20,7 +20,48 @@
           :sent="j === 0 ? true : false"
           class="q-mb-md chat-message-content"
           :class="{ 'last-message': chatHistory.length - 1 === i && j === 1 }"
-        />
+        >
+          <template #stamp>
+            <div v-if="j === 1" class="flex justify-end q-my-none">
+              <q-icon name="info" size="20px" color="dark1">
+                <q-menu>
+                  <div
+                    style="max-width: 250px"
+                    class="row no-wrap q-pa-md bg-accent text-dark"
+                  >
+                    <div class="column">
+                      <div class="text-dark text-weight-bold">
+                        {{ $t('Extra.reference') }}
+                      </div>
+                      <div
+                        class="q-mb-sm text-dark1"
+                        style="
+                          white-space: nowrap;
+                          text-overflow: ellipsis;
+                          display: block;
+                          width: 230px;
+                          overflow: hidden;
+                        "
+                      >
+                        2023 annual car saling dataset
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <div  class="text-dark-page">{{ $t('Extra.download') }}</div>
+                        <q-btn
+                          class="text-capitalize"
+                          flat
+                          style="color: #45b3b2"
+                          :label="$t('Extra.abstractBtn')"
+                          @click="abstractModal = !abstractModal"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </q-menu>
+              </q-icon>
+            </div>
+          </template>
+        </q-chat-message>
       </div>
       <!-- <div
           v-for="(message, j) in Object.values(chat)"
@@ -68,6 +109,27 @@
         </template>
       </q-input>
     </q-form>
+
+    <q-dialog v-model="abstractModal">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6 text-center text-weight-bold">Abstract Reference</div>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section style="max-height: 50vh" class="scroll">
+          <p v-for="n in 15" :key="n">Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum repellendus sit voluptate voluptas eveniet porro. Rerum blanditiis perferendis totam, ea at omnis vel numquam exercitationem aut, natus minima, porro labore.</p>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="center">
+          <q-btn no-caps outline label="Download Full Document" color="primary" v-close-popup />
+          <q-btn no-caps label="Close" color="primary" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -86,18 +148,16 @@ const loading = ref(false);
 const error = ref(null);
 const queryText = ref('');
 const scrollAreaRef = ref(null);
+const abstractModal = ref(false);
+
 const scrollToBottom = async () => {
-  await nextTick()
+  await nextTick();
   // Scrolling at the bottom of Question List
   const scrollArea = scrollAreaRef.value;
   const scrollTarget = scrollArea.getScrollTarget();
   const duration = 0;
-  scrollAreaRef.value.setScrollPosition(
-    'vertical',
-    scrollTarget.scrollHeight,
-    duration
-  );
-}
+  scrollAreaRef.value.setScrollPosition('vertical', scrollTarget.scrollHeight, duration);
+};
 const submitQuery = async () => {
   if (projectName.value) {
     try {
@@ -108,8 +168,8 @@ const submitQuery = async () => {
           query: queryText.value,
           sessionFrom: 'ChatRoom',
         },
-        scrollToBottom,
-      )
+        scrollToBottom
+      );
     } catch (err) {
       console.log(err);
       error.value = err.response.status + ' - ' + err.response.statusText;
@@ -130,28 +190,6 @@ const submitQuery = async () => {
     });
     queryText.value = '';
   }
-};
-const formatMessage = (text, iterate) => {
-  let str = text.split(' ');
-  if (iterate) {
-    const interval = setInterval(() => {
-      let returnedText = str[0];
-      console.log(returnedText);
-      str = str.slice(1);
-      if (!str.length) {
-        clearInterval(interval);
-      }
-      return returnedText;
-    }, 1000);
-    // console.log(iterate);
-    // return text;
-  }
-
-  // else {
-  //   return text;
-  // }
-  // console.log(iterate);
-  // return text;
 };
 </script>
 

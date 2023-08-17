@@ -242,6 +242,9 @@ export default {
     chatPlaceholder: 'Type your question here...',
     fileTitle:"is exceeding the limit",
     fileCaption:"Maximum File limit is 20 MB",
-
+    reference: "Reference",
+    fileName: "",
+    download: "Download",
+    abstractBtn: "Check Abstract",
   }
 };

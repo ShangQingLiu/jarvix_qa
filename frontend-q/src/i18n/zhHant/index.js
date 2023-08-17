@@ -160,8 +160,8 @@ export default {
       indexBtn: "重新訓練",
       uploadNewFileTitle: "上傳新檔案",
       uploadBtn: "上傳",
-      theseFiles: '上傳這些檔案：',
-dragFiles: '拖曳或點擊以上傳檔案'
+      theseFiles: "上傳這些檔案：",
+      dragFiles: "拖曳或點擊以上傳檔案",
     },
     IndexPreparation: {
       chatBtn: "聊天室",
@@ -203,11 +203,11 @@ dragFiles: '拖曳或點擊以上傳檔案'
   MainLayout: {
     loginBtn: "登入",
     logoutBtn: "登出",
-    links:{
-      UserAuthenticationAndManagement: '使用者驗證與管理',
-      Index: '專案管理',
-      FileManagement: '檔案管理',
-      Services: '服務'
+    links: {
+      UserAuthenticationAndManagement: "使用者驗證與管理",
+      Index: "專案管理",
+      FileManagement: "檔案管理",
+      Services: "服務",
     },
     languages: {
       english: "英文",
@@ -215,22 +215,26 @@ dragFiles: '拖曳或點擊以上傳檔案'
       chineeseTraditional: "中文（繁體）",
     },
     roles: {
-      user: '使用者',
-      admin: '管理員'
-    }
+      user: "使用者",
+      admin: "管理員",
+    },
   },
   AuthLayout: {
     welcomeText: "欢迎访问我们的网站，将为您提供帮助。",
-    },
-    Extra:{
-      projectName: '專案名稱：',
-      logout: '登出',
-      existingSession: '現有會話',
-      createProject: '建立專案',
-      uploadFile: '上傳檔案',
-      service: '服務',
-      chatPlaceholder: '在這裡輸入您的問題...',
-      fileTitle: '已超過限制',
-      fileCaption: '最大文件限制為20 MB',
-    }
+  },
+  Extra: {
+    projectName: "專案名稱：",
+    logout: "登出",
+    existingSession: "現有會話",
+    createProject: "建立專案",
+    uploadFile: "上傳檔案",
+    service: "服務",
+    chatPlaceholder: "在這裡輸入您的問題...",
+    fileTitle: "已超過限制",
+    fileCaption: "最大文件限制為20 MB",
+    reference: "參考",
+    fileName: "",
+    download: "下載",
+    abstractBtn: "檢查摘要",
+  },
 };

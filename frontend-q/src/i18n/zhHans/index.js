@@ -232,5 +232,9 @@ export default {
     chatPlaceholder: '在此处输入您的问题...',
     fileTitle: '超过了限制',
     fileCaption: '最大文件限制为20MB',
+    reference: '参考',
+    fileName: '',
+    download: '下载',
+    abstractBtn: '检查摘要'
   }
 };
