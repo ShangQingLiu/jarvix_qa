@@ -47,10 +47,23 @@
                   <div
                     class="flex full-width justify-between items-center q-px-md q-py-sm"
                   >
-                    <div>
+                    <div class="full-width">
                       <!-- Name -->
-                      <div class="text-dark text-h6 text-weight-bold">
+                      <div
+                        class="text-dark text-h6 text-weight-bold"
+                        style="
+                          white-space: nowrap;
+                          text-overflow: ellipsis;
+                          display: block;
+                          width: calc(100%);
+                          overflow: hidden;
+                        "
+                      >
                         {{ file.split('.')[0] }}
+
+                        <q-tooltip>
+                          {{ file.split('.')[0] }}
+                        </q-tooltip>
                       </div>
                       <!-- Extension -->
                       <div class="text-dark-page text-body">
