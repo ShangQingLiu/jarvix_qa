@@ -161,7 +161,7 @@
               accept=".docx,.pdf,.html,.mp3,.m4a,.xlsx"
               type="file"
               class="q-my-md full-width bg-accent file-input"
-              style="height: 200px"
+              style="height: 200px; overflow-y: auto;"
               use-chips
               :placeholder="$t('pages.FileManagementPage.dragFiles')"
             >
