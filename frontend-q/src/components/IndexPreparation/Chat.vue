@@ -11,42 +11,79 @@
       </div> -->
       <div v-for="(chat, i) in chatHistory" :key="i">
         <q-chat-message
-          v-for="(message, j) in Object.values(chat)"
-          :key="j"
-          :bg-color="j === 0 ? 'user-chat' : 'response'"
+          :bg-color="'user-chat'"
           text-color="dark-page"
           size="9"
-          :text="[message]"
-          :sent="j === 0 ? true : false"
+          :text="[chat.query]"
+          :sent="false"
           class="q-mb-md chat-message-content"
-          :class="{ 'last-message': chatHistory.length - 1 === i && j === 1 }"
+        >
+        </q-chat-message>
+
+        <q-chat-message
+          :bg-color="'response'"
+          text-color="dark-page"
+          size="9"
+          :text="[chat.response]"
+          :sent="true"
+          class="q-mb-md chat-message-content"
         >
           <template #stamp>
-            <div v-if="j === 1" class="flex justify-end q-my-none">
+            <div
+              @click="getQuestionReference(chat.question_id)"
+              class="flex justify-end q-my-none"
+            >
               <q-icon name="info" size="20px" color="dark1">
                 <q-menu>
                   <div
                     style="max-width: 250px"
                     class="row no-wrap q-pa-md bg-accent text-dark"
                   >
-                    <div class="column">
+                    <div v-if="!isLoading" class="column">
                       <div class="text-dark text-weight-bold">
                         {{ $t('Extra.reference') }}
                       </div>
+                      <div v-if="referenceContent.length">
+                        <div
+                          v-for="(content, i) in referenceContent"
+                          class="flex no-wrap items-center"
+                        >
+                          <div
+                            class="q-mb-sm text-dark1"
+                            style="
+                              white-space: nowrap;
+                              text-overflow: ellipsis;
+                              display: block;
+                              width: 150px;
+                              overflow: hidden;
+                            "
+                          >
+                            {{ content.filename ? content.filename : content.score }}
+                          </div>
+                          <q-icon
+                            class="q-ml-md cursor-pointer"
+                            name="download"
+                            size="20px"
+                            color="dark1"
+                          />
+                        </div>
+                      </div>
                       <div
-                        class="q-mb-sm text-dark1"
                         style="
                           white-space: nowrap;
                           text-overflow: ellipsis;
                           display: block;
-                          width: 230px;
+                          width: 180px;
                           overflow: hidden;
                         "
+                        v-else
                       >
-                        2023 annual car saling dataset
+                        No Reference Found
                       </div>
-                      <div class="flex justify-between items-center">
-                        <div  class="text-dark-page">{{ $t('Extra.download') }}</div>
+                      <div
+                        v-if="referenceContent.length"
+                        class="flex justify-end items-center"
+                      >
                         <q-btn
                           class="text-capitalize"
                           flat
@@ -55,6 +92,13 @@
                           @click="abstractModal = !abstractModal"
                         />
                       </div>
+                    </div>
+                    <div
+                      v-else
+                      class="flex justify-center items-center"
+                      style="height: 150px; width: 200px"
+                    >
+                      <q-spinner-oval color="primary" size="2em" />
                     </div>
                   </div>
                 </q-menu>
@@ -114,18 +158,53 @@
       <q-card>
         <q-card-section>
           <div class="text-h6 text-center text-weight-bold">Abstract Reference</div>
+          <q-tabs
+            indicator-color="transparent"
+            v-model="existingAbstract"
+            inline-label
+            class="bg-transparent"
+            align="left"
+          >
+            <q-tab
+              v-for="(content, i) in referenceContent"
+              :key="i"
+              class="custom-tab"
+              :name="getTabName(content.filename ? content.filename : content.score)"
+              :label="content.filename ? content.filename : content.score"
+            />
+          </q-tabs>
         </q-card-section>
 
         <q-separator />
 
         <q-card-section style="max-height: 50vh" class="scroll">
-          <p v-for="n in 15" :key="n">Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum repellendus sit voluptate voluptas eveniet porro. Rerum blanditiis perferendis totam, ea at omnis vel numquam exercitationem aut, natus minima, porro labore.</p>
+          <q-tab-panels
+            v-model="existingAbstract"
+            class="bg-transparent q-px-none q-py-none"
+          >
+            <q-tab-panel
+              v-for="(content, i) in referenceContent"
+              :key="i"
+              class="q-px-none q-py-none"
+              :name="getTabName(content.filename ? content.filename : content.score)"
+            >
+              <p>
+                {{ content.text }}
+              </p>
+            </q-tab-panel></q-tab-panels
+          >
         </q-card-section>
 
         <q-separator />
 
         <q-card-actions align="center">
-          <q-btn no-caps outline label="Download Full Document" color="primary" v-close-popup />
+          <q-btn
+            no-caps
+            outline
+            label="Download Full Document"
+            color="primary"
+            v-close-popup
+          />
           <q-btn no-caps label="Close" color="primary" v-close-popup />
         </q-card-actions>
       </q-card>
@@ -138,6 +217,7 @@ import { computed, ref, nextTick } from 'vue';
 import { useServiceStore } from 'src/stores/service';
 import { useQuasar } from 'quasar';
 import { useProjectStore } from 'src/stores/project';
+import { api, apiFetch } from 'src/boot/axios';
 
 const $q = useQuasar();
 const store = useServiceStore();
@@ -149,7 +229,13 @@ const error = ref(null);
 const queryText = ref('');
 const scrollAreaRef = ref(null);
 const abstractModal = ref(false);
+const referenceContent = ref([]);
+const isLoading = ref(false);
+const existingAbstract = ref(null);
 
+const getTabName = (tabName) => {
+  return tabName.toString().split(' ').join('_');
+};
 const scrollToBottom = async () => {
   await nextTick();
   // Scrolling at the bottom of Question List
@@ -189,6 +275,17 @@ const submitQuery = async () => {
       color: 'primary',
     });
     queryText.value = '';
+  }
+};
+const getQuestionReference = async (id) => {
+  try {
+    isLoading.value = true;
+    const { data } = await api.get(`/service/query/reference/${id}`);
+    referenceContent.value = data;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>

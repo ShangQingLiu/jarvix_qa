@@ -76,6 +76,7 @@ export const useServiceStore = defineStore("ServiceStore", {
             this.selectedSession = this.sessionId;
             // await this.getSessions();
             // await this.getChatHistory();
+            console.log(record);
             resolve(record.response);
           } else {
             reject(new Error("Something Wrong"));
@@ -92,7 +93,7 @@ export const useServiceStore = defineStore("ServiceStore", {
       return new Promise(async (resolve, reject) => {
         const store = useProjectStore();
         try {
-          console.log(store.selectedProject);
+          // console.log(store.selectedProject);
 
           // If don't have any project nothing todo
           if (store.selectedProject) {
@@ -100,7 +101,7 @@ export const useServiceStore = defineStore("ServiceStore", {
               `service/sessions/${store.selectedProject}`
             );
             // this.chatHistory.push({ type: "bot-message", text: data });
-            console.log(data);
+            // console.log(data);
             this.sessions = data.sessions;
             this.selectedSession = data.sessions[this.sessions.length - 1];
             this.sessionId = data.sessions[this.sessions.length - 1];
@@ -134,12 +135,15 @@ export const useServiceStore = defineStore("ServiceStore", {
             const { data } = await api.get(
               `service/chat_history/${store.selectedProject}/${this.selectedSession}`
             );
+            console.log('[CHAT_HISTORY]', data.chat_history);
+
             this.chatHistory = data.chat_history;
             resolve(data);
           } else {
             const { data } = await api.get(
               `service/chat_history/${store.selectedProject}/${this.sessionId}`
             );
+            console.log('[CHAT_HISTORY]', data.chat_history);
             this.chatHistory = data.chat_history;
             resolve(data);
           }
