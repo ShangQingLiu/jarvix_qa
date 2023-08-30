@@ -220,7 +220,7 @@ export const useProjectStore = defineStore("projectStore", {
       return new Promise(async (resolve, reject) => {
         try {
           console.log(payload);
-          const fileNameArray = payload.filename.split('.')
+          const fileNameArray = payload.filename.toString().split('.')
           const extension = fileNameArray[fileNameArray.length - 1]
           const fileName = fileNameArray[0]
           const { data } = await api.post(`file/download`, {

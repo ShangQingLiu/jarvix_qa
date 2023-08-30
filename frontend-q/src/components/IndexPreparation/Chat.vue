@@ -65,6 +65,7 @@
                             name="download"
                             size="20px"
                             color="dark1"
+                            @click="downloadProjectFile(content.filename ? content.filename : content.score)"
                           />
                         </div>
                       </div>
@@ -204,6 +205,8 @@
             label="Download Full Document"
             color="primary"
             v-close-popup
+            v-if="existingAbstract"
+            @click="downloadProjectFile(existingAbstract)"
           />
           <q-btn no-caps label="Close" color="primary" v-close-popup />
         </q-card-actions>
@@ -288,6 +291,25 @@ const getQuestionReference = async (id) => {
     isLoading.value = false;
   }
 };
+
+const downloadProjectFile = async (file) => {
+
+  try {
+    error.value = null;
+    loading.value = true;
+    console.log('View Project File');
+    const res = await projectStore.ViewProjectFile({
+      project_name: projectStore.selectedProject,
+      filename: file,
+    });
+  } catch (err) {
+    console.log(err);
+    error.value = err.response.status + ' - ' + err.response.statusText;
+  } finally {
+    loading.value = false;
+  }
+
+}
 </script>
 
 <style lang="scss">
