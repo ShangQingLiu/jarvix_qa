@@ -210,7 +210,7 @@ export default {
       Services: "服務",
     },
     languages: {
-      english: "英文",
+      english: "English",
       chineeseSimplified: "中文（简体）",
       chineeseTraditional: "中文（繁體）",
     },
