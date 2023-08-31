@@ -246,5 +246,12 @@ export default {
     fileName: "",
     download: "Download",
     abstractBtn: "Check Abstract",
+    noReference: "No Reference Found",
+    modalTitle: "Abstract Reference",
+    downloadBtn: "Download Full Document",
+    closeBtn: "Close",
+
+
+
   }
 };

@@ -235,6 +235,10 @@ export default {
     reference: '参考',
     fileName: '',
     download: '下载',
-    abstractBtn: '检查摘要'
+    abstractBtn: '检查摘要',
+    noReference: "未找到参考资料",
+    modalTitle: "摘要参考",
+    downloadBtn: "下载完整文档",
+    closeBtn: "关闭"
   }
 };

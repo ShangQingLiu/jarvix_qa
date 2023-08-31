@@ -236,5 +236,9 @@ export default {
     fileName: "",
     download: "下載",
     abstractBtn: "檢查摘要",
+    noReference: "找不到參考資料",
+    modalTitle: "摘要參考資料",
+    downloadBtn: "下載完整文件",
+    closeBtn: "關閉",
   },
 };

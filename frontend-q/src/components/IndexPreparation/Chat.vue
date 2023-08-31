@@ -65,7 +65,11 @@
                             name="download"
                             size="20px"
                             color="dark1"
-                            @click="downloadProjectFile(content.filename ? content.filename : content.score)"
+                            @click="
+                              downloadProjectFile(
+                                content.filename ? content.filename : content.score
+                              )
+                            "
                           />
                         </div>
                       </div>
@@ -79,7 +83,7 @@
                         "
                         v-else
                       >
-                        No Reference Found
+                        {{ $t('Extra.noReference') }}
                       </div>
                       <div
                         v-if="referenceContent.length"
@@ -157,20 +161,30 @@
 
     <q-dialog v-model="abstractModal">
       <q-card>
-        <q-card-section>
-          <div class="text-h6 text-center text-weight-bold">Abstract Reference</div>
+        <q-card-section class="q-pb-none">
+          <div class="text-h6 text-center text-weight-bold">
+          {{ $t('Extra.modalTitle') }}
+          </div>
           <q-tabs
-            indicator-color="transparent"
             v-model="existingAbstract"
             inline-label
-            class="bg-transparent"
             align="left"
+            dense
+            class="text-grey"
+            active-color="primary"
+            indicator-color="primary"
+            narrow-indicator
           >
             <q-tab
               v-for="(content, i) in referenceContent"
               :key="i"
               class="custom-tab"
-              :name="getTabName(content.filename ? content.filename : content.score)"
+              :name="
+                getTabName(
+                  content.filename ? content.filename : content.score,
+                  content.score
+                )
+              "
               :label="content.filename ? content.filename : content.score"
             />
           </q-tabs>
@@ -182,12 +196,18 @@
           <q-tab-panels
             v-model="existingAbstract"
             class="bg-transparent q-px-none q-py-none"
+            animated
           >
             <q-tab-panel
               v-for="(content, i) in referenceContent"
               :key="i"
               class="q-px-none q-py-none"
-              :name="getTabName(content.filename ? content.filename : content.score)"
+              :name="
+                getTabName(
+                  content.filename ? content.filename : content.score,
+                  content.score
+                )
+              "
             >
               <p>
                 {{ content.text }}
@@ -202,13 +222,13 @@
           <q-btn
             no-caps
             outline
-            label="Download Full Document"
+            :label="$t('Extra.downloadBtn')"
             color="primary"
             v-close-popup
             v-if="existingAbstract"
             @click="downloadProjectFile(existingAbstract)"
           />
-          <q-btn no-caps label="Close" color="primary" v-close-popup />
+          <q-btn no-caps :label="$t('Extra.closeBtn')" color="primary" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -221,6 +241,7 @@ import { useServiceStore } from 'src/stores/service';
 import { useQuasar } from 'quasar';
 import { useProjectStore } from 'src/stores/project';
 import { api, apiFetch } from 'src/boot/axios';
+import { guidGenerator } from 'src/utils';
 
 const $q = useQuasar();
 const store = useServiceStore();
@@ -236,8 +257,10 @@ const referenceContent = ref([]);
 const isLoading = ref(false);
 const existingAbstract = ref(null);
 
-const getTabName = (tabName) => {
-  return tabName.toString().split(' ').join('_');
+const getTabName = (tabName, index) => {
+  console.log(index);
+  console.log(`${tabName.toString().split(' ').join('_')}${index}`);
+  return `${tabName.toString().split(' ').join('_')}${index}`;
 };
 const scrollToBottom = async () => {
   await nextTick();
@@ -285,6 +308,11 @@ const getQuestionReference = async (id) => {
     isLoading.value = true;
     const { data } = await api.get(`/service/query/reference/${id}`);
     referenceContent.value = data;
+    console.log(data);
+    existingAbstract.value = getTabName(
+      data[0].filename ? data[0].filename : data[0].score,
+      data[0].score
+    );
   } catch (error) {
     console.log(error);
   } finally {
@@ -293,7 +321,6 @@ const getQuestionReference = async (id) => {
 };
 
 const downloadProjectFile = async (file) => {
-
   try {
     error.value = null;
     loading.value = true;
@@ -308,8 +335,7 @@ const downloadProjectFile = async (file) => {
   } finally {
     loading.value = false;
   }
-
-}
+};
 </script>
 
 <style lang="scss">
