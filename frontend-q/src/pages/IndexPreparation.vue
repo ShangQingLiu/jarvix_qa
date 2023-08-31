@@ -82,6 +82,7 @@
             :name="file.id"
             :label="file.name"
             :key="i"
+            v-bind:disable="tabStatus"
           />
         </q-tabs>
       </div>
@@ -129,7 +130,7 @@
                 </div>
                 <div class="col-12 col-md-9">
                   <div class="q-px-md border-left">
-                    <Chat />
+                    <Chat @disabled="filesStatus" />
                   </div>
                 </div>
               </div>
@@ -176,7 +177,11 @@ const sessions = computed(() => serviceStore.sessions);
 const showExistingSessions = computed(() => serviceStore.showExistingSessions);
 const existingChat = computed(() => serviceStore.chatHistory);
 const projectFiles = computed(() => store.projectFiles);
+const tabStatus = ref(false);
 
+const filesStatus = (status) => {
+  tabStatus.value = status
+}
 const toggleShow = () => {
   serviceStore.showExistingSessions = !serviceStore.showExistingSessions;
 };

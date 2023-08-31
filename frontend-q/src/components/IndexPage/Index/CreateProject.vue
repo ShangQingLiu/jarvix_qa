@@ -51,6 +51,8 @@
 <script setup>
 import { ref } from 'vue';
 import { useProjectStore } from 'src/stores/project';
+import { useServiceStore } from 'src/stores/service';
+const serviceStore = useServiceStore();
 const store = useProjectStore();
 const projectName = ref('');
 const description = ref('');
@@ -66,6 +68,7 @@ const createProject = async () => {
     });
     console.log(res);
     if (res) {
+      serviceStore.chatHistory = []
       store.selectedProject = projectName.value;
       projectName.value = '';
       description.value = '';

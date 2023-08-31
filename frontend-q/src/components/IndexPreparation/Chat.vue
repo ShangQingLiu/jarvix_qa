@@ -256,6 +256,7 @@ const abstractModal = ref(false);
 const referenceContent = ref([]);
 const isLoading = ref(false);
 const existingAbstract = ref(null);
+const emit = defineEmits(['disabled'])
 
 const getTabName = (tabName, index) => {
   console.log(index);
@@ -275,6 +276,7 @@ const submitQuery = async () => {
     try {
       error.value = null;
       loading.value = true;
+      emit('disabled', true);
       await store.submitQuery(
         {
           query: queryText.value,
@@ -293,6 +295,8 @@ const submitQuery = async () => {
     } finally {
       loading.value = false;
       queryText.value = '';
+      emit('disabled', false);
+
     }
   } else {
     $q.notify({
