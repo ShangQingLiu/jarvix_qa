@@ -226,7 +226,7 @@
             color="primary"
             v-close-popup
             v-if="existingAbstract"
-            @click="downloadProjectFile(existingAbstract)"
+            @click="downloadModaledFile(existingAbstract)"
           />
           <q-btn no-caps :label="$t('Extra.closeBtn')" color="primary" v-close-popup />
         </q-card-actions>
@@ -260,8 +260,8 @@ const emit = defineEmits(['disabled'])
 
 const getTabName = (tabName, index) => {
   console.log(index);
-  console.log(`${tabName.toString().split(' ').join('_')}${index}`);
-  return `${tabName.toString().split(' ').join('_')}${index}`;
+  console.log(`${tabName.toString().split(' ').join('_')}_${index}`);
+  return `${tabName.toString().split(' ').join('_')}_${index}`;
 };
 const scrollToBottom = async () => {
   await nextTick();
@@ -323,7 +323,13 @@ const getQuestionReference = async (id) => {
     isLoading.value = false;
   }
 };
-
+const downloadModaledFile = async(file) => {
+  let mappedArray = file.split('_');
+  mappedArray.pop();
+  const filename = mappedArray.join('_');
+  console.log(filename);
+  await downloadProjectFile(filename);
+}
 const downloadProjectFile = async (file) => {
   try {
     error.value = null;

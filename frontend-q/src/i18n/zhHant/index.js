@@ -84,68 +84,69 @@ export default {
       },
       LoginPage: {
         breadcrumbs: {
-          label: "用戶驗證和用戶管理",
-          label2: "登錄",
+            label: "使用者驗證與使用者管理",
+            label2: "登入",
         },
         Login: {
-          title: "登錄",
-          form: {
-            username: "用戶名",
-            password: "密碼",
-            btn: "登錄",
-            dontAccountText: "還沒有帳戶？",
-            signupBtn: "註冊",
-            forgotPasswordBtn: "忘記密碼",
-            dontRememberText: "如果忘記密碼",
-          },
+            title: "登入",
+            form: {
+                username: "使用者名稱",
+                password: "密碼",
+                btn: "登入",
+                dontAccountText: "是第一次使用 Bauma？/還沒有帳號？",
+                signupBtn: "註冊",
+                forgotPasswordBtn: "忘記密碼",
+                dontRememberText: "如果不記得密碼",
+            },
         },
-      },
-      NewPasswordPage: {
+    },
+    NewPasswordPage: {
         breadcrumbs: {
-          label: "用戶驗證和用戶管理",
-          label2: "設置新密碼",
+            label: "使用者驗證與使用者管理",
+            label2: "設置新密碼",
         },
         NewPassword: {
-          title: "新密碼",
-          form: {
-            password: "密碼",
-            confirmPassword: "確認密碼",
-            btn: "設置新密碼",
-          },
+            title: "新密碼",
+            form: {
+                password: "密碼",
+                confirmPassword: "確認密碼",
+                btn: "設置新密碼",
+            },
         },
-      },
-      OtpPage: {
+    },
+    OtpPage: {
         breadcrumbs: {
-          label: "用戶驗證和用戶管理",
-          label2: "重置密碼",
+            label: "使用者驗證與使用者管理",
+            label2: "重設密碼",
         },
         Otp: {
-          title: "驗證碼",
-          subtitle: "我們已將驗證碼發送至",
-          form: {
-            btn: "繼續",
-            didntreceive: "未收到驗證碼",
-            resendBtn: "點擊重新發送",
-          },
+            title: "驗證碼",
+            subtitle: "我們已將驗證碼發送至",
+            form: {
+                btn: "繼續",
+                didntreceive: "未收到驗證碼",
+                resendBtn: "點擊重新發送",
+            },
         },
-      },
-      RegisterPage: {
+    },
+    RegisterPage: {
         breadcrumbs: {
-          label: "用戶認證和用戶管理",
-          label2: "註冊",
+            label: "使用者驗證與使用者管理",
+            label2: "註冊",
         },
         Register: {
-          title: "註冊",
-          form: {
-            username: "用戶名稱",
-            email: "電子郵件",
-            password: "密碼",
-            btn: "註冊",
-            alreadyBtn: "已經有帳戶？",
-            loginBtn: "登入",
-          },
+            title: "註冊",
+            form: {
+                username: "使用者名稱",
+                email: "電子郵件",
+                password: "密碼",
+                btn: "註冊",
+                alreadyBtn: "已經有帳號？",
+                loginBtn: "登入",
+            },
         },
-      },
+    },
+
       ViewUserPage: {
         title: "用戶專案",
         noFound: "找不到用戶專案",

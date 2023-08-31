@@ -84,68 +84,69 @@ export default {
       },
       LoginPage: {
         breadcrumbs: {
-          label: "用户身份验证和用户管理",
-          label2: "登录",
+            label: "用户认证和用户管理",
+            label2: "登录",
         },
         Login: {
-          title: "登录",
-          form: {
-            username: "用户名",
-            password: "密码",
-            btn: "登录",
-            dontAccountText: "还没有账号？",
-            signupBtn: "注册",
-            forgotPasswordBtn: "忘记密码",
-            dontRememberText: "如果不记得密码",
-          },
+            title: "登录",
+            form: {
+                username: "用户名",
+                password: "密码",
+                btn: "登录",
+                dontAccountText: "是Bauma的新用户？/还没有账户？",
+                signupBtn: "注册",
+                forgotPasswordBtn: "忘记密码",
+                dontRememberText: "如果忘记密码",
+            },
         },
-      },
-      NewPasswordPage: {
+    },
+    NewPasswordPage: {
         breadcrumbs: {
-          label: "用户身份验证和用户管理",
-          label2: "设置新密码",
+            label: "用户认证和用户管理",
+            label2: "设置新密码",
         },
         NewPassword: {
-          title: "新密码",
-          form: {
-            password: "密码",
-            confirmPassword: "确认密码",
-            btn: "设置新密码",
-          },
+            title: "新密码",
+            form: {
+                password: "密码",
+                confirmPassword: "确认密码",
+                btn: "设置新密码",
+            },
         },
-      },
-      OtpPage: {
+    },
+    OtpPage: {
         breadcrumbs: {
-          label: "用户身份验证和用户管理",
-          label2: "密码重置",
+            label: "用户认证和用户管理",
+            label2: "重置密码",
         },
         Otp: {
-          title: "Otp代码",
-          subtitle: "我们已将代码发送到",
-          form: {
-            btn: "继续",
-            didntreceive: "没有收到代码",
-            resendBtn: "点击重新发送",
-          },
+            title: "OTP验证码",
+            subtitle: "我们已将验证码发送至",
+            form: {
+                btn: "继续",
+                didntreceive: "没有收到验证码",
+                resendBtn: "点击重新发送",
+            },
         },
-      },
-      RegisterPage: {
+    },
+    RegisterPage: {
         breadcrumbs: {
-          label: "用户认证和用户管理",
-          label2: "注册",
+            label: "用户认证和用户管理",
+            label2: "注册",
         },
         Register: {
-          title: "注册",
-          form: {
-            username: "用户名",
-            email: "电子邮件",
-            password: "密码",
-            btn: "注册",
-            alreadyBtn: "已经有一个账号?",
-            loginBtn: "登录",
-          },
+            title: "注册",
+            form: {
+                username: "用户名",
+                email: "电子邮箱",
+                password: "密码",
+                btn: "注册",
+                alreadyBtn: "已经有账户了？",
+                loginBtn: "登录",
+            },
         },
-      },
+    },
+
       ViewUserPage: {
         title: "用户项目",
         noFound: "未找到用户项目",
