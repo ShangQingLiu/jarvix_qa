@@ -97,6 +97,7 @@ export default {
                 signupBtn: "注册",
                 forgotPasswordBtn: "忘记密码",
                 dontRememberText: "如果忘记密码",
+                loginError: "用户名或密码无效，请重试。"
             },
         },
     },
@@ -196,7 +197,11 @@ export default {
           question: "问题",
           expect_answer: "预期答案",
           query_answer: "查询答案",
-          is_correct: "正确(True/False)",
+          is_correct: "正确（是/否）",
+          true: '是',
+          false: '否',
+          True: '是',
+          False: '否'
         },
       },
     },

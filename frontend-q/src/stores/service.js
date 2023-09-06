@@ -27,9 +27,12 @@ export const useServiceStore = defineStore("ServiceStore", {
             }
 
             const index = this.chatHistory.length;
+            const lastQuestionId = this.chatHistory[this.chatHistory.length - 1].question_id;
+            console.log('[QUESTION_ID]', lastQuestionId);
             this.chatHistory.push({
               query: form.query,
-              response: '...'
+              response: '...',
+              question_id: lastQuestionId + 1
             });
             const record = this.chatHistory[index];
             await scrollToBottom?.()

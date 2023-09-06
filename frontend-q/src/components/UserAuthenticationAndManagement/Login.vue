@@ -7,7 +7,7 @@
       <q-spinner-oval color="primary" size="3rem" />
     </div>
     <div v-if="error" class="q-py-sm flex">
-      <div class="text-body1 text-negative">! {{ error }}</div>
+      <div class="text-body1 text-negative">! {{ $t('pages.UserAuthenticationAndManagement.LoginPage.Login.form.loginError') }}</div>
     </div>
     <q-form @submit.prevent="loginUser">
       <div class="row">
@@ -134,7 +134,7 @@ const loginUser = async () => {
     }
   } catch (err) {
     console.log(err);
-    error.value = 'Invalid user name or password, please try again.';
+    error.value = 'loginError';
     // console.log(err.response.statusText);
   } finally {
     loading.value = false;

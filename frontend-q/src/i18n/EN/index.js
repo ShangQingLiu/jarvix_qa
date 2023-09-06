@@ -104,6 +104,7 @@ export default {
             signupBtn: "Sign Up",
             forgotPasswordBtn: "Forget Password",
             dontRememberText: "If don’t remember password",
+            loginError: 'Invalid user name or password, please try again.'
           },
         },
       },
@@ -204,6 +205,10 @@ export default {
           expect_answer: "Expected Answer",
           query_answer: "Query Answer",
           is_correct: "Correct(True/False)",
+          true: 'true',
+          false: 'false',
+          True: 'true',
+          False: 'false'
         },
       },
     },

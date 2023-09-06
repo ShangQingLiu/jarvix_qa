@@ -116,7 +116,7 @@
                     {{ props.row.query_answer.split(',')[0] }}
                   </q-td>
                   <q-td key="is_correct" :props="props">
-                    {{ props.row.is_correct }}
+                    {{ $t(`pages.IndexPreparation.ValidationForum.labels.${props.row.is_correct}`) }}
                   </q-td>
                 </q-tr>
               </template>

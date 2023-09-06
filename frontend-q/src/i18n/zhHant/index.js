@@ -97,6 +97,7 @@ export default {
                 signupBtn: "註冊",
                 forgotPasswordBtn: "忘記密碼",
                 dontRememberText: "如果不記得密碼",
+                loginError: '無效的使用者名稱或密碼，請重試。'
             },
         },
     },
@@ -196,7 +197,11 @@ export default {
           question: "問題",
           expect_answer: "預期答案",
           query_answer: "查詢答案",
-          is_correct: "正確（是/否）",
+          is_correct: "正確 (是/否)",
+          true: '是',
+          false: '否',
+          True: '是',
+          False: '否'
         },
       },
     },
